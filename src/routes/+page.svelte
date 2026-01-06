@@ -93,9 +93,25 @@
       const urlParams = new URLSearchParams(window.location.search);
       const taskFromUrl = urlParams.get("task");
       if (taskFromUrl) {
-        taskDescription = decodeURIComponent(taskFromUrl);
-        // Components are now guaranteed to be initialized
-        handleTaskSubmit({ detail: { taskDescription } });
+        try {
+          taskDescription = decodeURIComponent(taskFromUrl);
+
+          // Security: Validate and sanitize URL parameter
+          // Enforce maximum length (500 chars)
+          if (taskDescription.length > 500) {
+            taskDescription = taskDescription.substring(0, 500);
+            console.warn("Task from URL exceeded 500 characters, truncated");
+          }
+
+          // Security: Strip control characters and non-printable characters
+          taskDescription = taskDescription.replace(/[\x00-\x1F\x7F]/g, '');
+
+          // Components are now guaranteed to be initialized
+          handleTaskSubmit({ detail: { taskDescription } });
+        } catch (err) {
+          console.error("Failed to process task from URL:", err);
+          // Don't auto-submit if URL parameter is malformed
+        }
       }
     } catch (err) {
       console.error("❌ Failed to initialize data pipeline:", err);

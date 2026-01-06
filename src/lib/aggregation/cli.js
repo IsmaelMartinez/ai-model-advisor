@@ -40,9 +40,6 @@ function parseArgs() {
       case '-h':
         options.help = true;
         break;
-      case '--token':
-        process.env.HF_TOKEN = args[++i];
-        break;
       default:
         if (arg.startsWith('--')) {
           console.warn(`Unknown option: ${arg}`);
@@ -64,11 +61,10 @@ Options:
   --dry-run              Run without saving changes
   --max-models N         Maximum models per category (default: 10)
   --no-validation        Skip accuracy validation
-  --token TOKEN          Hugging Face API token
   --help, -h             Show this help message
 
 Environment Variables:
-  HF_TOKEN              Hugging Face API token (recommended)
+  HF_TOKEN              Hugging Face API token (optional, for higher rate limits)
 
 Examples:
   # Dry run to preview changes
