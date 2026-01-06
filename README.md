@@ -28,13 +28,16 @@ npm test        # Run tests
 - Falls back to keyword matching if embeddings aren't available
 - PWA - installable and works offline after first visit
 
-## Environmental scoring
+## Model tiers and environmental scoring
 
-| Score | Size | Typical use |
-|-------|------|-------------|
-| Low | ≤500MB | Edge/mobile/browser |
-| Medium | ≤4GB | Cloud, quantized models |
-| High | >4GB | Dedicated GPU |
+Models are organized into 4 tiers by size and capability:
+
+| Tier | Size | Environmental Score | Typical use |
+|------|------|---------------------|-------------|
+| Lightweight | ≤500MB | Low | Edge/mobile/browser |
+| Standard | ≤4GB | Medium | Cloud, quantized models |
+| Advanced | ≤20GB | High | Dedicated GPU, full LLMs |
+| Extra Large | >20GB | High | High-end GPU, 13B+ models |
 
 ## Deployment
 
