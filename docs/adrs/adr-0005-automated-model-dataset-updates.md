@@ -40,7 +40,7 @@ GitHub Actions (2 AM UTC) → ModelAggregator.js → Hugging Face API → PR →
 1. **Scheduled Trigger**: GitHub Actions workflow runs daily at 2 AM UTC
 2. **Data Source**: Hugging Face API (free tier, ~160 calls/day)
 3. **Processing**: Categorize by task, tier by size, calculate environmental scores
-4. **PR Workflow**: Automated PR creation with human review before merge
+4. **PR Workflow**: Automated PR creation with auto-merge when tests pass
 5. **Quality Checks**: Validation before merge, tests pass requirement
 
 ### Key Files
@@ -73,6 +73,15 @@ GitHub Actions (2 AM UTC) → ModelAggregator.js → Hugging Face API → PR →
 1. **API Issues**: Graceful failure with notification; manual trigger available
 2. **Review Load**: PRs only created when changes detected; most days have few/no changes
 3. **Accuracy**: Planned Phase 2 will add Gemini-based validation and real metric extraction
+
+### Update (2026-01-06): Auto-merge Implementation
+
+**Rationale**: Historical data shows manual review adds latency without catching issues that automated tests would miss. Quality is now enforced through:
+- Test suite validation (data structure, build success)
+- CI/CD pipeline gates
+- Automatic rollback capability via Git
+
+**Override**: This supersedes the original "human review" requirement in favor of test-based quality gates.
 
 ## Phases
 
