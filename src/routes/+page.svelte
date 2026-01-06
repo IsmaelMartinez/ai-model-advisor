@@ -502,6 +502,8 @@
           <span>Data from Hugging Face Hub</span>
           <span class="dot">•</span>
           <span>Updated {new Date(modelsData.lastUpdated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          <span class="dot">•</span>
+          <a href="https://github.com/ismaelmartinez/model-selector" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub">GitHub</a>
         </div>
       </div>
     </footer>
@@ -861,6 +863,22 @@
 
   .dot {
     opacity: 0.5;
+  }
+
+  .footer-meta a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-meta a:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+  }
+
+  .footer-meta a:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
   }
 
   /* Responsive */
