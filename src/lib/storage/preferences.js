@@ -12,9 +12,35 @@ const STORAGE_KEY = 'modelSelector';
 function getPreferences() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
+    if (!stored) return {};
+
+    // Security: Protect against JSON bomb attacks
+    // Limit stored data to 10KB to prevent excessive memory usage
+    if (stored.length > 10000) {
+      console.error('localStorage data too large (>10KB), resetting to defaults');
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {}
+      return {};
+    }
+
+    const parsed = JSON.parse(stored);
+
+    // Security: Validate schema - must be a plain object
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      console.error('Invalid preferences format, expected object');
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {}
+      return {};
+    }
+
+    return parsed;
   } catch (error) {
     console.warn('Failed to read from localStorage:', error);
+    try {
+      localStorage.removeItem(STORAGE_KEY); // Clear corrupted data
+    } catch {}
     return {};
   }
 }
