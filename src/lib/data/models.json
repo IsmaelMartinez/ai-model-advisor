@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-06",
+  "lastUpdated": "2026-01-07",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -2766,6 +2766,23 @@
               "PyTorch"
             ],
             "lastUpdated": "2025-12-10"
+          },
+          {
+            "id": "chengsenwang_chattime-1-7b-chat",
+            "name": "ChatTime 1 7B Chat",
+            "huggingFaceId": "ChengsenWang/ChatTime-1-7B-Chat",
+            "description": "ChatTime 1 7B Chat model for time series forecasting",
+            "sizeMB": 13009,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2024-12-17T02:36:20.000Z"
           }
         ]
       },
