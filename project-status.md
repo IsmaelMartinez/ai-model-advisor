@@ -1,6 +1,6 @@
 # AI Model Advisor - Current Project Status
 
-**Date**: December 18, 2025
+**Date**: January 8, 2026
 **Status**: MVP Complete & Deployed ✅ + PWA Support ✅ + Mobile Ready ✅
 **Live URL**: https://ismaelmartinez.github.io/ai-model-advisor
 **Classifier**: MiniLM embeddings (23MB, 98.3% accuracy)
@@ -12,10 +12,9 @@ All MVP tasks have been completed successfully. See [ADR documentation](docs/adr
 ## 🎯 MVP Accomplishments
 
 ### ✅ Core Features Working
-- **Task Classification**: MiniLM sentence embeddings with semantic fallback
-  - **Embedding Mode** (default): Similarity-based matching, ~0.3s, 98.3% accuracy
+- **Task Classification**: MiniLM sentence embeddings with voting mode (5 votes)
+  - Similarity-based matching, ~2ms, 98.3% accuracy
   - **Model Size**: ~23MB (vs previous 700MB), mobile-friendly
-- **Model Accuracy Filtering**: User-controlled threshold (50-95%) with localStorage persistence
 - **Model Recommendations**: 3-tiered system (Lightweight/Standard/Advanced)
 - **Environmental Focus**: "Smaller is better" algorithm prioritizing efficient models
 - **Accessibility**: Full keyboard navigation, ARIA labels, screen reader support
@@ -48,14 +47,11 @@ src/
 │   ├── classification/
 │   │   ├── EmbeddingTaskClassifier.js ✅ (MiniLM 23MB, 98.3% accuracy)
 │   │   └── BrowserTaskClassifier.js ✅ (Semantic fallback)
-│   ├── recommendation/
-│   │   └── ModelSelector.js ✅ ("Smaller is better" + accuracy filtering)
-│   └── storage/
-│       └── preferences.js ✅ (localStorage for mode & filters)
+│   └── recommendation/
+│       └── ModelSelector.js ✅ ("Smaller is better" ranking)
 ├── components/
 │   ├── TaskInput.svelte ✅ (Accessible input)
-│   ├── AccuracyFilter.svelte ✅ (Accuracy threshold slider)
-│   └── RecommendationDisplay.svelte ✅ (Tiered display)
+│   └── RecommendationDisplay.svelte ✅ (Tiered display with scroll feedback)
 ├── static/
 │   ├── sw.js ✅ (Service worker for PWA)
 │   ├── manifest.webmanifest ✅ (PWA manifest)
@@ -83,7 +79,7 @@ src/
   - PWA installable
 
 ### Test Status (All Passing ✅)
-- **Tests (CI/CD)**: All passing (acceptance + integration + accuracy filter + code assistant, ~2s)
+- **Tests (CI/CD)**: All passing (acceptance + integration + model selector + code assistant, ~2s)
 - **Note**: Classification uses MiniLM embedding model (23MB, 98.3% accuracy)
 
 ### Classification Accuracy
@@ -117,7 +113,7 @@ src/
 ```
 ✅ MVP Acceptance Tests: passing (100%)
 ✅ Integration Tests: passing (100%)
-✅ Accuracy Filter Tests: passing (100%)
+✅ Model Selector Tests: passing (100%)
 ✅ Code Assistant Tests: passing (100%)
 ```
 
@@ -178,9 +174,8 @@ git status         # ✅ Clean working tree
 3. **Performance Optimization**: Further reduce inference time
 
 #### Medium Priority
-1. **Advanced Filters**: Allow users to filter by model size, task type, etc.
-2. **Usage Analytics**: Basic privacy-friendly usage tracking
-3. **Multi-SLM Options**: Let users choose speed vs accuracy
+1. **Usage Analytics**: Basic privacy-friendly usage tracking
+2. **Model Comparison**: Side-by-side model feature comparison
 
 #### Low Priority
 1. **Model Performance Metrics**: Add benchmarking data where available

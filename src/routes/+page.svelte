@@ -1,8 +1,6 @@
 <script>
   import TaskInput from "../components/TaskInput.svelte";
   import RecommendationDisplay from "../components/RecommendationDisplay.svelte";
-  import AccuracyFilter from "../components/AccuracyFilter.svelte";
-  import ClassificationMode from "../components/ClassificationMode.svelte";
   import ClarificationFlow from "../components/ClarificationFlow.svelte";
   import { EmbeddingTaskClassifier } from "../lib/classification/EmbeddingTaskClassifier.js";
   import { BrowserTaskClassifier } from "../lib/classification/BrowserTaskClassifier.js";
@@ -31,10 +29,9 @@
   let taskCategory = "";
   let taskSubcategory = "";
   let error = null;
-  let accuracyThreshold = 0;
-  let totalHidden = 0;
-  let classificationMode = "fast";
   let ensembleInfo = null;
+  let showResultsHighlight = false;
+  let recommendationsSection;
   
   // Clarification flow state
   let showClarification = false;
@@ -264,10 +261,8 @@
           }
 
           if (!usingFallback && classifierReady) {
-            // Use embedding classifier (98.3% accuracy)
-            // Fast mode: top-1 match, Ensemble mode: top-5 with voting
-            const topK = classificationMode === 'fast' ? 1 : 5;
-            classificationResult = await taskClassifier.classify(description, { topK });
+            // Use embedding classifier (98.3% accuracy) with voting (5 votes)
+            classificationResult = await taskClassifier.classify(description, { topK: 5 });
             
             // Set ensemble/voting info for display
             // Shows how many of the top-K examples agree on the category
@@ -331,7 +326,6 @@
       const groupedModels = modelSelector.getTaskModelsGroupedByTier(
         classification.category,
         classification.subcategory,
-        accuracyThreshold,
       );
 
       const filteredRecommendations = [
@@ -340,13 +334,21 @@
         ...groupedModels.advanced.models,
       ];
 
-      totalHidden = groupedModels.totalHidden;
-
       if (filteredRecommendations.length === 0) {
         throw new Error(`No models found for ${classification.category}. Try a different task description.`);
       }
 
       recommendations = filteredRecommendations;
+
+      // Scroll to results and show highlight animation
+      showResultsHighlight = true;
+      setTimeout(() => {
+        if (recommendationsSection) {
+          recommendationsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Remove highlight after animation completes
+        setTimeout(() => { showResultsHighlight = false; }, 1500);
+      }, 100);
 
       const currentUrl = new URL(window.location);
       currentUrl.searchParams.set("task", encodeURIComponent(description));
@@ -356,27 +358,6 @@
       error = err.message || "An error occurred. Please try again.";
     } finally {
       isLoading = false;
-    }
-  }
-
-  function handleAccuracyFilterChange(newThreshold) {
-    accuracyThreshold = newThreshold;
-
-    if (taskCategory && taskSubcategory && modelSelector) {
-      const groupedModels = modelSelector.getTaskModelsGroupedByTier(
-        taskCategory,
-        taskSubcategory,
-        accuracyThreshold,
-      );
-
-      const filteredRecommendations = [
-        ...groupedModels.lightweight.models,
-        ...groupedModels.standard.models,
-        ...groupedModels.advanced.models,
-      ];
-
-      totalHidden = groupedModels.totalHidden;
-      recommendations = filteredRecommendations;
     }
   }
 
@@ -487,26 +468,15 @@
       <TaskInput bind:taskDescription {isLoading} on:submit={handleTaskSubmit} />
     {/if}
 
-    <div class="settings-row">
-      <ClassificationMode
-        bind:mode={classificationMode}
-        onModeChange={(newMode) => { classificationMode = newMode; }}
-      />
-      <AccuracyFilter
-        threshold={accuracyThreshold}
-        onChange={handleAccuracyFilterChange}
+    <div bind:this={recommendationsSection} class:results-highlight={showResultsHighlight}>
+      <RecommendationDisplay
+        {recommendations}
+        {taskCategory}
+        {taskSubcategory}
+        {isLoading}
+        {ensembleInfo}
       />
     </div>
-
-    <RecommendationDisplay
-      {recommendations}
-      {taskCategory}
-      {taskSubcategory}
-      {isLoading}
-      {totalHidden}
-      {accuracyThreshold}
-      {ensembleInfo}
-    />
 
     <footer class="app-footer">
       <div class="footer-content">
@@ -828,17 +798,20 @@
     opacity: 1;
   }
 
-  /* Settings Row */
-  .settings-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 2rem;
+  /* Results highlight animation */
+  .results-highlight {
+    animation: highlightPulse 1.5s ease-out;
   }
 
-  @media (max-width: 768px) {
-    .settings-row {
-      grid-template-columns: 1fr;
+  @keyframes highlightPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 20px 10px rgba(76, 175, 80, 0.2);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
     }
   }
 

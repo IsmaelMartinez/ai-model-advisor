@@ -26,7 +26,7 @@ Models are ranked by efficiency (smaller first):
 | Standard | ≤4GB | Cloud, consumer GPU |
 | Advanced | ≤20GB | Dedicated GPU |
 
-The ⭐ Top Pick is the most efficient option.
+Models are ranked by efficiency — smaller, greener models appear first.
 
 ### Environmental Impact
 

@@ -106,7 +106,7 @@ The agreed priority order:
 
 - **Turn recommendations into a “decision workflow”**:
   - ask for constraints (deployment target, min accuracy, latency, privacy)
-  - explain why the top pick is top (eco/size/accuracy tradeoffs)
+  - explain why the first recommendation ranks highest (eco/size/accuracy tradeoffs)
   - provide “what if” comparisons
 - **Improve first-run messaging** (download size, caching, device requirements) and add a no-download mode.
 - **Add shareability/reproducibility**: encode inputs + constraints into the URL, and show a compact “recommendation report” users can export.
@@ -218,6 +218,9 @@ The agreed priority order:
 - **SRE**: offline/caching strategy + SLO instrumentation and regression tracking
 - **Security**: threat model + dependency/supply chain controls + CSP guidance
 - **PM**: UX/content alignment, onboarding and trust signals, constraint-based recommendation flow
+
+
+
 
 
 

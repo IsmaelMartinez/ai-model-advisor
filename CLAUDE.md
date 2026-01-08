@@ -50,8 +50,8 @@ npm run update-models:dry-run  # Preview updates
 
 ### Classification Pipeline
 
-**Embedding Mode** (default, ~0.3s):
-1. **MiniLM Embeddings** (Primary) → Sentence similarity matching (98.3% accuracy)
+**Embedding Mode with Voting** (default, ~2ms):
+1. **MiniLM Embeddings** (Primary) → Sentence similarity with 5-vote consensus (98.3% accuracy)
 2. **Semantic** (Fallback 1) → N-gram matching with keywords
 3. **Keyword** (Fallback 2) → Direct lookup
 4. **Default** (Final) → Returns natural_language_processing

@@ -34,13 +34,7 @@
   
   /** @type {boolean} */
   export let isLoading = false;
-  
-  /** @type {number} */
-  export let totalHidden = 0;
-  
-  /** @type {number} */
-  export let accuracyThreshold = 0;
-  
+
   /** @type {EnsembleInfo|null} */
   export let ensembleInfo = null;
   
@@ -147,12 +141,6 @@
           </div>
         {/if}
 
-        {#if totalHidden > 0}
-          <div class="meta-badge filtered">
-            <span class="meta-icon">🔍</span>
-            <span>{totalHidden} hidden by {accuracyThreshold}% filter</span>
-          </div>
-        {/if}
       </div>
     </div>
 
@@ -165,17 +153,10 @@
       {#each recommendations as model, index}
         {@const envBadge = getEnvironmentalBadge(model.environmentalScore)}
         {@const tierInfo = getTierInfo(model.tier)}
-        <article 
-          class="model-card" 
-          class:top-pick={index === 0}
+        <article
+          class="model-card"
           style="animation-delay: {index * 50}ms"
         >
-          {#if index === 0}
-            <div class="top-pick-ribbon">
-              <span>⭐ Top Pick</span>
-            </div>
-          {/if}
-
           <div class="card-header">
             <h3 class="model-name">{model.name}</h3>
             <div class="badges">
@@ -261,17 +242,10 @@
     <div class="empty-state">
       <div class="empty-icon">🔍</div>
       <h2>No models found</h2>
-      {#if accuracyThreshold > 0}
-        <p>No models meet your {accuracyThreshold}% accuracy threshold.</p>
-        <p class="empty-hint">
-          💡 Try lowering the accuracy filter to see more options.
-        </p>
-      {:else}
-        <p>We couldn't find models for this task type.</p>
-        <p class="empty-hint">
-          💡 Try describing your task differently.
-        </p>
-      {/if}
+      <p>We couldn't find models for this task type.</p>
+      <p class="empty-hint">
+        💡 Try describing your task differently.
+      </p>
     </div>
   {/if}
 </section>
@@ -382,11 +356,6 @@
     color: #a78bfa;
   }
 
-  .meta-badge.filtered {
-    background: rgba(59, 130, 246, 0.15);
-    color: #60a5fa;
-  }
-
   .efficiency-banner {
     display: flex;
     align-items: center;
@@ -438,25 +407,6 @@
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
   }
 
-  .model-card.top-pick {
-    border-color: rgba(16, 185, 129, 0.4);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 100%);
-  }
-
-  .top-pick-ribbon {
-    position: absolute;
-    top: -1px;
-    right: 1.5rem;
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    padding: 0.35rem 0.75rem 0.45rem;
-    border-radius: 0 0 8px 8px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
   .card-header {
     margin-bottom: 1rem;
   }
@@ -466,7 +416,6 @@
     font-size: 1.15rem;
     font-weight: 700;
     color: #e8f5e9;
-    padding-right: 4rem;
   }
 
   .badges {
