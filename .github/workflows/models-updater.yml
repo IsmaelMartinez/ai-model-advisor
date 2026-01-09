@@ -120,16 +120,18 @@ jobs:
           PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number')
 
           if [ -z "$PR_NUMBER" ]; then
-            echo "Error: Could not find PR number for branch $BRANCH_NAME"
-            exit 1
+            echo "Warning: Could not find PR number for branch $BRANCH_NAME"
+            exit 0
           fi
 
-          echo "Enabling auto-merge for PR #$PR_NUMBER"
+          echo "Attempting to enable auto-merge for PR #$PR_NUMBER"
 
-          # Enable auto-merge with squash strategy
-          gh pr merge "$PR_NUMBER" --auto --squash --delete-branch
-
-          echo "Auto-merge enabled. PR will merge automatically when tests pass."
+          # Try to enable auto-merge, but don't fail if not supported
+          if gh pr merge "$PR_NUMBER" --auto --squash --delete-branch 2>&1; then
+            echo "Auto-merge enabled. PR will merge automatically when tests pass."
+          else
+            echo "Auto-merge not available for this repository. PR created and ready for manual review."
+          fi
 
       - name: Cleanup old branches
         if: always()
