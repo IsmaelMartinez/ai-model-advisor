@@ -78,7 +78,7 @@ jobs:
       - name: Create Pull Request
         if: steps.changes.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || github.token }}
         run: |
           CURRENT_DATE=$(date +%Y-%m-%d)
           BRANCH_NAME="${{ steps.branch.outputs.branch_name }}"
@@ -112,7 +112,7 @@ jobs:
       - name: Enable auto-merge for PR
         if: steps.changes.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || github.token }}
         run: |
           BRANCH_NAME="${{ steps.branch.outputs.branch_name }}"
 
@@ -136,7 +136,7 @@ jobs:
       - name: Cleanup old branches
         if: always()
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || github.token }}
         run: |
           echo "Cleaning up branches older than 7 days..."
           CURRENT_EPOCH=$(date +%s)
