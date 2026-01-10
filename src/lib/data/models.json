@@ -2041,16 +2041,14 @@
             "lastUpdated": "2024-11-09T18:21:01.000Z"
           },
           {
-            "id": "openai_whisper-small",
-            "name": "Whisper Small",
-            "huggingFaceId": "openai/whisper-small",
-            "description": "Whisper Small model for automatic speech recognition",
-            "sizeMB": 25,
-            "accuracy": 0.72,
+            "id": "openai_whisper-base",
+            "name": "Whisper Base",
+            "huggingFaceId": "openai/whisper-base",
+            "description": "Whisper Base model for automatic speech recognition",
+            "sizeMB": 138,
+            "accuracy": 0.78,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
-              "mobile",
               "edge",
               "cloud",
               "server"
@@ -2059,7 +2057,7 @@
               "PyTorch",
               "TensorFlow"
             ],
-            "lastUpdated": "2025-10-12"
+            "lastUpdated": "2024-02-29T10:26:57.000Z"
           }
         ],
         "standard": [
