@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-09",
+  "lastUpdated": "2026-01-10",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -2041,14 +2041,16 @@
             "lastUpdated": "2024-11-09T18:21:01.000Z"
           },
           {
-            "id": "openai_whisper-base",
-            "name": "Whisper Base",
-            "huggingFaceId": "openai/whisper-base",
-            "description": "Whisper Base model for automatic speech recognition",
-            "sizeMB": 138,
-            "accuracy": 0.78,
+            "id": "openai_whisper-tiny",
+            "name": "Whisper Tiny",
+            "huggingFaceId": "openai/whisper-tiny",
+            "description": "Whisper Tiny model for automatic speech recognition",
+            "sizeMB": 72,
+            "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
+              "browser",
+              "mobile",
               "edge",
               "cloud",
               "server"
@@ -2057,7 +2059,7 @@
               "PyTorch",
               "TensorFlow"
             ],
-            "lastUpdated": "2024-02-29T10:26:57.000Z"
+            "lastUpdated": "2024-02-29T10:57:33.000Z"
           }
         ],
         "standard": [
