@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-09-29",
+  "lastUpdated": "2026-01-11",
   "taskTaxonomy": {
     "computer_vision": {
       "label": "Computer Vision",
@@ -15,13 +15,13 @@
         "object_detection": {
           "label": "Object Detection",
           "description": "Identifying and locating objects within images",
-          "keywords": ["detect objects", "bounding box", "yolo", "object recognition", "locate objects", "count objects", "count stars", "find objects", "identify objects", "spot objects", "objects in image", "things in photo", "count", "count walrus", "count animals", "from image", "from space", "in image", "satellite image", "aerial image", "space image", "image from space", "objects from image", "animals in image", "walrus", "animals from image"],
-          "examples": ["Traffic sign detection", "Face detection", "Security monitoring", "Count stars in NASA images", "Count walrus from satellite images"]
+          "keywords": ["detect objects", "bounding box", "yolo", "object recognition", "locate objects", "count objects", "count stars", "find objects", "identify objects", "spot objects", "objects in image", "things in photo", "count animals", "satellite image", "aerial image", "space image", "animals in image"],
+          "examples": ["Traffic sign detection", "Face detection", "Security monitoring", "Count stars in NASA images", "Count animals in satellite images"]
         },
         "semantic_segmentation": {
           "label": "Semantic Segmentation", 
           "description": "Pixel-level classification of image regions",
-          "keywords": ["segment image", "pixel classification", "region detection", "image segmentation"],
+          "keywords": ["segment image", "pixel classification", "region detection", "image segmentation", "mask generation", "pixel-wise labeling", "scene parsing", "instance segmentation", "label pixels"],
           "examples": ["Medical image segmentation", "Autonomous driving", "Satellite imagery analysis"]
         }
       }
@@ -51,7 +51,7 @@
         "named_entity_recognition": {
           "label": "Named Entity Recognition",
           "description": "Identifying and extracting entities from text",
-          "keywords": ["entity extraction", "ner", "named entities", "information extraction"],
+          "keywords": ["entity extraction", "ner", "named entities", "information extraction", "extract names", "find entities", "identify names", "parse entities", "extract locations", "extract organizations"],
           "examples": ["Extract person names", "Location identification", "Company name extraction"]
         },
         "code_assistant": {
@@ -87,7 +87,7 @@
           "label": "Speech Recognition",
           "description": "Converting speech to text",
           "keywords": ["speech to text", "asr", "voice recognition", "transcription", "dictation"],
-          "examples": ["Voice assistants", "Meeting transcription", "Podcast subtitles"]
+          "examples": ["Voice command recognition", "Meeting transcription", "Podcast subtitles"]
         },
         "text_to_speech": {
           "label": "Text to Speech",
@@ -104,7 +104,7 @@
         "forecasting": {
           "label": "Time Series Forecasting",
           "description": "Predicting future values based on historical data",
-          "keywords": ["forecast", "predict", "time series", "temporal prediction", "trend analysis"],
+          "keywords": ["forecast", "predict future", "predict values", "time series", "temporal prediction", "trend analysis", "projection", "future values", "historical data prediction"],
           "examples": ["Stock price prediction", "Weather forecasting", "Demand planning"]
         },
         "anomaly_detection": {
@@ -122,13 +122,13 @@
         "collaborative_filtering": {
           "label": "Collaborative Filtering",
           "description": "Recommendations based on user similarity",
-          "keywords": ["collaborative filtering", "user-based", "similar users", "recommendation"],
+          "keywords": ["collaborative filtering", "user-based recommendations", "similar users", "recommend based on users", "recommend products", "suggest products", "personalized recommendations"],
           "examples": ["Movie recommendations", "Product suggestions", "Music discovery"]
         },
         "content_based": {
           "label": "Content-Based Filtering",
           "description": "Recommendations based on item features",
-          "keywords": ["content based", "item features", "similarity", "feature matching"],
+          "keywords": ["content based", "item features", "similarity matching", "feature matching", "recommend similar", "similar products", "based on content", "recommend items", "suggest items"],
           "examples": ["News article recommendations", "Job matching", "Similar product suggestions"]
         }
       }
@@ -140,13 +140,13 @@
         "game_playing": {
           "label": "Game Playing",
           "description": "Learning to play games through trial and error",
-          "keywords": ["game", "agent", "policy", "q-learning", "strategy"],
+          "keywords": ["game ai", "play game", "game agent", "game policy", "q-learning", "game strategy", "learn to play", "video game bot"],
           "examples": ["Chess playing", "Video game AI", "Board game strategies"]
         },
         "robotics": {
           "label": "Robotics Control",
           "description": "Learning robot control policies",
-          "keywords": ["robot", "control", "manipulation", "navigation", "motor skills"],
+          "keywords": ["robot control", "robotic manipulation", "robot navigation", "motor control", "robot arm", "autonomous robot", "robot learning"],
           "examples": ["Robot arm control", "Autonomous navigation", "Grasping objects"]
         }
       }
@@ -164,7 +164,7 @@
         "feature_engineering": {
           "label": "Feature Engineering",
           "description": "Creating meaningful features from raw data",
-          "keywords": ["feature", "transform", "encode", "scale", "normalize"],
+          "keywords": ["feature extraction", "data transform", "encode categorical", "scale features", "normalize data", "feature selection", "create features", "data encoding"],
           "examples": ["Feature scaling", "Categorical encoding", "Feature selection"]
         }
       }
@@ -185,6 +185,6 @@
       "medium": 0.6,
       "low": 0.4
     },
-    "fallbackCategory": "data_preprocessing"
+    "fallbackCategory": "natural_language_processing"
   }
 }
