@@ -53,24 +53,24 @@ describe('Integration Tests - Real User Scenarios', () => {
 
     test('should handle text classification tasks', async () => {
       const taskDescription = 'classify customer support tickets';
-      
+
       const result = await taskClassifier.classify(taskDescription);
       const topPrediction = result.subcategoryPredictions[0] || result.predictions[0];
-      
+
       const classification = {
         category: topPrediction.category,
         subcategory: topPrediction.subcategory || 'text_classification'
       };
-      
+
       const models = modelSelector.selectModels(classification.category, classification.subcategory, 3);
-      
+
       expect(models.length).toBeGreaterThan(0);
-      
+
       // Should prioritize smaller models
       if (models.length > 1) {
         const lightweight = models.filter(m => m.tier === 'lightweight');
         const standard = models.filter(m => m.tier === 'standard');
-        
+
         // Lightweight models should come first if they exist
         if (lightweight.length > 0 && standard.length > 0) {
           const firstLightweight = models.findIndex(m => m.tier === 'lightweight');
@@ -78,6 +78,25 @@ describe('Integration Tests - Real User Scenarios', () => {
           expect(firstLightweight).toBeLessThan(firstStandard);
         }
       }
+    });
+
+    test('should classify chatbot FAQ tasks correctly', async () => {
+      const taskDescription = 'I want to create a chatbot that uses a FAQ to answer users questions';
+
+      const result = await taskClassifier.classify(taskDescription);
+      const topPrediction = result.subcategoryPredictions[0] || result.predictions[0];
+
+      // Should be classified as NLP, not computer vision
+      expect(topPrediction.category).toBe('natural_language_processing');
+      expect(['text_generation', 'text_classification']).toContain(topPrediction.subcategory);
+
+      const classification = {
+        category: topPrediction.category,
+        subcategory: topPrediction.subcategory || 'text_generation'
+      };
+
+      const models = modelSelector.selectModels(classification.category, classification.subcategory, 3);
+      expect(models.length).toBeGreaterThan(0);
     });
   });
 
