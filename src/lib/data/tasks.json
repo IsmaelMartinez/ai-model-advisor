@@ -45,8 +45,8 @@
         "text_generation": {
           "label": "Text Generation",
           "description": "Generating human-like text",
-          "keywords": ["generate text", "language model", "gpt", "text creation", "writing assistant"],
-          "examples": ["Content creation", "Chatbot responses", "Code generation"]
+          "keywords": ["generate text", "language model", "gpt", "text creation", "writing assistant", "chatbot", "faq chatbot", "conversational ai", "dialogue system", "customer service bot", "virtual assistant", "faq bot", "support bot", "user questions", "customer questions"],
+          "examples": ["Content creation", "Chatbot responses", "Article writing", "Create a chatbot that answers FAQ questions", "Build a virtual assistant for customer support", "Automated FAQ system", "Question answering from documents"]
         },
         "named_entity_recognition": {
           "label": "Named Entity Recognition",
@@ -71,7 +71,10 @@
             "Explain this function and write tests for it",
             "Suggest improvements to this Python module",
             "Analyze this codebase and suggest simplifications",
-            "Generate a function to parse JSON data"
+            "Generate a function to parse JSON data",
+            "I need help reviewing my javascript code",
+            "Can you help me review this python script",
+            "Help me refactor this code module"
           ]
         }
       }
