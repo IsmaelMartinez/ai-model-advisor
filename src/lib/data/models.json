@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-15",
+  "lastUpdated": "2026-01-23",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -319,6 +319,27 @@
             "lastUpdated": "2025-05-05T11:38:46.000Z"
           },
           {
+            "id": "ustc-community_dfine-large-coco",
+            "name": "Dfine Large Coco",
+            "huggingFaceId": "ustc-community/dfine-large-coco",
+            "description": "Dfine Large Coco model for object detection",
+            "sizeMB": 60,
+            "accuracy": 0.85,
+            "environmentalScore": 1,
+            "deploymentOptions": [
+              "browser",
+              "mobile",
+              "edge",
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2025-05-05T11:35:56.000Z"
+          },
+          {
             "id": "hustvl_yolos-small",
             "name": "Yolos Small",
             "huggingFaceId": "hustvl/yolos-small",
@@ -346,27 +367,6 @@
             "description": "Yolos Tiny model for object detection",
             "sizeMB": 8,
             "accuracy": 0.75,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "browser",
-              "mobile",
-              "edge",
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-10-12"
-          },
-          {
-            "id": "ustc-community_dfine-small-obj365",
-            "name": "Dfine Small Obj365",
-            "huggingFaceId": "ustc-community/dfine-small-obj365",
-            "description": "Dfine Small Obj365 model for object detection",
-            "sizeMB": 25,
-            "accuracy": 0.72,
             "environmentalScore": 1,
             "deploymentOptions": [
               "browser",
@@ -1524,11 +1524,11 @@
             "lastUpdated": "2025-07-26T03:49:23.000Z"
           },
           {
-            "id": "qwen_qwen3-coder-30b-a3b-instruct",
-            "name": "Qwen3 Coder 30B A3B Instruct",
-            "huggingFaceId": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
-            "description": "Qwen3 Coder 30B A3B Instruct model for text generation",
-            "sizeMB": 29118,
+            "id": "qwen_qwen3-14b-awq",
+            "name": "Qwen3 14B AWQ",
+            "huggingFaceId": "Qwen/Qwen3-14B-AWQ",
+            "description": "Qwen3 14B AWQ model for text generation",
+            "sizeMB": 28168,
             "accuracy": 0.75,
             "environmentalScore": 3,
             "deploymentOptions": [
@@ -1538,7 +1538,7 @@
               "PyTorch",
               "TensorFlow"
             ],
-            "lastUpdated": "2025-12-03T08:05:17.000Z"
+            "lastUpdated": "2025-05-21T06:21:57.000Z"
           }
         ]
       },
@@ -1941,11 +1941,11 @@
             "lastUpdated": "2025-07-26T03:49:23.000Z"
           },
           {
-            "id": "qwen_qwen3-coder-30b-a3b-instruct",
-            "name": "Qwen3 Coder 30B A3B Instruct",
-            "huggingFaceId": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
-            "description": "Qwen3 Coder 30B A3B Instruct model for text generation",
-            "sizeMB": 29118,
+            "id": "qwen_qwen3-14b-awq",
+            "name": "Qwen3 14B AWQ",
+            "huggingFaceId": "Qwen/Qwen3-14B-AWQ",
+            "description": "Qwen3 14B AWQ model for text generation",
+            "sizeMB": 28168,
             "accuracy": 0.75,
             "environmentalScore": 3,
             "deploymentOptions": [
@@ -1955,7 +1955,7 @@
               "PyTorch",
               "TensorFlow"
             ],
-            "lastUpdated": "2025-12-03T08:05:17.000Z"
+            "lastUpdated": "2025-05-21T06:21:57.000Z"
           }
         ]
       }
