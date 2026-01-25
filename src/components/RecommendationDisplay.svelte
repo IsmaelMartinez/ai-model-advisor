@@ -184,13 +184,6 @@
               </div>
             </div>
             <div class="stat">
-              <span class="stat-icon">📊</span>
-              <div class="stat-content">
-                <span class="stat-value">{model.accuracy ? (model.accuracy * 100).toFixed(0) + '%' : 'N/A'}</span>
-                <span class="stat-label">Accuracy</span>
-              </div>
-            </div>
-            <div class="stat">
               <span class="stat-icon">📅</span>
               <div class="stat-content">
                 <span class="stat-value">{formatDate(model.lastUpdated)}</span>

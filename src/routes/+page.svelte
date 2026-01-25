@@ -398,11 +398,6 @@
           <span class="stat-number">7</span>
           <span class="stat-label">Categories</span>
         </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-number">98.3%</span>
-          <span class="stat-label">Accuracy</span>
-        </div>
       </div>
     </header>
 

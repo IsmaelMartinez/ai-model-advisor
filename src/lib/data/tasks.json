@@ -172,8 +172,8 @@
   },
   "taskMappingRules": {
     "priorityOrder": [
+      "natural_language_processing",
       "computer_vision",
-      "natural_language_processing", 
       "speech_processing",
       "time_series",
       "recommendation_systems",
