@@ -1960,6 +1960,345 @@
             "lastUpdated": "2025-05-21T06:21:57.000Z"
           }
         ]
+      },
+      "embedding": {
+        "lightweight": [
+          {
+            "id": "sentence-transformers_all-MiniLM-L6-v2",
+            "name": "All-MiniLM-L6-v2",
+            "huggingFaceId": "sentence-transformers/all-MiniLM-L6-v2",
+            "description": "Fast and efficient sentence embedding model, great for semantic search",
+            "sizeMB": 23,
+            "accuracy": 0.82,
+            "environmentalScore": 1,
+            "deploymentOptions": ["browser", "mobile", "edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX", "Transformers.js"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "sentence-transformers_paraphrase-MiniLM-L3-v2",
+            "name": "Paraphrase-MiniLM-L3-v2",
+            "huggingFaceId": "sentence-transformers/paraphrase-MiniLM-L3-v2",
+            "description": "Ultra-lightweight paraphrase embedding model",
+            "sizeMB": 17,
+            "accuracy": 0.78,
+            "environmentalScore": 1,
+            "deploymentOptions": ["browser", "mobile", "edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "sentence-transformers_all-MiniLM-L12-v2",
+            "name": "All-MiniLM-L12-v2",
+            "huggingFaceId": "sentence-transformers/all-MiniLM-L12-v2",
+            "description": "Higher quality sentence embeddings with moderate size",
+            "sizeMB": 33,
+            "accuracy": 0.84,
+            "environmentalScore": 1,
+            "deploymentOptions": ["browser", "edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          }
+        ],
+        "standard": [
+          {
+            "id": "sentence-transformers_all-mpnet-base-v2",
+            "name": "All-MPNet-Base-v2",
+            "huggingFaceId": "sentence-transformers/all-mpnet-base-v2",
+            "description": "High-quality general-purpose sentence embeddings",
+            "sizeMB": 420,
+            "accuracy": 0.89,
+            "environmentalScore": 1,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "BAAI_bge-base-en-v1.5",
+            "name": "BGE Base English v1.5",
+            "huggingFaceId": "BAAI/bge-base-en-v1.5",
+            "description": "State-of-the-art embedding model for retrieval",
+            "sizeMB": 438,
+            "accuracy": 0.91,
+            "environmentalScore": 1,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "thenlper_gte-base",
+            "name": "GTE Base",
+            "huggingFaceId": "thenlper/gte-base",
+            "description": "General text embedding model with strong performance",
+            "sizeMB": 438,
+            "accuracy": 0.88,
+            "environmentalScore": 1,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch"],
+            "lastUpdated": "2026-02-05"
+          }
+        ],
+        "advanced": [
+          {
+            "id": "BAAI_bge-large-en-v1.5",
+            "name": "BGE Large English v1.5",
+            "huggingFaceId": "BAAI/bge-large-en-v1.5",
+            "description": "Large-scale embedding model for maximum retrieval quality",
+            "sizeMB": 1340,
+            "accuracy": 0.93,
+            "environmentalScore": 2,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "intfloat_e5-large-v2",
+            "name": "E5 Large v2",
+            "huggingFaceId": "intfloat/e5-large-v2",
+            "description": "High-performance text embedding for dense retrieval",
+            "sizeMB": 1340,
+            "accuracy": 0.92,
+            "environmentalScore": 2,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch"],
+            "lastUpdated": "2026-02-05"
+          }
+        ]
+      },
+      "translation": {
+        "lightweight": [
+          {
+            "id": "Helsinki-NLP_opus-mt-en-es",
+            "name": "OPUS-MT English-Spanish",
+            "huggingFaceId": "Helsinki-NLP/opus-mt-en-es",
+            "description": "Lightweight English to Spanish translation model",
+            "sizeMB": 298,
+            "accuracy": 0.85,
+            "environmentalScore": 1,
+            "specialization": "language:en-es",
+            "deploymentOptions": ["edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "TensorFlow"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "Helsinki-NLP_opus-mt-en-fr",
+            "name": "OPUS-MT English-French",
+            "huggingFaceId": "Helsinki-NLP/opus-mt-en-fr",
+            "description": "Lightweight English to French translation model",
+            "sizeMB": 298,
+            "accuracy": 0.84,
+            "environmentalScore": 1,
+            "specialization": "language:en-fr",
+            "deploymentOptions": ["edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "TensorFlow"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "Helsinki-NLP_opus-mt-en-de",
+            "name": "OPUS-MT English-German",
+            "huggingFaceId": "Helsinki-NLP/opus-mt-en-de",
+            "description": "Lightweight English to German translation model",
+            "sizeMB": 298,
+            "accuracy": 0.83,
+            "environmentalScore": 1,
+            "specialization": "language:en-de",
+            "deploymentOptions": ["edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "TensorFlow"],
+            "lastUpdated": "2026-02-05"
+          }
+        ],
+        "standard": [
+          {
+            "id": "facebook_nllb-200-distilled-600M",
+            "name": "NLLB-200 Distilled 600M",
+            "huggingFaceId": "facebook/nllb-200-distilled-600M",
+            "description": "Multilingual translation supporting 200 languages",
+            "sizeMB": 2400,
+            "accuracy": 0.88,
+            "environmentalScore": 2,
+            "specialization": "multilingual",
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "facebook_mbart-large-50-many-to-many-mmt",
+            "name": "mBART-50 Many-to-Many",
+            "huggingFaceId": "facebook/mbart-large-50-many-to-many-mmt",
+            "description": "Multilingual translation between 50 languages",
+            "sizeMB": 2400,
+            "accuracy": 0.86,
+            "environmentalScore": 2,
+            "specialization": "multilingual",
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch", "TensorFlow"],
+            "lastUpdated": "2026-02-05"
+          }
+        ],
+        "advanced": [
+          {
+            "id": "facebook_nllb-200-3.3B",
+            "name": "NLLB-200 3.3B",
+            "huggingFaceId": "facebook/nllb-200-3.3B",
+            "description": "Large multilingual translation model with highest quality",
+            "sizeMB": 13200,
+            "accuracy": 0.92,
+            "environmentalScore": 3,
+            "specialization": "multilingual",
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch"],
+            "lastUpdated": "2026-02-05"
+          }
+        ]
+      },
+      "summarization": {
+        "lightweight": [
+          {
+            "id": "facebook_bart-large-cnn",
+            "name": "BART Large CNN",
+            "huggingFaceId": "facebook/bart-large-cnn",
+            "description": "News article summarization model",
+            "sizeMB": 406,
+            "accuracy": 0.85,
+            "environmentalScore": 1,
+            "deploymentOptions": ["edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "TensorFlow"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "sshleifer_distilbart-cnn-12-6",
+            "name": "DistilBART CNN",
+            "huggingFaceId": "sshleifer/distilbart-cnn-12-6",
+            "description": "Efficient distilled summarization model",
+            "sizeMB": 306,
+            "accuracy": 0.82,
+            "environmentalScore": 1,
+            "deploymentOptions": ["edge", "cloud", "server"],
+            "frameworks": ["PyTorch"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "google_pegasus-xsum",
+            "name": "Pegasus XSum",
+            "huggingFaceId": "google/pegasus-xsum",
+            "description": "Abstractive summarization for extreme summarization",
+            "sizeMB": 500,
+            "accuracy": 0.84,
+            "environmentalScore": 1,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch", "TensorFlow"],
+            "lastUpdated": "2026-02-05"
+          }
+        ],
+        "standard": [
+          {
+            "id": "google_long-t5-tglobal-base",
+            "name": "Long-T5 Base",
+            "huggingFaceId": "google/long-t5-tglobal-base",
+            "description": "Summarization model for long documents",
+            "sizeMB": 890,
+            "accuracy": 0.87,
+            "environmentalScore": 2,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch", "TensorFlow"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "philschmid_bart-large-cnn-samsum",
+            "name": "BART Large CNN SAMSum",
+            "huggingFaceId": "philschmid/bart-large-cnn-samsum",
+            "description": "Dialogue and conversation summarization",
+            "sizeMB": 1630,
+            "accuracy": 0.86,
+            "environmentalScore": 2,
+            "specialization": "task:dialogue",
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch"],
+            "lastUpdated": "2026-02-05"
+          }
+        ],
+        "advanced": [
+          {
+            "id": "google_long-t5-tglobal-xl",
+            "name": "Long-T5 XL",
+            "huggingFaceId": "google/long-t5-tglobal-xl",
+            "description": "Large model for very long document summarization",
+            "sizeMB": 12000,
+            "accuracy": 0.91,
+            "environmentalScore": 3,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch"],
+            "lastUpdated": "2026-02-05"
+          }
+        ]
+      },
+      "question_answering": {
+        "lightweight": [
+          {
+            "id": "distilbert-base-cased-distilled-squad",
+            "name": "DistilBERT SQuAD",
+            "huggingFaceId": "distilbert-base-cased-distilled-squad",
+            "description": "Efficient extractive QA model",
+            "sizeMB": 261,
+            "accuracy": 0.86,
+            "environmentalScore": 1,
+            "deploymentOptions": ["browser", "edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "TensorFlow", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "deepset_minilm-uncased-squad2",
+            "name": "MiniLM SQuAD2",
+            "huggingFaceId": "deepset/minilm-uncased-squad2",
+            "description": "Tiny but capable QA model",
+            "sizeMB": 127,
+            "accuracy": 0.82,
+            "environmentalScore": 1,
+            "deploymentOptions": ["browser", "mobile", "edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          }
+        ],
+        "standard": [
+          {
+            "id": "deepset_roberta-base-squad2",
+            "name": "RoBERTa Base SQuAD2",
+            "huggingFaceId": "deepset/roberta-base-squad2",
+            "description": "Strong extractive QA with RoBERTa architecture",
+            "sizeMB": 496,
+            "accuracy": 0.89,
+            "environmentalScore": 1,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          },
+          {
+            "id": "Intel_dynamic_tinybert",
+            "name": "Dynamic TinyBERT",
+            "huggingFaceId": "Intel/dynamic_tinybert",
+            "description": "Intel-optimized QA model with dynamic inference",
+            "sizeMB": 260,
+            "accuracy": 0.85,
+            "environmentalScore": 1,
+            "deploymentOptions": ["edge", "cloud", "server"],
+            "frameworks": ["PyTorch", "ONNX"],
+            "lastUpdated": "2026-02-05"
+          }
+        ],
+        "advanced": [
+          {
+            "id": "deepset_roberta-large-squad2",
+            "name": "RoBERTa Large SQuAD2",
+            "huggingFaceId": "deepset/roberta-large-squad2",
+            "description": "High-accuracy extractive QA for demanding applications",
+            "sizeMB": 1420,
+            "accuracy": 0.92,
+            "environmentalScore": 2,
+            "deploymentOptions": ["cloud", "server"],
+            "frameworks": ["PyTorch"],
+            "lastUpdated": "2026-02-05"
+          }
+        ]
       }
     },
     "speech_processing": {
@@ -2826,179 +3165,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2023-11-18"
-          }
-        ]
-      }
-    },
-    "recommendation_systems": {
-      "collaborative_filtering": {
-        "lightweight": [
-          {
-            "id": "matrix_factorization",
-            "name": "Matrix Factorization",
-            "huggingFaceId": "placeholder/matrix-factorization",
-            "description": "Lightweight collaborative filtering using matrix factorization",
-            "sizeMB": 8.5,
-            "accuracy": 0.76,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "browser",
-              "cloud"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "scikit-learn"
-            ],
-            "lastUpdated": "2023-10-28"
-          }
-        ],
-        "standard": [
-          {
-            "id": "neural_collaborative_filtering",
-            "name": "Neural Collaborative Filtering",
-            "huggingFaceId": "placeholder/neural-cf",
-            "description": "Deep learning approach to collaborative filtering",
-            "sizeMB": 152,
-            "accuracy": 0.82,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "cloud"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2023-09-15"
-          }
-        ]
-      },
-      "content_based": {
-        "lightweight": [
-          {
-            "id": "content_similarity",
-            "name": "Content Similarity Recommender",
-            "huggingFaceId": "placeholder/content-similarity",
-            "description": "Lightweight content-based filtering using embeddings",
-            "sizeMB": 12.3,
-            "accuracy": 0.71,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "browser",
-              "cloud"
-            ],
-            "frameworks": [
-              "sentence-transformers",
-              "ONNX"
-            ],
-            "lastUpdated": "2023-11-10"
-          }
-        ]
-      }
-    },
-    "reinforcement_learning": {
-      "game_playing": {
-        "standard": [
-          {
-            "id": "dqn_atari",
-            "name": "Deep Q-Network for Atari",
-            "huggingFaceId": "placeholder/dqn-atari",
-            "description": "Deep reinforcement learning for Atari games",
-            "sizeMB": 89.4,
-            "accuracy": 0.85,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "cloud"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "stable-baselines3"
-            ],
-            "lastUpdated": "2023-08-20"
-          }
-        ],
-        "advanced": [
-          {
-            "id": "alphazero",
-            "name": "AlphaZero",
-            "huggingFaceId": "placeholder/alphazero",
-            "description": "Advanced game playing with Monte Carlo Tree Search",
-            "sizeMB": 445,
-            "accuracy": 0.95,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "cloud"
-            ],
-            "frameworks": [
-              "PyTorch"
-            ],
-            "lastUpdated": "2023-07-25"
-          }
-        ]
-      },
-      "robotics": {
-        "standard": [
-          {
-            "id": "td3_robotics",
-            "name": "Twin Delayed DDPG for Robotics",
-            "huggingFaceId": "placeholder/td3-robotics",
-            "description": "Continuous control for robotic applications",
-            "sizeMB": 67.8,
-            "accuracy": 0.79,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "browser",
-              "cloud"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "stable-baselines3"
-            ],
-            "lastUpdated": "2023-09-30"
-          }
-        ]
-      }
-    },
-    "data_preprocessing": {
-      "data_cleaning": {
-        "lightweight": [
-          {
-            "id": "pandas_profiling",
-            "name": "Pandas Profiling",
-            "huggingFaceId": "placeholder/pandas-profiling",
-            "description": "Automated data quality assessment and cleaning",
-            "sizeMB": 5.2,
-            "accuracy": 0.88,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "browser",
-              "cloud"
-            ],
-            "frameworks": [
-              "pandas",
-              "Python"
-            ],
-            "lastUpdated": "2023-12-01"
-          }
-        ]
-      },
-      "feature_engineering": {
-        "lightweight": [
-          {
-            "id": "feature_tools",
-            "name": "Featuretools",
-            "huggingFaceId": "placeholder/featuretools",
-            "description": "Automated feature engineering framework",
-            "sizeMB": 18.9,
-            "accuracy": 0.82,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "cloud"
-            ],
-            "frameworks": [
-              "Python",
-              "pandas"
-            ],
-            "lastUpdated": "2023-11-25"
           }
         ]
       }

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-11",
+  "lastUpdated": "2026-02-05",
   "taskTaxonomy": {
     "computer_vision": {
       "label": "Computer Vision",
@@ -76,6 +76,75 @@
             "Can you help me review this python script",
             "Help me refactor this code module"
           ]
+        },
+        "embedding": {
+          "label": "Embeddings & Retrieval",
+          "description": "Converting text to vector representations for semantic search and retrieval",
+          "keywords": [
+            "embedding", "embeddings", "vector", "vectors", "semantic search",
+            "similarity search", "retrieval", "rag", "retrieval augmented",
+            "sentence transformer", "sentence embedding", "text embedding",
+            "vector database", "vector store", "similarity", "semantic similarity",
+            "dense retrieval", "document retrieval", "search index", "encode text",
+            "vectorize", "represent text", "text representation"
+          ],
+          "examples": [
+            "Create embeddings for semantic search",
+            "Build a RAG system for document retrieval",
+            "Find similar documents using vectors",
+            "Encode sentences for similarity matching",
+            "Set up semantic search for my knowledge base"
+          ]
+        },
+        "translation": {
+          "label": "Translation",
+          "description": "Translating text between languages",
+          "keywords": [
+            "translate", "translation", "translator", "language translation",
+            "machine translation", "multilingual", "convert language",
+            "english to spanish", "french to english", "translate text",
+            "language pair", "neural translation", "nmt", "localization",
+            "multi-language", "cross-lingual", "bilingual"
+          ],
+          "examples": [
+            "Translate English documents to Spanish",
+            "Build a multilingual translation service",
+            "Convert French text to English",
+            "Machine translation for website content"
+          ]
+        },
+        "summarization": {
+          "label": "Summarization",
+          "description": "Condensing long text into shorter summaries",
+          "keywords": [
+            "summarize", "summarization", "summary", "condense", "shorten",
+            "abstract", "abstractive", "extractive", "tldr", "brief",
+            "key points", "main points", "summarize document", "summarize article",
+            "document summary", "text summary", "news summary", "meeting summary",
+            "digest", "synopsis"
+          ],
+          "examples": [
+            "Summarize long articles into key points",
+            "Create executive summaries of documents",
+            "Generate meeting notes from transcripts",
+            "Condense research papers into abstracts"
+          ]
+        },
+        "question_answering": {
+          "label": "Question Answering",
+          "description": "Answering questions based on context or knowledge",
+          "keywords": [
+            "question answering", "qa", "answer questions", "extractive qa",
+            "reading comprehension", "find answer", "answer from text",
+            "document qa", "knowledge qa", "squad", "context question",
+            "ask questions", "query answering"
+          ],
+          "examples": [
+            "Answer questions from documents",
+            "Build a QA system for customer support",
+            "Extract answers from knowledge base",
+            "Reading comprehension system"
+          ]
         }
       }
     },
@@ -109,63 +178,9 @@
         },
         "anomaly_detection": {
           "label": "Anomaly Detection",
-          "description": "Identifying unusual patterns in temporal data",
-          "keywords": ["anomaly", "outlier", "unusual pattern", "fraud detection", "abnormal behavior", "detect anomalies", "anomaly detection", "server monitoring", "system monitoring", "monitoring data", "unusual data", "abnormal data", "detect outliers", "find anomalies"],
-          "examples": ["Fraud detection", "System monitoring", "Quality control"]
-        }
-      }
-    },
-    "recommendation_systems": {
-      "label": "Recommendation Systems",
-      "description": "Tasks involving personalized content suggestions",
-      "subcategories": {
-        "collaborative_filtering": {
-          "label": "Collaborative Filtering",
-          "description": "Recommendations based on user similarity",
-          "keywords": ["collaborative filtering", "user-based recommendations", "similar users", "recommend based on users", "recommend products", "suggest products", "personalized recommendations"],
-          "examples": ["Movie recommendations", "Product suggestions", "Music discovery"]
-        },
-        "content_based": {
-          "label": "Content-Based Filtering",
-          "description": "Recommendations based on item features",
-          "keywords": ["content based", "item features", "similarity matching", "feature matching", "recommend similar", "similar products", "based on content", "recommend items", "suggest items"],
-          "examples": ["News article recommendations", "Job matching", "Similar product suggestions"]
-        }
-      }
-    },
-    "reinforcement_learning": {
-      "label": "Reinforcement Learning",
-      "description": "Tasks involving learning through interaction and rewards",
-      "subcategories": {
-        "game_playing": {
-          "label": "Game Playing",
-          "description": "Learning to play games through trial and error",
-          "keywords": ["game ai", "play game", "game agent", "game policy", "q-learning", "game strategy", "learn to play", "video game bot"],
-          "examples": ["Chess playing", "Video game AI", "Board game strategies"]
-        },
-        "robotics": {
-          "label": "Robotics Control",
-          "description": "Learning robot control policies",
-          "keywords": ["robot control", "robotic manipulation", "robot navigation", "motor control", "robot arm", "autonomous robot", "robot learning"],
-          "examples": ["Robot arm control", "Autonomous navigation", "Grasping objects"]
-        }
-      }
-    },
-    "data_preprocessing": {
-      "label": "Data Preprocessing", 
-      "description": "Tasks involving data cleaning and preparation",
-      "subcategories": {
-        "data_cleaning": {
-          "label": "Data Cleaning",
-          "description": "Removing errors and inconsistencies from data",
-          "keywords": ["clean data", "remove noise", "handle missing", "data quality"],
-          "examples": ["Remove duplicates", "Handle missing values", "Correct data errors"]
-        },
-        "feature_engineering": {
-          "label": "Feature Engineering",
-          "description": "Creating meaningful features from raw data",
-          "keywords": ["feature extraction", "data transform", "encode categorical", "scale features", "normalize data", "feature selection", "create features", "data encoding"],
-          "examples": ["Feature scaling", "Categorical encoding", "Feature selection"]
+          "description": "Identifying unusual patterns, outliers, and abnormal behavior in data",
+          "keywords": ["anomaly", "outlier", "unusual pattern", "fraud detection", "abnormal behavior", "detect anomalies", "anomaly detection", "server monitoring", "system monitoring", "monitoring data", "unusual data", "abnormal data", "detect outliers", "find anomalies", "intrusion detection", "network anomaly", "log anomaly", "defect detection", "fault detection", "novelty detection", "out of distribution"],
+          "examples": ["Fraud detection", "System monitoring", "Quality control", "Network intrusion detection", "Manufacturing defect detection", "Log anomaly detection"]
         }
       }
     }
@@ -175,10 +190,7 @@
       "natural_language_processing",
       "computer_vision",
       "speech_processing",
-      "time_series",
-      "recommendation_systems",
-      "reinforcement_learning",
-      "data_preprocessing"
+      "time_series"
     ],
     "confidenceThresholds": {
       "high": 0.8,
