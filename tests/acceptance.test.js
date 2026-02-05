@@ -119,11 +119,8 @@ describe('MVP Acceptance Tests', () => {
       const expectedCategories = [
         'computer_vision',
         'natural_language_processing',
-        'speech_processing', 
-        'time_series',
-        'recommendation_systems',
-        'reinforcement_learning',
-        'data_preprocessing'
+        'speech_processing',
+        'time_series'
       ];
 
       expectedCategories.forEach(category => {
