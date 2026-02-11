@@ -109,12 +109,27 @@ async function main() {
 
     if (result.success) {
       console.log('✅ Aggregation completed successfully!');
-      
+
+      // Check if there were substantive changes
+      const hasChanges = result.stats?.hasSubstantiveChanges;
+
       if (options.dryRun) {
         console.log('\n💡 This was a dry run. To apply changes, run without --dry-run');
+        if (hasChanges) {
+          console.log('   Substantive changes detected - would update dataset');
+        } else {
+          console.log('   No substantive changes detected - dataset is up to date');
+        }
       } else {
-        console.log('\n💡 Model dataset has been updated.');
-        console.log('   Review changes and commit to version control.');
+        if (hasChanges) {
+          console.log('\n💡 Model dataset has been updated with new changes.');
+          console.log('   Review changes and commit to version control.');
+        } else {
+          console.log('\n💡 No substantive changes detected - dataset is up to date.');
+          console.log('   Timestamp preserved from previous update.');
+          // Exit with special code to signal no changes
+          process.exit(0);
+        }
       }
     } else {
       console.error('❌ Aggregation failed:', result.error);

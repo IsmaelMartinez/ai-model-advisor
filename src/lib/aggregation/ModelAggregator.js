@@ -94,11 +94,15 @@ export class ModelAggregator {
       console.log('✅ Validating and merging with existing dataset...');
       const mergedData = this.mergeWithExistingData(tieredModels, config);
 
-      // Step 5: Save updated dataset (if not dry run)
+      // Step 5: Save updated dataset (if not dry run AND has substantive changes)
       if (!config.dryRun) {
-        console.log('💾 Saving updated model dataset...');
-        this.saveModelsData(mergedData);
-        console.log('   ✅ Dataset saved successfully\n');
+        if (this.stats.hasSubstantiveChanges) {
+          console.log('💾 Saving updated model dataset...');
+          this.saveModelsData(mergedData);
+          console.log('   ✅ Dataset saved successfully\n');
+        } else {
+          console.log('⏭️  No substantive changes - skipping file write\n');
+        }
       } else {
         console.log('🧪 Dry run complete - no files modified\n');
       }
@@ -334,9 +338,11 @@ export class ModelAggregator {
   mergeWithExistingData(newTieredModels, config) {
     const merged = {
       ...this.currentModels,
-      lastUpdated: new Date().toISOString().split('T')[0],
       models: { ...this.currentModels.models }
     };
+
+    // Track whether we made substantive changes
+    let hasSubstantiveChanges = false;
 
     // Merge each category/subcategory/tier
     for (const [category, subcategories] of Object.entries(newTieredModels)) {
@@ -353,31 +359,78 @@ export class ModelAggregator {
           if (models.length > 0) {
             // Keep best models from existing + new (limit per tier)
             const existing = merged.models[category][subcategory][tier] || [];
-            
+
             // Preserve curated fields (specialization) on new models
             const modelsWithCuratedFields = models.map(m => this.preserveCuratedFields(m, existing));
-            
+
             const combined = [...existing, ...modelsWithCuratedFields];
-            
+
             // Remove duplicates based on huggingFaceId (preserves curated fields)
             const deduped = this.deduplicateModels(combined);
-            
+
             // Sort and limit - prioritize models with curated specialization
             const sorted = this.sortModelsByRelevance(deduped);
-            merged.models[category][subcategory][tier] = sorted.slice(0, 5); // Max 5 per tier
-            
+            const finalModels = sorted.slice(0, 5); // Max 5 per tier
+
+            // Check if this tier has substantive changes
+            if (this.hasModelListChanged(existing, finalModels)) {
+              hasSubstantiveChanges = true;
+            }
+
+            merged.models[category][subcategory][tier] = finalModels;
+
             // Update statistics
             const newCount = models.length;
             const existingCount = existing.length;
             if (newCount > 0) {
-              this.stats.added += Math.max(0, merged.models[category][subcategory][tier].length - existingCount);
+              this.stats.added += Math.max(0, finalModels.length - existingCount);
             }
           }
         }
       }
     }
 
+    // Only update timestamp if there are substantive changes
+    if (hasSubstantiveChanges) {
+      merged.lastUpdated = new Date().toISOString().split('T')[0];
+    } else {
+      // Preserve existing timestamp
+      merged.lastUpdated = this.currentModels.lastUpdated || new Date().toISOString().split('T')[0];
+    }
+
+    // Store whether we had substantive changes for reporting
+    this.stats.hasSubstantiveChanges = hasSubstantiveChanges;
+
     return merged;
+  }
+
+  /**
+   * Check if two model lists have substantive differences
+   * Compares model content excluding lastUpdated fields
+   */
+  hasModelListChanged(oldModels, newModels) {
+    // Different number of models = change
+    if (oldModels.length !== newModels.length) {
+      return true;
+    }
+
+    // Compare each model (excluding lastUpdated)
+    for (let i = 0; i < oldModels.length; i++) {
+      const oldModel = oldModels[i];
+      const newModel = newModels[i];
+
+      // Compare all fields except lastUpdated
+      const oldWithoutTimestamp = { ...oldModel };
+      const newWithoutTimestamp = { ...newModel };
+      delete oldWithoutTimestamp.lastUpdated;
+      delete newWithoutTimestamp.lastUpdated;
+
+      if (JSON.stringify(oldWithoutTimestamp) !== JSON.stringify(newWithoutTimestamp)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   // === Utility Methods ===
@@ -814,12 +867,13 @@ export class ModelAggregator {
    */
   printAggregationSummary() {
     const duration = Date.now() - this.stats.startTime;
-    
+
     console.log('📈 Aggregation Summary:');
     console.log(`   Processed: ${this.stats.processed} models`);
     console.log(`   Added: ${this.stats.added} new models`);
     console.log(`   Updated: ${this.stats.updated} existing models`);
     console.log(`   Errors: ${this.stats.errors} failed models`);
+    console.log(`   Substantive changes: ${this.stats.hasSubstantiveChanges ? 'Yes' : 'No'}`);
     console.log(`   Duration: ${Math.round(duration / 1000)}s\n`);
   }
 
