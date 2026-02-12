@@ -3,7 +3,7 @@
  * Prioritizes lightweight models and smaller sizes within each tier
  */
 
-const TIERS = ['lightweight', 'standard', 'advanced', 'xlarge'];
+import { TIERS } from '../data/constants.js';
 
 export class ModelSelector {
   constructor(modelsData) {
