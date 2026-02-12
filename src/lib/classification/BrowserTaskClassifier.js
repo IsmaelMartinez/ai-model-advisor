@@ -112,7 +112,7 @@ export class BrowserTaskClassifier {
         ];
         
         for (const keyword of allKeywords) {
-          const normalizedKeyword = this.normalizeKeyword(keyword);
+          const normalizedKeyword = this.normalizeText(keyword);
           if (!index[normalizedKeyword]) {
             index[normalizedKeyword] = [];
           }
@@ -165,7 +165,7 @@ export class BrowserTaskClassifier {
   classifyWithEnhancedSemantics(taskDescription) {
     console.log('🔄 Using enhanced semantic similarity classification...');
     
-    const text = this.preprocessText(taskDescription);
+    const text = this.normalizeText(taskDescription);
     const categoryScores = {};
     const subcategoryScores = {};
     
@@ -218,19 +218,16 @@ export class BrowserTaskClassifier {
   classifyWithEnhancedKeywords(taskDescription) {
     console.log('🔄 Using enhanced keyword classification...');
     
-    const text = this.preprocessText(taskDescription);
+    const text = this.normalizeText(taskDescription);
     const words = text.split(/\s+/);
-    const bigrams = this.generateBigrams(words);
-    const trigrams = this.generateTrigrams(words);
-    
     const categoryScores = {};
     const subcategoryScores = {};
-    
+
     // Match unigrams, bigrams, and trigrams
-    const allNgrams = [...words, ...bigrams, ...trigrams];
+    const allNgrams = [...words, ...this.generateNgrams(words, 2), ...this.generateNgrams(words, 3)];
     
     for (const ngram of allNgrams) {
-      const normalizedNgram = this.normalizeKeyword(ngram);
+      const normalizedNgram = this.normalizeText(ngram);
       const matches = this.keywordIndex[normalizedNgram] || [];
       
       for (const match of matches) {
@@ -308,7 +305,7 @@ export class BrowserTaskClassifier {
     const subcategoryPredictions = [];
     
     // Use enhanced keyword matching for subcategories
-    const text = this.preprocessText(taskDescription);
+    const text = this.normalizeText(taskDescription);
     
     for (const prediction of categoryPredictions.slice(0, 2)) {
       const categoryData = this.taskTaxonomy[prediction.category];
@@ -352,44 +349,45 @@ export class BrowserTaskClassifier {
   }
 
   /**
-   * Normalize category predictions
+   * Normalize and rank score entries
+   * @param {Object} scores - Map of key -> { score, matches, label, ... }
+   * @param {Function} mapFn - Transforms (key, data) to prediction object
+   * @param {Object} options - { limit, normalizeScores }
    */
-  normalizePredictions(categoryScores) {
-    const predictions = Object.entries(categoryScores)
-      .map(([category, data]) => ({
-        category,
-        label: data.label,
-        score: data.score / Math.max(1, data.matches), // Normalize by match count
-        matchCount: data.matches
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
-    
-    // Normalize scores to sum to 1
-    const totalScore = predictions.reduce((sum, p) => sum + p.score, 0);
-    if (totalScore > 0) {
-      predictions.forEach(p => p.score = Math.min(1, p.score / totalScore));
-    }
-    
-    return predictions;
-  }
-
-  /**
-   * Normalize subcategory predictions
-   */
-  normalizeSubcategoryPredictions(subcategoryScores) {
-    const predictions = Object.entries(subcategoryScores)
+  normalizeScores(scores, mapFn, { limit = 3, normalizeScoresToOne = false } = {}) {
+    const predictions = Object.entries(scores)
       .map(([key, data]) => ({
-        category: data.category,
-        subcategory: data.subcategory,
-        label: data.label,
+        ...mapFn(key, data),
         score: data.score / Math.max(1, data.matches),
         matchCount: data.matches
       }))
       .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
-    
+      .slice(0, limit);
+
+    if (normalizeScoresToOne) {
+      const totalScore = predictions.reduce((sum, p) => sum + p.score, 0);
+      if (totalScore > 0) {
+        predictions.forEach(p => p.score = Math.min(1, p.score / totalScore));
+      }
+    }
+
     return predictions;
+  }
+
+  normalizePredictions(categoryScores) {
+    return this.normalizeScores(
+      categoryScores,
+      (category, data) => ({ category, label: data.label }),
+      { limit: 3, normalizeScoresToOne: true }
+    );
+  }
+
+  normalizeSubcategoryPredictions(subcategoryScores) {
+    return this.normalizeScores(
+      subcategoryScores,
+      (_key, data) => ({ category: data.category, subcategory: data.subcategory, label: data.label }),
+      { limit: 5 }
+    );
   }
 
   /**
@@ -420,9 +418,10 @@ export class BrowserTaskClassifier {
   }
 
   /**
-   * Preprocess text for classification
+   * Normalize text: lowercase, strip punctuation, collapse whitespace
+   * Used for both preprocessing input text and normalizing keywords
    */
-  preprocessText(text) {
+  normalizeText(text) {
     return text
       .toLowerCase()
       .replace(/[^\w\s]/g, ' ')
@@ -431,36 +430,14 @@ export class BrowserTaskClassifier {
   }
 
   /**
-   * Normalize keyword for indexing
+   * Generate n-grams (bigrams, trigrams, etc.) from words
    */
-  normalizeKeyword(keyword) {
-    return keyword
-      .toLowerCase()
-      .replace(/[^\w\s]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  /**
-   * Generate bigrams from words
-   */
-  generateBigrams(words) {
-    const bigrams = [];
-    for (let i = 0; i < words.length - 1; i++) {
-      bigrams.push(`${words[i]} ${words[i + 1]}`);
+  generateNgrams(words, n) {
+    const ngrams = [];
+    for (let i = 0; i <= words.length - n; i++) {
+      ngrams.push(words.slice(i, i + n).join(' '));
     }
-    return bigrams;
-  }
-
-  /**
-   * Generate trigrams from words
-   */
-  generateTrigrams(words) {
-    const trigrams = [];
-    for (let i = 0; i < words.length - 2; i++) {
-      trigrams.push(`${words[i]} ${words[i + 1]} ${words[i + 2]}`);
-    }
-    return trigrams;
+    return ngrams;
   }
 
   /**
@@ -552,6 +529,3 @@ export class BrowserTaskClassifier {
     return suggestions;
   }
 }
-
-// Export browser-compatible classifier
-export const browserTaskClassifier = new BrowserTaskClassifier();
