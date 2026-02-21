@@ -1,12 +1,9 @@
 <script>
-  import TaskInput from "../components/TaskInput.svelte";
+  import TaskForm from "../components/TaskForm.svelte";
   import RecommendationDisplay from "../components/RecommendationDisplay.svelte";
-  import ClarificationFlow from "../components/ClarificationFlow.svelte";
   import { EmbeddingTaskClassifier } from "../lib/classification/EmbeddingTaskClassifier.js";
   import { BrowserTaskClassifier } from "../lib/classification/BrowserTaskClassifier.js";
-  import { CLASSIFIER_CONFIG } from "../lib/classification/classifierConfig.js";
   import { ModelSelector } from "../lib/recommendation/ModelSelector.js";
-  import { getDefaultSubcategory } from "../lib/data/constants.js";
 
   // Import data
   import modelsData from "../lib/data/models.json";
@@ -20,7 +17,6 @@
   let classifierReady = false;
 
   // Component state
-  let taskDescription = "";
   let isLoading = false;
   let isModelLoading = false;
   let modelLoadProgress = "";
@@ -32,22 +28,34 @@
   let ensembleInfo = null;
   let showResultsHighlight = false;
   let recommendationsSection;
-  
-  // Clarification flow state
-  let showClarification = false;
-  let clarificationOptions = [];
-  let pendingTaskDescription = "";
+
+  // Classifier pre-fill state
+  let prefillCategory = null;
+  let prefillSubcategory = null;
+  let prefillConfidence = 0;
+
+  // Available categories (from model data)
+  let availableCategories = {};
+
+  // Model count
+  let totalModelCount = 0;
 
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
 
   onMount(async () => {
     try {
-      // 1. Initialize components first
+      // 1. Initialize components
       modelSelector = new ModelSelector(modelsData);
-      fallbackClassifier = new BrowserTaskClassifier(); // Uses tasks.json internally
+      fallbackClassifier = new BrowserTaskClassifier();
+      availableCategories = modelSelector.getAvailableCategories();
 
-      // Use new MiniLM embedding classifier (23MB vs 500MB Llama)
+      // Count total models
+      totalModelCount = Object.values(availableCategories)
+        .flatMap(subs => Object.values(subs))
+        .reduce((a, b) => a + b, 0);
+
+      // Initialize embedding classifier (loads in background, not blocking)
       taskClassifier = new EmbeddingTaskClassifier({
         onProgress: (progress) => {
           if (progress.status === "downloading") {
@@ -66,301 +74,130 @@
           } else if (progress.status === "error") {
             modelLoadProgress = "";
             isModelLoading = false;
-            console.warn("⚠️ Embedding classifier failed, using keyword fallback");
+            console.warn("Embedding classifier failed, using keyword fallback");
             usingFallback = true;
           }
         },
       });
 
-      // Initialize the embedding classifier with task data
-      // This triggers model download on first visit, cached after
       const initResult = await taskClassifier.initialize(tasksData);
       if (initResult.success) {
         classifierReady = true;
         usingFallback = false;
-        console.log("✅ Embedding classifier ready (98.3% accuracy, 23MB)");
       } else {
-        console.warn("⚠️ Embedding classifier failed, using keyword fallback");
         usingFallback = true;
       }
 
-      console.log("✅ Data pipeline initialized successfully");
-
-      // 2. Handle URL parameters after initialization is complete
+      // 2. Handle URL parameters
       const urlParams = new URLSearchParams(window.location.search);
-      const taskFromUrl = urlParams.get("task");
-      if (taskFromUrl) {
-        try {
-          taskDescription = decodeURIComponent(taskFromUrl);
+      const catFromUrl = urlParams.get("category");
+      const subFromUrl = urlParams.get("task");
+      const deployFromUrl = urlParams.get("deploy");
 
-          // Security: Validate and sanitize URL parameter
-          // Enforce maximum length (500 chars)
-          if (taskDescription.length > 500) {
-            taskDescription = taskDescription.substring(0, 500);
-            console.warn("Task from URL exceeded 500 characters, truncated");
+      if (catFromUrl && subFromUrl) {
+        handleFormSubmit({
+          detail: {
+            category: catFromUrl,
+            subcategory: subFromUrl,
+            deploymentTarget: deployFromUrl || null,
+            taskDescription: null
           }
-
-          // Security: Strip control characters and non-printable characters
-          taskDescription = taskDescription.replace(/[\x00-\x1F\x7F]/g, '');
-
-          // Components are now guaranteed to be initialized
-          handleTaskSubmit({ detail: { taskDescription } });
-        } catch (err) {
-          console.error("Failed to process task from URL:", err);
-          // Don't auto-submit if URL parameter is malformed
-        }
+        });
       }
     } catch (err) {
-      console.error("❌ Failed to initialize data pipeline:", err);
+      console.error("Failed to initialize:", err);
       error = "Failed to initialize the AI model advisor. Please refresh the page.";
     }
   });
 
-  // Check if task needs clarification
-  function needsClarification(description) {
-    const lowerDesc = description.toLowerCase();
-    const ambiguousPatterns = [
-      { pattern: /\b(help|assist|work with)\b.*\b(ai|model|ml)\b/i, reason: "general" },
-      { pattern: /^(i want to|i need to|help me)\s+\w+$/i, reason: "too_short" },
-      { pattern: /\b(process|handle|work with)\s+(data|information)\b/i, reason: "data_ambiguous" },
-      { pattern: /\b(analyze|analysis)\b/i, matchMultiple: ["text", "image", "audio", "video", "time", "series"], reason: "analysis_type" },
-    ];
+  async function handleClassify(event) {
+    const { taskDescription } = event.detail;
 
-    // Check for very short descriptions
-    if (description.split(/\s+/).length < 4) {
-      return { needs: true, reason: "too_short" };
-    }
-
-    // Check ambiguous patterns
-    for (const p of ambiguousPatterns) {
-      if (p.pattern.test(lowerDesc)) {
-        return { needs: true, reason: p.reason };
+    try {
+      let result;
+      if (!usingFallback && classifierReady) {
+        result = await taskClassifier.classify(taskDescription, { topK: 5 });
+      } else {
+        result = await fallbackClassifier.classify(taskDescription);
       }
+
+      const topPrediction = result.subcategoryPredictions?.[0] || result.predictions?.[0];
+      if (topPrediction?.category) {
+        prefillCategory = topPrediction.category;
+        prefillSubcategory = topPrediction.subcategory || null;
+        prefillConfidence = result.confidence || 0;
+      }
+    } catch (err) {
+      // Classifier failure is not critical — form still works
+      console.warn("Classifier pre-fill failed:", err);
     }
-
-    return { needs: false };
   }
 
-  // Generate clarification options based on ambiguity
-  function generateClarificationOptions(description, reason) {
-    const options = {
-      general: [
-        { label: "📝 Text & Language", desc: "Analyze, generate, or classify text", category: "natural_language_processing" },
-        { label: "🖼️ Images & Vision", desc: "Classify, detect, or segment images", category: "computer_vision" },
-        { label: "🎤 Speech & Audio", desc: "Transcribe, synthesize, or analyze audio", category: "speech_processing" },
-        { label: "📈 Time Series & Forecasting", desc: "Predict trends or detect anomalies", category: "time_series" },
-        { label: "🎯 Recommendations", desc: "Suggest products, content, or items", category: "recommendation_systems" },
-      ],
-      too_short: [
-        { label: "📝 Text & Language", desc: "NLP tasks like classification, generation, translation", category: "natural_language_processing" },
-        { label: "🖼️ Images & Vision", desc: "Computer vision tasks", category: "computer_vision" },
-        { label: "🎤 Speech & Audio", desc: "Audio processing tasks", category: "speech_processing" },
-        { label: "📈 Data & Analytics", desc: "Time series, forecasting, anomaly detection", category: "time_series" },
-        { label: "🤖 Other AI Tasks", desc: "Reinforcement learning, recommendations", category: "recommendation_systems" },
-      ],
-      data_ambiguous: [
-        { label: "📊 Tabular Data", desc: "Structured data, spreadsheets, databases", category: "data_preprocessing" },
-        { label: "📝 Text Data", desc: "Documents, articles, messages", category: "natural_language_processing" },
-        { label: "🖼️ Image Data", desc: "Photos, graphics, scans", category: "computer_vision" },
-        { label: "📈 Time Series Data", desc: "Sequential measurements over time", category: "time_series" },
-      ],
-      analysis_type: [
-        { label: "📝 Text Analysis", desc: "Sentiment, entities, classification", category: "natural_language_processing" },
-        { label: "🖼️ Image Analysis", desc: "Object detection, segmentation", category: "computer_vision" },
-        { label: "🎤 Audio Analysis", desc: "Speech recognition, sound classification", category: "speech_processing" },
-        { label: "📈 Trend Analysis", desc: "Time series forecasting, patterns", category: "time_series" },
-      ],
-      low_confidence: [
-        { label: "📝 Text & Language", desc: "Summarization, generation, translation, analysis", category: "natural_language_processing" },
-        { label: "🖼️ Images & Vision", desc: "Classification, detection, segmentation", category: "computer_vision" },
-        { label: "🎤 Speech & Audio", desc: "Transcription, synthesis, audio analysis", category: "speech_processing" },
-        { label: "📈 Time Series", desc: "Forecasting, anomaly detection, trends", category: "time_series" },
-        { label: "🎯 Recommendations", desc: "Content, product, or user suggestions", category: "recommendation_systems" },
-        { label: "🎮 Reinforcement Learning", desc: "Game AI, robotics, decision making", category: "reinforcement_learning" },
-        { label: "🔧 Data Processing", desc: "Cleaning, preprocessing, feature extraction", category: "data_preprocessing" },
-      ],
-    };
+  function handleFormSubmit(event) {
+    const { category, subcategory, deploymentTarget, taskDescription } = event.detail;
 
-    return options[reason] || options.general;
-  }
-
-  async function handleTaskSubmit(event) {
-    const { taskDescription: description } = event.detail;
-
-    if (!taskClassifier || !modelSelector) {
-      error = "System not initialized. Please refresh the page.";
-      return;
-    }
-
-    // Check if clarification is needed
-    const clarification = needsClarification(description);
-    if (clarification.needs) {
-      pendingTaskDescription = description;
-      clarificationOptions = generateClarificationOptions(description, clarification.reason);
-      showClarification = true;
-      return;
-    }
-
-    await processTask(description);
-  }
-
-  async function handleClarificationSelect(event) {
-    const { category, originalDescription } = event.detail;
-    showClarification = false;
-    
-    // Process with the clarified category
-    await processTask(originalDescription, category);
-  }
-
-  function handleClarificationSkip() {
-    showClarification = false;
-    // Pass skipClarification=true to prevent infinite loop
-    processTask(pendingTaskDescription, null, true);
-  }
-
-  async function handleClarificationText(event) {
-    const { originalDescription, additionalDetails } = event.detail;
-    showClarification = false;
-    
-    // Combine original description with additional details
-    // Normalize: remove trailing punctuation from original before adding separator
-    const normalizedOriginal = originalDescription.replace(/[.!?,;:]+$/, '').trim();
-    const enhancedDescription = `${normalizedOriginal}. ${additionalDetails}`;
-    
-    // Update the task description in the input field
-    taskDescription = enhancedDescription;
-    
-    // Process with enhanced description, skip further clarification to prevent loops
-    await processTask(enhancedDescription, null, true);
-  }
-
-  async function processTask(description, forcedCategory = null, skipClarification = false) {
     isLoading = true;
     error = null;
     recommendations = [];
     taskCategory = "";
     taskSubcategory = "";
+    ensembleInfo = null;
 
     try {
-      console.log("🔍 Analyzing task:", description);
-
-      let classificationResult;
-
-      if (forcedCategory) {
-        // Use the clarified category directly
-        classificationResult = {
-          predictions: [{ category: forcedCategory, confidence: 1.0 }],
-          subcategoryPredictions: [{ category: forcedCategory, subcategory: getDefaultSubcategory(forcedCategory), confidence: 1.0 }]
-        };
-        ensembleInfo = null;
-      } else {
-        try {
-          if (!classifierReady && !usingFallback) {
-            modelLoadProgress = "Loading AI model (first time only, ~23MB)...";
-            isModelLoading = true;
-          }
-
-          if (!usingFallback && classifierReady) {
-            // Use embedding classifier (98.3% accuracy) with voting (5 votes)
-            classificationResult = await taskClassifier.classify(description, { topK: 5 });
-            
-            // Set ensemble/voting info for display
-            // Shows how many of the top-K examples agree on the category
-            ensembleInfo = {
-              method: 'embedding_similarity',
-              votes: classificationResult.votesForWinner,
-              total: classificationResult.totalVotes,
-              confidence: classificationResult.confidence,
-              similarExamples: classificationResult.similarExamples || []
-            };
-            
-            // If confidence is below threshold AND not forced by clarification, ask for more details
-            // For voting mode (5 votes): need at least 3/5 to agree
-            // For fast mode (1 vote): just check confidence threshold
-            const lowVoteAgreement = classificationResult.totalVotes > 1 && classificationResult.votesForWinner < 3;
-            const lowConfidence = classificationResult.confidence < 0.70;
-            
-            if ((lowConfidence || lowVoteAgreement) && !forcedCategory && !skipClarification) {
-              console.log(`⚠️ Low confidence (${(classificationResult.confidence * 100).toFixed(1)}%, ${classificationResult.votesForWinner}/${classificationResult.totalVotes} agree) - asking for clarification`);
-              
-              // Trigger clarification flow instead of silently using fallback
-              pendingTaskDescription = description;
-              clarificationOptions = generateClarificationOptions(description, "low_confidence");
-              showClarification = true;
-              isLoading = false;
-              return; // Stop processing, show clarification UI
-            }
-          } else if (usingFallback) {
-            // Use keyword fallback
-            classificationResult = await fallbackClassifier.classify(description);
-            ensembleInfo = null;
-          } else {
-            throw new Error("Classifier not ready");
-          }
-
-          isModelLoading = false;
-          modelLoadProgress = "";
-        } catch (classifierError) {
-          console.warn("⚠️ Embedding classifier failed, using keyword fallback:", classifierError);
-          classificationResult = await fallbackClassifier.classify(description);
-          usingFallback = true;
-          isModelLoading = false;
-          modelLoadProgress = "";
-        }
-      }
-
-      const topPrediction = classificationResult.subcategoryPredictions[0] || classificationResult.predictions[0];
-
-      if (!topPrediction || !topPrediction.category) {
-        throw new Error("Could not classify the task. Please try describing it differently.");
-      }
-
-      const classification = {
-        category: topPrediction.category,
-        subcategory: topPrediction.subcategory || getDefaultSubcategory(topPrediction.category),
-      };
-
-      taskCategory = classification.category;
-      taskSubcategory = classification.subcategory;
+      taskCategory = category;
+      taskSubcategory = subcategory;
 
       const groupedModels = modelSelector.getTaskModelsGroupedByTier(
-        classification.category,
-        classification.subcategory,
+        category,
+        subcategory,
+        0,
+        deploymentTarget
       );
 
       const filteredRecommendations = [
         ...groupedModels.lightweight.models,
         ...groupedModels.standard.models,
         ...groupedModels.advanced.models,
+        ...(groupedModels.xlarge?.models || []),
       ];
 
       if (filteredRecommendations.length === 0) {
-        throw new Error(`No models found for ${classification.category}. Try a different task description.`);
+        // If deployment filter yielded no results, show message
+        if (deploymentTarget) {
+          error = `No ${deploymentTarget}-ready models found for this task. Try "Any environment" to see all options.`;
+        } else {
+          error = `No models found for ${category} / ${subcategory}.`;
+        }
+      } else {
+        recommendations = filteredRecommendations;
       }
 
-      recommendations = filteredRecommendations;
-
-      // Scroll to results and show highlight animation
+      // Scroll to results
       showResultsHighlight = true;
       setTimeout(() => {
         if (recommendationsSection) {
           recommendationsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        // Remove highlight after animation completes
         setTimeout(() => { showResultsHighlight = false; }, 1500);
       }, 100);
 
+      // Update URL
       const currentUrl = new URL(window.location);
-      currentUrl.searchParams.set("task", encodeURIComponent(description));
+      currentUrl.searchParams.set("category", category);
+      currentUrl.searchParams.set("task", subcategory);
+      if (deploymentTarget) {
+        currentUrl.searchParams.set("deploy", deploymentTarget);
+      } else {
+        currentUrl.searchParams.delete("deploy");
+      }
       goto(currentUrl.pathname + currentUrl.search, { replaceState: true, noScroll: true });
     } catch (err) {
-      console.error("❌ Error processing task:", err);
+      console.error("Error processing task:", err);
       error = err.message || "An error occurred. Please try again.";
     } finally {
       isLoading = false;
     }
   }
-
 </script>
 
 <svelte:head>
@@ -383,19 +220,19 @@
       <h1>
         <span class="gradient-text">AI Model Advisor</span>
       </h1>
-      
+
       <p class="hero-subtitle">
         Find the <em>right AI model</em> for your task.
       </p>
 
       <div class="stats-bar">
         <div class="stat-item">
-          <span class="stat-number">150+</span>
+          <span class="stat-number">{totalModelCount || '...'}</span>
           <span class="stat-label">Models</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-number">7</span>
+          <span class="stat-number">{Object.keys(availableCategories).length || '...'}</span>
           <span class="stat-label">Categories</span>
         </div>
       </div>
@@ -405,11 +242,10 @@
       <div class="disclaimer-icon">💡</div>
       <div class="disclaimer-content">
         <p>
-          <strong>This is a starting point, not a final answer.</strong> 
-          We point you toward models that might fit your task, but you decide what works best for your use case, 
-          data, and constraints. Smaller models are often highly specialized and can match or outperform 
-          larger ones for specific tasks while using far fewer resources. When you refine your task description, 
-          we re-run the classifier, so recommendations may change as we better understand your needs.
+          <strong>This is a starting point, not a final answer.</strong>
+          We point you toward models that might fit your task, but you decide what works best for your use case,
+          data, and constraints. Smaller models are often highly specialized and can match or outperform
+          larger ones for specific tasks while using far fewer resources.
         </p>
       </div>
     </div>
@@ -435,7 +271,7 @@
               <div class="progress-fill" style="width: {downloadPercentage}%"></div>
             </div>
           {/if}
-          <span class="loading-note">One-time download • Cached in browser for instant future loads</span>
+          <span class="loading-note">Optional — form works without it • Cached after first load</span>
         </div>
       </div>
     {/if}
@@ -451,17 +287,16 @@
       </div>
     {/if}
 
-    {#if showClarification}
-      <ClarificationFlow 
-        options={clarificationOptions}
-        originalDescription={pendingTaskDescription}
-        on:select={handleClarificationSelect}
-        on:skip={handleClarificationSkip}
-        on:clarify={handleClarificationText}
-      />
-    {:else}
-      <TaskInput bind:taskDescription {isLoading} on:submit={handleTaskSubmit} />
-    {/if}
+    <TaskForm
+      {tasksData}
+      {availableCategories}
+      {isLoading}
+      {prefillCategory}
+      {prefillSubcategory}
+      {prefillConfidence}
+      on:submit={handleFormSubmit}
+      on:classify={handleClassify}
+    />
 
     <div bind:this={recommendationsSection} class:results-highlight={showResultsHighlight}>
       <RecommendationDisplay
@@ -554,7 +389,7 @@
   .grid-overlay {
     position: absolute;
     inset: 0;
-    background-image: 
+    background-image:
       linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
     background-size: 60px 60px;
@@ -598,13 +433,6 @@
   .hero-subtitle em {
     color: #e8f5e9;
     font-style: normal;
-    font-weight: 600;
-  }
-
-  .highlight {
-    display: inline-block;
-    margin-top: 0.5rem;
-    color: #10b981;
     font-weight: 600;
   }
 
@@ -898,9 +726,4 @@
     }
   }
 
-  @media (prefers-contrast: high) {
-    .badge {
-      border-width: 2px;
-    }
-  }
 </style>
