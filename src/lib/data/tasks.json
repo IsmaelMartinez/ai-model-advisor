@@ -17,12 +17,6 @@
           "description": "Identifying and locating objects within images",
           "keywords": ["detect objects", "bounding box", "yolo", "object recognition", "locate objects", "count objects", "count stars", "find objects", "identify objects", "spot objects", "objects in image", "things in photo", "count animals", "satellite image", "aerial image", "space image", "animals in image"],
           "examples": ["Traffic sign detection", "Face detection", "Security monitoring", "Count stars in NASA images", "Count animals in satellite images"]
-        },
-        "semantic_segmentation": {
-          "label": "Semantic Segmentation", 
-          "description": "Pixel-level classification of image regions",
-          "keywords": ["segment image", "pixel classification", "region detection", "image segmentation", "mask generation", "pixel-wise labeling", "scene parsing", "instance segmentation", "label pixels"],
-          "examples": ["Medical image segmentation", "Autonomous driving", "Satellite imagery analysis"]
         }
       }
     },
@@ -47,12 +41,6 @@
           "description": "Generating human-like text",
           "keywords": ["generate text", "language model", "gpt", "text creation", "writing assistant", "chatbot", "faq chatbot", "conversational ai", "dialogue system", "customer service bot", "virtual assistant", "faq bot", "support bot", "user questions", "customer questions"],
           "examples": ["Content creation", "Chatbot responses", "Article writing", "Create a chatbot that answers FAQ questions", "Build a virtual assistant for customer support", "Automated FAQ system", "Question answering from documents"]
-        },
-        "named_entity_recognition": {
-          "label": "Named Entity Recognition",
-          "description": "Identifying and extracting entities from text",
-          "keywords": ["entity extraction", "ner", "named entities", "information extraction", "extract names", "find entities", "identify names", "parse entities", "extract locations", "extract organizations"],
-          "examples": ["Extract person names", "Location identification", "Company name extraction"]
         },
         "code_assistant": {
           "label": "Code Assistant",
@@ -94,40 +82,6 @@
             "Find similar documents using vectors",
             "Encode sentences for similarity matching",
             "Set up semantic search for my knowledge base"
-          ]
-        },
-        "translation": {
-          "label": "Translation",
-          "description": "Translating text between languages",
-          "keywords": [
-            "translate", "translation", "translator", "language translation",
-            "machine translation", "multilingual", "convert language",
-            "english to spanish", "french to english", "translate text",
-            "language pair", "neural translation", "nmt", "localization",
-            "multi-language", "cross-lingual", "bilingual"
-          ],
-          "examples": [
-            "Translate English documents to Spanish",
-            "Build a multilingual translation service",
-            "Convert French text to English",
-            "Machine translation for website content"
-          ]
-        },
-        "summarization": {
-          "label": "Summarization",
-          "description": "Condensing long text into shorter summaries",
-          "keywords": [
-            "summarize", "summarization", "summary", "condense", "shorten",
-            "abstract", "abstractive", "extractive", "tldr", "brief",
-            "key points", "main points", "summarize document", "summarize article",
-            "document summary", "text summary", "news summary", "meeting summary",
-            "digest", "synopsis"
-          ],
-          "examples": [
-            "Summarize long articles into key points",
-            "Create executive summaries of documents",
-            "Generate meeting notes from transcripts",
-            "Condense research papers into abstracts"
           ]
         },
         "question_answering": {
