@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-02-11",
+  "lastUpdated": "2026-02-24",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -2991,6 +2991,23 @@
             "lastUpdated": "2025-09-25T00:32:21.000Z"
           },
           {
+            "id": "openmoss-team_moss-tts-realtime",
+            "name": "MOSS TTS Realtime",
+            "huggingFaceId": "OpenMOSS-Team/MOSS-TTS-Realtime",
+            "description": "MOSS TTS Realtime model for text to speech",
+            "sizeMB": 4448,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-02-15T15:26:05.000Z"
+          },
+          {
             "id": "microsoft_vibevoice-1.5b",
             "name": "VibeVoice 1.5B",
             "huggingFaceId": "microsoft/VibeVoice-1.5B",
@@ -3023,22 +3040,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-09-05T04:08:25.000Z"
-          },
-          {
-            "id": "bosonai_higgs-audio-v2-generation-3b-base",
-            "name": "Higgs Audio V2 Generation 3B Base",
-            "huggingFaceId": "bosonai/higgs-audio-v2-generation-3B-base",
-            "description": "Higgs Audio V2 Generation 3B Base model for text to speech",
-            "sizeMB": 5504,
-            "accuracy": 0.78,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch"
-            ],
-            "lastUpdated": "2025-07-28T20:17:03.000Z"
           }
         ]
       }
