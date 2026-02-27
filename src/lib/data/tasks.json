@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-02-05",
+  "lastUpdated": "2026-02-27",
   "taskTaxonomy": {
     "computer_vision": {
       "label": "Computer Vision",
@@ -10,19 +10,52 @@
           "label": "Image Classification",
           "description": "Categorizing images into predefined classes", 
           "keywords": ["classify images", "image recognition", "visual classification", "photo categorization", "categorize images", "identify image type", "image analysis", "visual recognition", "photo classification", "NASA image", "satellite image", "medical image", "space image", "aerial image"],
-          "examples": ["Classify dog breeds", "Medical image diagnosis", "Quality control inspection", "Categorize NASA telescope images"]
+          "examples": [
+            "Classify dog breeds from photos",
+            "Medical image diagnosis for X-rays",
+            "Quality control inspection on assembly line",
+            "Categorize NASA telescope images",
+            "Identify plant species from leaf photos",
+            "Sort product images by category",
+            "Detect skin conditions from dermatology photos",
+            "Classify satellite images by land use type",
+            "Recognize handwritten digits",
+            "Identify bird species from wildlife camera"
+          ]
         },
         "object_detection": {
           "label": "Object Detection",
           "description": "Identifying and locating objects within images",
           "keywords": ["detect objects", "bounding box", "yolo", "object recognition", "locate objects", "count objects", "count stars", "find objects", "identify objects", "spot objects", "objects in image", "things in photo", "count animals", "satellite image", "aerial image", "space image", "animals in image"],
-          "examples": ["Traffic sign detection", "Face detection", "Security monitoring", "Count stars in NASA images", "Count animals in satellite images"]
+          "examples": [
+            "Traffic sign detection for self-driving cars",
+            "Face detection in group photos",
+            "Security camera monitoring for intruders",
+            "Count stars in NASA images",
+            "Count animals in satellite images",
+            "Detect pedestrians in street footage",
+            "Find defects on a circuit board",
+            "Locate tumors in medical scans",
+            "Detect vehicles in drone footage",
+            "Find and count fish in underwater video"
+          ]
         },
         "semantic_segmentation": {
           "label": "Semantic Segmentation", 
           "description": "Pixel-level classification of image regions",
           "keywords": ["segment image", "pixel classification", "region detection", "image segmentation", "mask generation", "pixel-wise labeling", "scene parsing", "instance segmentation", "label pixels"],
-          "examples": ["Medical image segmentation", "Autonomous driving", "Satellite imagery analysis"]
+          "examples": [
+            "Medical image segmentation for organ boundaries",
+            "Autonomous driving scene understanding",
+            "Satellite imagery land cover analysis",
+            "Segment tumors from healthy tissue in MRI",
+            "Label each pixel in a street scene",
+            "Separate foreground from background in photos",
+            "Crop field boundary detection from aerial images",
+            "Segment buildings from satellite photos",
+            "Cell segmentation in microscopy images",
+            "Flood area mapping from drone imagery"
+          ]
         }
       }
     },
@@ -34,25 +67,69 @@
           "label": "Text Classification",
           "description": "Categorizing text into predefined classes",
           "keywords": ["classify text", "text categorization", "document classification", "text analysis", "classify tickets", "classify emails", "classify documents", "categorize text", "sort text", "classify customer", "support tickets", "customer support", "email classification", "document sorting", "text sorting"],
-          "examples": ["Email spam detection", "News article categorization", "Customer inquiry routing"]
+          "examples": [
+            "Email spam detection",
+            "News article categorization by topic",
+            "Customer inquiry routing to departments",
+            "Classify support tickets by priority",
+            "Tag blog posts with relevant categories",
+            "Filter toxic comments in a forum",
+            "Categorize legal documents by case type",
+            "Sort resumes by job role",
+            "Classify bug reports as critical or minor",
+            "Detect phishing emails automatically"
+          ]
         },
         "sentiment_analysis": {
           "label": "Sentiment Analysis",
           "description": "Determining emotional tone in text",
           "keywords": ["sentiment", "emotion", "positive negative", "opinion mining", "mood analysis", "analyze sentiment", "product reviews", "review analysis", "customer feedback", "social media sentiment", "opinion analysis", "emotional analysis"],
-          "examples": ["Product review analysis", "Social media monitoring", "Customer feedback analysis"]
+          "examples": [
+            "Product review analysis on Amazon",
+            "Social media monitoring for brand perception",
+            "Customer feedback analysis from surveys",
+            "Analyze movie review sentiment",
+            "Detect negative tone in support conversations",
+            "Gauge public opinion on Twitter about a product",
+            "Rate restaurant reviews as positive or negative",
+            "Measure employee satisfaction from feedback forms",
+            "Analyze app store reviews for user sentiment",
+            "Track sentiment trends in news coverage"
+          ]
         },
         "text_generation": {
           "label": "Text Generation",
           "description": "Generating human-like text",
           "keywords": ["generate text", "language model", "gpt", "text creation", "writing assistant", "chatbot", "faq chatbot", "conversational ai", "dialogue system", "customer service bot", "virtual assistant", "faq bot", "support bot", "user questions", "customer questions"],
-          "examples": ["Content creation", "Chatbot responses", "Article writing", "Create a chatbot that answers FAQ questions", "Build a virtual assistant for customer support", "Automated FAQ system", "Question answering from documents"]
+          "examples": [
+            "Content creation for marketing blog",
+            "Chatbot responses for customer service",
+            "Article writing assistant",
+            "Create a chatbot that answers FAQ questions",
+            "Build a virtual assistant for customer support",
+            "Generate product descriptions automatically",
+            "Write email drafts from bullet points",
+            "Create dialogue for a conversational AI",
+            "Auto-generate social media captions",
+            "Story writing assistant for creative fiction"
+          ]
         },
         "named_entity_recognition": {
           "label": "Named Entity Recognition",
           "description": "Identifying and extracting entities from text",
           "keywords": ["entity extraction", "ner", "named entities", "information extraction", "extract names", "find entities", "identify names", "parse entities", "extract locations", "extract organizations"],
-          "examples": ["Extract person names", "Location identification", "Company name extraction"]
+          "examples": [
+            "Extract person names from news articles",
+            "Location identification in travel reviews",
+            "Company name extraction from financial filings",
+            "Tag medical entities in clinical notes",
+            "Extract dates and events from legal contracts",
+            "Identify drug names in research papers",
+            "Pull product names from customer emails",
+            "Extract addresses from invoices",
+            "Identify gene and protein names in biomedical text",
+            "Tag organization names in government documents"
+          ]
         },
         "code_assistant": {
           "label": "Code Assistant",
@@ -70,11 +147,13 @@
             "Review this repository and suggest refactors",
             "Explain this function and write tests for it",
             "Suggest improvements to this Python module",
-            "Analyze this codebase and suggest simplifications",
             "Generate a function to parse JSON data",
             "I need help reviewing my javascript code",
-            "Can you help me review this python script",
-            "Help me refactor this code module"
+            "Help me refactor this code module",
+            "Write unit tests for my REST API endpoints",
+            "Debug this stack trace from my Node.js app",
+            "Convert this Java class to Python",
+            "Autocomplete code suggestions while I type"
           ]
         },
         "embedding": {
@@ -93,7 +172,12 @@
             "Build a RAG system for document retrieval",
             "Find similar documents using vectors",
             "Encode sentences for similarity matching",
-            "Set up semantic search for my knowledge base"
+            "Set up semantic search for my knowledge base",
+            "Generate text embeddings for a vector database",
+            "Index product descriptions for similarity search",
+            "Embed FAQ entries for retrieval augmented generation",
+            "Vectorize customer queries for nearest-neighbor lookup",
+            "Build a document similarity engine"
           ]
         },
         "translation": {
@@ -110,7 +194,13 @@
             "Translate English documents to Spanish",
             "Build a multilingual translation service",
             "Convert French text to English",
-            "Machine translation for website content"
+            "Machine translation for website content",
+            "Translate user interface strings for localization",
+            "Real-time chat translation between languages",
+            "Translate product descriptions for international store",
+            "Convert Japanese customer reviews to English",
+            "Subtitle translation for video content",
+            "Translate technical documentation to multiple languages"
           ]
         },
         "summarization": {
@@ -127,7 +217,13 @@
             "Summarize long articles into key points",
             "Create executive summaries of documents",
             "Generate meeting notes from transcripts",
-            "Condense research papers into abstracts"
+            "Condense research papers into abstracts",
+            "Summarize customer support chat logs",
+            "Create a TLDR for lengthy email threads",
+            "Summarize legal contracts into plain language",
+            "Generate daily news digests from multiple sources",
+            "Shorten product reviews into brief highlights",
+            "Summarize earnings call transcripts"
           ]
         },
         "question_answering": {
@@ -143,7 +239,13 @@
             "Answer questions from documents",
             "Build a QA system for customer support",
             "Extract answers from knowledge base",
-            "Reading comprehension system"
+            "Reading comprehension system",
+            "Answer questions about a product manual",
+            "Find answers in a collection of PDF reports",
+            "Build a help desk that answers from documentation",
+            "Answer patient questions from medical guidelines",
+            "Extract specific facts from legal documents",
+            "Build a study assistant that answers from textbooks"
           ]
         }
       }
@@ -156,13 +258,35 @@
           "label": "Speech Recognition",
           "description": "Converting speech to text",
           "keywords": ["speech to text", "asr", "voice recognition", "transcription", "dictation"],
-          "examples": ["Voice command recognition", "Meeting transcription", "Podcast subtitles"]
+          "examples": [
+            "Voice command recognition for smart home",
+            "Meeting transcription in real time",
+            "Podcast subtitles and captions",
+            "Transcribe doctor-patient conversations",
+            "Convert voicemail recordings to text",
+            "Transcribe lecture recordings for students",
+            "Real-time speech to text for live captioning",
+            "Transcribe call center phone calls",
+            "Voice dictation for note-taking app",
+            "Convert interview audio recordings to text"
+          ]
         },
         "text_to_speech": {
           "label": "Text to Speech",
           "description": "Converting text to spoken words", 
           "keywords": ["text to speech", "tts", "voice synthesis", "speech generation"],
-          "examples": ["Audiobook generation", "Voice assistants", "Accessibility tools"]
+          "examples": [
+            "Audiobook generation from text",
+            "Voice assistant that speaks responses",
+            "Accessibility screen reader with natural voice",
+            "Read notifications aloud on mobile device",
+            "Generate spoken announcements for transit systems",
+            "Convert written articles into audio podcasts",
+            "Text to speech for language learning app",
+            "Narrate game dialogue with synthetic voices",
+            "Pronounce words aloud in a dictionary app",
+            "Generate voice prompts for an IVR phone system"
+          ]
         }
       }
     },
@@ -174,13 +298,35 @@
           "label": "Time Series Forecasting",
           "description": "Predicting future values based on historical data",
           "keywords": ["forecast", "predict future", "predict values", "time series", "temporal prediction", "trend analysis", "projection", "future values", "historical data prediction"],
-          "examples": ["Stock price prediction", "Weather forecasting", "Demand planning"]
+          "examples": [
+            "Stock price prediction from historical data",
+            "Weather forecasting for the next week",
+            "Demand planning for retail inventory",
+            "Predict energy consumption for a building",
+            "Forecast website traffic for capacity planning",
+            "Predict sales revenue for next quarter",
+            "Estimate hospital bed occupancy over time",
+            "Forecast crop yield from seasonal data",
+            "Predict server load for auto-scaling",
+            "Revenue projection from historical trends"
+          ]
         },
         "anomaly_detection": {
           "label": "Anomaly Detection",
           "description": "Identifying unusual patterns, outliers, and abnormal behavior in data",
           "keywords": ["anomaly", "outlier", "unusual pattern", "fraud detection", "abnormal behavior", "detect anomalies", "anomaly detection", "server monitoring", "system monitoring", "monitoring data", "unusual data", "abnormal data", "detect outliers", "find anomalies", "intrusion detection", "network anomaly", "log anomaly", "defect detection", "fault detection", "novelty detection", "out of distribution"],
-          "examples": ["Fraud detection", "System monitoring", "Quality control", "Network intrusion detection", "Manufacturing defect detection", "Log anomaly detection"]
+          "examples": [
+            "Fraud detection in credit card transactions",
+            "System monitoring for server outages",
+            "Quality control on a production line",
+            "Network intrusion detection from traffic logs",
+            "Manufacturing defect detection from sensor data",
+            "Log anomaly detection in application logs",
+            "Detect unusual login patterns for security",
+            "Spot equipment failures before they happen",
+            "Identify billing anomalies in financial data",
+            "Detect abnormal heartbeat patterns in ECG data"
+          ]
         }
       }
     }
