@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-02-27",
+  "lastUpdated": "2026-02-28",
   "taskTaxonomy": {
     "computer_vision": {
       "label": "Computer Vision",
@@ -20,7 +20,17 @@
             "Detect skin conditions from dermatology photos",
             "Classify satellite images by land use type",
             "Recognize handwritten digits",
-            "Identify bird species from wildlife camera"
+            "Identify bird species from wildlife camera",
+            "Label food images for a nutrition app",
+            "Classify chest CT scans for lung disease",
+            "Sort fashion items by clothing type",
+            "Determine if a photo contains a cat or dog",
+            "Identify rock types from geological survey photos",
+            "Classify weather patterns from radar images",
+            "Recognize car makes and models from photos",
+            "Identify types of clouds in sky images",
+            "Classify microscope slides by cell type",
+            "Sort recycling items by material type from photos"
           ]
         },
         "object_detection": {
@@ -37,7 +47,17 @@
             "Find defects on a circuit board",
             "Locate tumors in medical scans",
             "Detect vehicles in drone footage",
-            "Find and count fish in underwater video"
+            "Find and count fish in underwater video",
+            "Identify potholes in road images",
+            "Detect PPE equipment on construction workers",
+            "Locate text regions in scanned documents",
+            "Find wildlife in trail camera photos",
+            "Detect ships in satellite imagery",
+            "Count people in a crowd from overhead camera",
+            "Find cracks in bridge inspection photos",
+            "Detect abandoned luggage in airport footage",
+            "Locate solar panels on rooftops from aerial views",
+            "Find parking spots from security camera feed"
           ]
         },
         "semantic_segmentation": {
@@ -54,7 +74,17 @@
             "Crop field boundary detection from aerial images",
             "Segment buildings from satellite photos",
             "Cell segmentation in microscopy images",
-            "Flood area mapping from drone imagery"
+            "Flood area mapping from drone imagery",
+            "Segment clothing items in fashion photos",
+            "Dental X-ray tooth segmentation",
+            "Parse indoor room layout from photos",
+            "Segment solar panels on rooftops from aerial views",
+            "Identify road surfaces vs sidewalks in images",
+            "Segment coral reefs in underwater imagery",
+            "Outline individual trees in forest canopy images",
+            "Segment skin lesions in dermatology images",
+            "Map agricultural crop types from satellite data",
+            "Segment lane markings on highway images"
           ]
         }
       }
@@ -77,7 +107,17 @@
             "Categorize legal documents by case type",
             "Sort resumes by job role",
             "Classify bug reports as critical or minor",
-            "Detect phishing emails automatically"
+            "Detect phishing emails automatically",
+            "Label survey responses by theme",
+            "Categorize product listings by department",
+            "Classify medical records by diagnosis type",
+            "Route incoming messages to the right team",
+            "Tag scientific papers by research field",
+            "Identify intent from user chat messages",
+            "Classify insurance claims by damage type",
+            "Sort incoming mail into folders automatically",
+            "Categorize help center articles by topic",
+            "Classify social media posts as news or opinion"
           ]
         },
         "sentiment_analysis": {
@@ -94,7 +134,17 @@
             "Rate restaurant reviews as positive or negative",
             "Measure employee satisfaction from feedback forms",
             "Analyze app store reviews for user sentiment",
-            "Track sentiment trends in news coverage"
+            "Track sentiment trends in news coverage",
+            "Classify customer complaints by frustration level",
+            "Detect sarcasm in social media comments",
+            "Measure audience reaction to marketing campaigns",
+            "Analyze hotel reviews for guest satisfaction",
+            "Score NPS survey responses by sentiment",
+            "Detect angry tone in support chat messages",
+            "Analyze political debate reactions on social media",
+            "Assess tone of internal company communications",
+            "Gauge investor sentiment from earnings call Q&A",
+            "Classify patient feedback as satisfied or unsatisfied"
           ]
         },
         "text_generation": {
@@ -111,7 +161,17 @@
             "Write email drafts from bullet points",
             "Create dialogue for a conversational AI",
             "Auto-generate social media captions",
-            "Story writing assistant for creative fiction"
+            "Story writing assistant for creative fiction",
+            "Generate personalized marketing emails",
+            "Create release notes from changelog entries",
+            "Auto-reply to common customer inquiries",
+            "Generate recipe descriptions from ingredients",
+            "Write property listings from real estate details",
+            "Create automated responses for a helpdesk bot",
+            "Generate commit messages from code diffs",
+            "Draft job descriptions from role requirements",
+            "Create personalized onboarding messages",
+            "Generate quiz questions from educational content"
           ]
         },
         "named_entity_recognition": {
@@ -128,7 +188,17 @@
             "Pull product names from customer emails",
             "Extract addresses from invoices",
             "Identify gene and protein names in biomedical text",
-            "Tag organization names in government documents"
+            "Tag organization names in government documents",
+            "Extract currency amounts from transaction records",
+            "Identify product specifications from datasheets",
+            "Pull key terms from patent applications",
+            "Extract speaker names from meeting transcripts",
+            "Tag skill names from job postings",
+            "Identify food allergens mentioned in menus",
+            "Extract facility names from inspection reports",
+            "Pull author and title from bibliography entries",
+            "Identify disease names in epidemiology reports",
+            "Extract city and country names from travel blogs"
           ]
         },
         "code_assistant": {
@@ -153,7 +223,17 @@
             "Write unit tests for my REST API endpoints",
             "Debug this stack trace from my Node.js app",
             "Convert this Java class to Python",
-            "Autocomplete code suggestions while I type"
+            "Autocomplete code suggestions while I type",
+            "Fix lint errors in my TypeScript project",
+            "Generate boilerplate code for a REST API",
+            "Optimize this slow database query",
+            "Add error handling to this async function",
+            "Migrate this codebase from JavaScript to TypeScript",
+            "Generate documentation from source code comments",
+            "Find and fix memory leaks in this Go program",
+            "Write integration tests for my microservice",
+            "Refactor this monolith into smaller modules",
+            "Create a CLI tool in Rust for file processing"
           ]
         },
         "embedding": {
@@ -177,7 +257,17 @@
             "Index product descriptions for similarity search",
             "Embed FAQ entries for retrieval augmented generation",
             "Vectorize customer queries for nearest-neighbor lookup",
-            "Build a document similarity engine"
+            "Build a document similarity engine",
+            "Cluster support tickets by topic using embeddings",
+            "Create a recommendation system using text similarity",
+            "Embed legal clauses for contract comparison",
+            "Build a plagiarism detector using sentence embeddings",
+            "Generate embeddings for deduplicating records",
+            "Embed job descriptions and resumes for matching",
+            "Create a citation finder using paper embeddings",
+            "Build a semantic cache for LLM query deduplication",
+            "Index help articles for intelligent search",
+            "Embed code snippets for similar code search"
           ]
         },
         "translation": {
@@ -200,7 +290,17 @@
             "Translate product descriptions for international store",
             "Convert Japanese customer reviews to English",
             "Subtitle translation for video content",
-            "Translate technical documentation to multiple languages"
+            "Translate technical documentation to multiple languages",
+            "Translate customer support messages in real time",
+            "Convert Chinese news articles to English",
+            "Translate user-generated content for a global platform",
+            "Localize mobile app strings into 10 languages",
+            "Translate legal contracts between languages",
+            "Build a cross-language search engine",
+            "Translate medical records for international patients",
+            "Convert German research papers to English",
+            "Translate social media posts for global monitoring",
+            "Real-time translation for multilingual video calls"
           ]
         },
         "summarization": {
@@ -223,7 +323,17 @@
             "Summarize legal contracts into plain language",
             "Generate daily news digests from multiple sources",
             "Shorten product reviews into brief highlights",
-            "Summarize earnings call transcripts"
+            "Summarize earnings call transcripts",
+            "Create bullet-point summaries of podcast episodes",
+            "Summarize patient visit notes for medical records",
+            "Generate weekly project status summaries",
+            "Condense lengthy Terms of Service into key points",
+            "Summarize scientific literature reviews",
+            "Create abstracts from conference proceedings",
+            "Distill key findings from market research reports",
+            "Summarize customer interviews into insights",
+            "Generate chapter summaries for textbooks",
+            "Create concise briefs from intelligence reports"
           ]
         },
         "question_answering": {
@@ -245,7 +355,17 @@
             "Build a help desk that answers from documentation",
             "Answer patient questions from medical guidelines",
             "Extract specific facts from legal documents",
-            "Build a study assistant that answers from textbooks"
+            "Build a study assistant that answers from textbooks",
+            "Answer HR policy questions from the employee handbook",
+            "Find answers in technical specification documents",
+            "Build a travel FAQ bot from a destination guide",
+            "Answer cooking questions from a recipe database",
+            "Extract compliance answers from regulatory filings",
+            "Build a troubleshooting assistant from support docs",
+            "Answer insurance questions from policy documents",
+            "Find specific clauses in legal agreements",
+            "Answer questions about software from API docs",
+            "Build a real estate FAQ from property listings"
           ]
         }
       }
@@ -268,7 +388,17 @@
             "Real-time speech to text for live captioning",
             "Transcribe call center phone calls",
             "Voice dictation for note-taking app",
-            "Convert interview audio recordings to text"
+            "Convert interview audio recordings to text",
+            "Transcribe court proceedings in real time",
+            "Convert sermon recordings to text for archives",
+            "Speech to text for hearing-impaired users",
+            "Transcribe focus group discussions",
+            "Recognize voice commands for a mobile app",
+            "Convert radio broadcast audio to searchable text",
+            "Transcribe earnings call audio for analysts",
+            "Automated closed captioning for live streams",
+            "Convert multilingual conference talks to text",
+            "Transcribe therapy session recordings"
           ]
         },
         "text_to_speech": {
@@ -285,7 +415,17 @@
             "Text to speech for language learning app",
             "Narrate game dialogue with synthetic voices",
             "Pronounce words aloud in a dictionary app",
-            "Generate voice prompts for an IVR phone system"
+            "Generate voice prompts for an IVR phone system",
+            "Create spoken weather reports automatically",
+            "Voice synthesis for animated character dialogue",
+            "Generate audio descriptions for visually impaired",
+            "Text to speech for in-car navigation system",
+            "Produce spoken alerts for monitoring dashboards",
+            "Read children's stories aloud with expressive voice",
+            "Generate multilingual voice announcements",
+            "Speak notifications for a wearable device",
+            "Create synthetic voiceovers for training videos",
+            "Text to speech for museum audio guides"
           ]
         }
       }
@@ -308,7 +448,17 @@
             "Estimate hospital bed occupancy over time",
             "Forecast crop yield from seasonal data",
             "Predict server load for auto-scaling",
-            "Revenue projection from historical trends"
+            "Revenue projection from historical trends",
+            "Forecast call center volume by hour",
+            "Predict patient admission rates for hospitals",
+            "Estimate future electricity prices",
+            "Forecast delivery times based on logistics data",
+            "Predict churn rate from subscription trends",
+            "Forecast air quality index from sensor history",
+            "Estimate inventory reorder timing",
+            "Predict peak network bandwidth usage",
+            "Forecast monthly active users for an app",
+            "Predict housing price trends by region"
           ]
         },
         "anomaly_detection": {
@@ -325,7 +475,17 @@
             "Detect unusual login patterns for security",
             "Spot equipment failures before they happen",
             "Identify billing anomalies in financial data",
-            "Detect abnormal heartbeat patterns in ECG data"
+            "Detect abnormal heartbeat patterns in ECG data",
+            "Find unusual spikes in API response times",
+            "Detect counterfeit transactions in e-commerce",
+            "Identify anomalous temperature readings from IoT sensors",
+            "Spot suspicious account activity in banking",
+            "Detect data exfiltration attempts in network traffic",
+            "Find outliers in clinical trial measurements",
+            "Monitor power grid for unusual consumption patterns",
+            "Detect bot traffic on a website",
+            "Identify abnormal vibration patterns in machinery",
+            "Spot irregular patterns in supply chain data"
           ]
         }
       }
