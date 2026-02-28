@@ -161,10 +161,11 @@ git status         # ✅ Clean working tree
 **Goal**: Improve data quality and expand features
 
 #### Key Objectives
-1. **Phase 2 Auto-Updates**: Add Gemini-based validation for model card parsing
-2. **Improved Accuracy Data**: Extract real metrics from model cards
-3. **Cross-Browser Support**: Expand beyond Chrome-first to Firefox, Safari
-4. **Community Features**: User feedback and model suggestions
+1. **Pre-compute Reference Embeddings**: Distill the 320 reference example embeddings at build time into a static JSON file, so the browser doesn't need to embed them on first load — significantly reducing initial classification latency
+2. **Phase 2 Auto-Updates**: Add Gemini-based validation for model card parsing
+3. **Improved Accuracy Data**: Extract real metrics from model cards
+4. **Cross-Browser Support**: Expand beyond Chrome-first to Firefox, Safari
+5. **Community Features**: User feedback and model suggestions
 
 ### Future Priorities (Post-v1.1)
 
