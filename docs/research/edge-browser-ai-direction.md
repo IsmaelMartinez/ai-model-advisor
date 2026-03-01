@@ -1,6 +1,6 @@
 # Research: Repositioning as an Edge/Browser AI Advisor
 
-**Date**: 2026-02-20
+**Date**: 2026-02-20 (updated 2026-03-01 with verified research)
 **Status**: Draft - For Discussion
 **Author**: Development Team
 
@@ -133,25 +133,28 @@ This makes the environmental message structural rather than just "pick the small
 
 Not every AI task is realistic at the edge today. The taxonomy should reflect this honestly.
 
-**Well-supported edge tasks** (rich model ecosystem):
-| Task | Edge Maturity | Key Models |
-|------|--------------|------------|
-| Image Classification | Excellent | MobileNet, EfficientNet, ViT-Tiny |
-| Object Detection | Good | YOLO-NAS, MobileDet, NanoDet |
-| Text Classification | Excellent | DistilBERT, MiniLM, TinyBERT |
-| Sentiment Analysis | Excellent | Same as text classification |
-| Embeddings/Search | Good | MiniLM, BGE-Small, all-MiniLM |
-| Speech Recognition | Good | Whisper Tiny/Base, Sherpa-ONNX |
-| Text-to-Speech | Emerging | Piper, Coqui TTS (small) |
+**Well-supported edge tasks** (rich model ecosystem, verified Feb 2026):
+| Task | Edge Maturity | Key Models | Browser Size |
+|------|--------------|------------|-------------|
+| Image Classification | Excellent | MobileNet (~8-16MB), EfficientNet-Lite0, ViT-Tiny | <20MB |
+| Object Detection | Excellent | COCO-SSD (~7MB), EfficientDet-Lite0/2, NanoDet | <15MB |
+| Text Classification | Excellent | DistilBERT (~67MB), MiniLM (~23MB), TinyBERT | <70MB |
+| Sentiment Analysis | Excellent | Same as text classification | <70MB |
+| Embeddings/Search | Excellent | all-MiniLM-L6-v2 (~23MB), BGE-Small (~25MB) | <30MB |
+| Speech Recognition | Good | Whisper-tiny.en (~38MB), Whisper-base.en (~74MB) | <80MB, WebGPU helps |
+| Face/Hand/Pose | Excellent | MediaPipe solutions (<10MB each) | <10MB |
+| Semantic Segmentation | Good | DeepLab (TF.js), MediaPipe selfie segmenter | <20MB |
+| Named Entity Recognition | Good | DistilBERT-NER, GLiNER-small | <70MB |
 
-**Harder at the edge** (should be flagged honestly):
-| Task | Edge Maturity | Challenge |
-|------|--------------|-----------|
-| Text Generation | Limited | Even 1B models need quantization + WebGPU |
-| Translation | Limited | Bilingual pairs work; general translation needs larger models |
-| Summarization | Limited | Abstractive summarization needs generative models |
-| Code Assistant | Very Limited | Smallest usable code models are ~1-3GB quantized |
-| Time Series | Varies | Lightweight statistical models work; deep learning models less so |
+**Harder at the edge** (should be flagged honestly, verified Feb 2026):
+| Task | Edge Maturity | Challenge | Smallest Viable |
+|------|--------------|-----------|-----------------|
+| Text Generation | Limited | Even 1B models need q4 quantization + WebGPU; 3B is sweet spot but ~1.8GB | SmolLM2-135M (tiny), Qwen2.5-0.5B (usable) |
+| Translation | Limited | Bilingual pairs work with specialized models; general needs generative | ~200MB–1GB for decent quality |
+| Summarization | Limited | Abstractive summarization needs generative models; extractive is feasible | ~500MB+ for abstractive |
+| Code Assistant | Very Limited | Smallest usable: Qwen2.5-Coder-0.5B (~500MB q4); decent quality needs 3B+ | ~500MB minimum |
+| Text-to-Speech | Emerging | Piper TTS works on-device; browser support limited | ~50-200MB |
+| Time Series | Varies | Lightweight statistical models work; deep learning less so | Task-specific, small |
 
 #### 5. New Feature: "Can I Run This?" Checker
 
@@ -188,13 +191,16 @@ This is a unique feature no other tool offers.
 
 **Nobody is answering**: "I need to do [X] on-device — what model should I use, in what framework, and how do I get started?"
 
-### Industry trends supporting this direction
+### Industry trends supporting this direction (verified Feb 2026)
 
-- **WebGPU adoption** (2024-2026): GPU-accelerated inference in browsers is becoming mainstream
-- **WebNN specification** (emerging): Native ML acceleration via browser APIs
-- **Transformers.js growth**: 300K+ weekly npm downloads, expanding model coverage
-- **Apple/Google on-device push**: Core ML, ML Kit driving mobile expectations
-- **Regulation** (EU AI Act, GDPR): Data locality requirements favor on-device processing
+- **WebGPU adoption**: Now in Chrome 113+ (desktop), Chrome 121+ (Android), Safari 26+, Edge, Firefox 141+ (Windows). Broad but fragmented — shader compilation bugs remain on mobile.
+- **Transformers.js v3 stable** (120 architectures), **v4 preview** (~200 architectures, Feb 2026): Rapidly expanding model support. 1,200+ models tagged on HuggingFace Hub.
+- **WebNN specification** (emerging): Native ML acceleration via browser APIs — not yet widely deployed.
+- **On-device AI hardware**: Qualcomm Snapdragon 8 Elite delivers 80+ TOPS NPU; Apple A18 with 16-core Neural Engine; Raspberry Pi AI HAT+ 2 ($130, 40 TOPS) launched Jan 2026.
+- **Small model revolution**: Sub-4B models now competitive — Llama 3.2 1B with inference-time compute beats the 8B model; Phi-3.5-mini (3.8B) hits scores that previously required 540B.
+- **ExecuTorch 1.0 GA** (Oct 2025): Meta's 50KB-footprint runtime for mobile, 12+ hardware backends.
+- **Regulation** (EU AI Act, GDPR): Data locality requirements favor on-device processing.
+- **80% of AI inference now happens on edge** — driven by economics (90% cost savings vs. cloud), privacy compliance, and latency requirements.
 
 ---
 
@@ -292,20 +298,115 @@ Based on current `models.json` deployment tags:
 
 The overlap between these tags and actual verified browser runnability is unknown — which is exactly the gap this direction would fill.
 
-## Appendix B: Key Edge AI Runtimes
+## Appendix B: Key Edge AI Runtimes (Updated Feb 2026)
 
-| Runtime | Language | Browser | Mobile | Desktop | Models |
-|---------|----------|---------|--------|---------|--------|
-| **Transformers.js** | JS | Yes (WASM/WebGPU) | Via WebView | Via Electron | 1000+ HF models |
-| **ONNX Runtime Web** | JS | Yes (WASM/WebGPU) | Via WebView | Via Electron | Any ONNX export |
-| **TensorFlow.js** | JS | Yes (WebGL/WASM/WebGPU) | Via WebView | Via Node.js | TF model zoo |
-| **MediaPipe** | JS/Native | Yes (WASM) | Native SDK | Limited | ~20 pre-built solutions |
-| **WebLLM** | JS | Yes (WebGPU required) | Limited | Via Electron | LLM-specific |
-| **TensorFlow Lite** | Native | No | Yes (Android/iOS) | No | TF model zoo |
-| **Core ML** | Swift | No | Yes (iOS/macOS) | Yes (macOS) | Apple ecosystem |
-| **NNAPI/ML Kit** | Kotlin/Java | No | Yes (Android) | No | Android ecosystem |
+| Runtime | Language | Browser | Mobile | Desktop | Models | Notes |
+|---------|----------|---------|--------|---------|--------|-------|
+| **Transformers.js v3/v4** | JS | Yes (WASM/WebGPU) | Via WebView | Via Electron | 1,200+ on HF Hub | v4 adds ~200 architectures, new WebGPU C++ runtime |
+| **ONNX Runtime Web** | JS | Yes (WASM/WebGPU/WebNN) | Via WebView | Via Electron | Any ONNX export | 4GB WASM limit; WebGL deprecated |
+| **TensorFlow.js** | JS | Yes (WebGL/WASM/WebGPU) | Via WebView | Via Node.js | ~15 pre-built models | Strongest for vision/media; no LLM support |
+| **MediaPipe** | JS/Native | Yes (WASM) | Native SDK | Limited | ~20 pre-built solutions | Tiny models (<10MB), production-ready, no flexibility |
+| **WebLLM** | JS | Yes (WebGPU required) | Limited | Via Electron | LLMs only | 80% of native MLC-LLM speed; needs 4GB+ VRAM |
+| **ExecuTorch** | C++/Python | No | Yes (iOS/Android, 12+ backends) | Yes | Meta ecosystem | 50KB footprint, GA since Oct 2025 |
+| **TensorFlow Lite / LiteRT** | Native | No | Yes (Android/iOS) | No | TF model zoo | Google rebranding to LiteRT |
+| **Core ML / MLX** | Swift/Python | No | Yes (iOS/macOS) | Yes (macOS) | Apple ecosystem | MLX excellent for M-series Macs |
+| **llama.cpp** | C++ | Via wllama (WASM) | Via termux | Yes | GGUF models | De facto standard for CPU inference; ~10-20% faster than Ollama |
 
-## Appendix C: Related Prior Research
+## Appendix C: Browser Model Size Limits (Verified Feb 2026)
+
+### Desktop Browser
+
+| Model Size | Experience | Backend Needed |
+|------------|-----------|----------------|
+| <50MB | Instant load, works everywhere including mobile | WASM fine |
+| 50–200MB | Fast with IndexedDB cache. WASM fine for encoder models. | WASM or WebGPU |
+| 200MB–1GB | Noticeable first load. WebGPU needed for LLMs. Good UX on desktop. | WebGPU preferred |
+| 1–4GB | Long first load (minutes on slow connections). WebGPU required. | WebGPU required |
+| >4GB | Hits WASM 32-bit address limit. Requires external data splits. Unreliable. | Not recommended |
+
+### Mobile Browser
+
+| Model Size | Experience |
+|------------|-----------|
+| <50MB | Works well |
+| 50–200MB | Generally fine for encoder models |
+| >200MB | LLMs: shader compilation often times out on Android |
+| >500MB | Risky; many devices run out of memory or crash |
+
+### Edge/Native Devices
+
+| Platform | Practical Ceiling |
+|----------|-------------------|
+| Raspberry Pi 5 (8GB, no HAT) | 3B q4 comfortable (4-7 tok/sec), 7B marginal (1-3 tok/sec) |
+| Pi 5 + AI HAT+ 2 (40 TOPS) | 3B fast, 7B coming |
+| Mid-range phone (8GB RAM) | 1-3B q4 |
+| Flagship phone (12GB+ RAM) | 3-7B q4 (Llama 2-7B at 12-18 tok/sec on Snapdragon 8 Gen 3) |
+| Laptop no GPU (16GB RAM) | 7B q4 workable (3-8 tok/sec via llama.cpp) |
+| Apple M2/M3 (16GB unified) | 13B q4 comfortable (20-40 tok/sec via MLX) |
+
+## Appendix D: WebGPU vs WASM Performance (Verified Feb 2026)
+
+| Metric | WASM | WebGPU | Notes |
+|--------|------|--------|-------|
+| Matrix multiply (1024×1024) | Baseline | ~50x faster | Microbenchmark, best-case |
+| BERT-class inference | Baseline | 3-5x faster | Real-world transformer models |
+| LLM inference (WebLLM) | Not viable for LLMs | 71-80% of native speed | Phi-3.5-mini: 71 tok/sec; Llama 3.1-8B: 41 tok/sec |
+| Small model (<50MB encoder) | Fine, ~2ms | Overhead not worth it | GPU setup cost exceeds inference time |
+| First load shader compilation | N/A | 2-30 seconds | Major UX pain point; cached on subsequent visits |
+| Browser support | Universal | Chrome, Edge, Safari 26+, Firefox 141+ (Windows) | Firefox Linux/Android still in progress |
+
+**Key insight**: The "up to 100x faster" claims are from matrix multiply microbenchmarks. Real-world LLM inference sees 5-20x speedup. For small encoder models (<100MB), WASM is often better due to GPU setup overhead.
+
+## Appendix E: Verified Browser-Runnable Models (Feb 2026)
+
+### Transformers.js — Confirmed Working
+
+| Model | Task | Size | Notes |
+|-------|------|------|-------|
+| `Xenova/all-MiniLM-L6-v2` | Embeddings | ~23MB | **What this project uses.** Rock solid. |
+| `Xenova/bge-small-en-v1.5` | Embeddings | ~25MB | Slightly better quality |
+| `Xenova/whisper-tiny.en` | ASR | ~38MB | Good with WebGPU |
+| `Xenova/whisper-base.en` | ASR | ~74MB | Best accuracy/size tradeoff for ASR |
+| DistilBERT variants | NLP (classify, QA, NER) | ~67MB | Reliable, fast on WASM |
+| `onnx-community/Qwen2.5-0.5B-Instruct` | Text generation | ~500MB (q4) | Needs WebGPU |
+| `onnx-community/Llama-3.2-1B-Instruct-ONNX` | Text generation | ~600MB (q4) | Needs WebGPU, 4-8GB RAM |
+| `onnx-community/Qwen3-0.6B-ONNX` | Text generation | ~600MB (q4) | Needs WebGPU |
+
+### TensorFlow.js — Pre-built Models
+
+| Model | Task | Size | Notes |
+|-------|------|------|-------|
+| MobileNet | Image classification | ~8-16MB | Very fast |
+| COCO-SSD | Object detection | ~7MB | Real-time |
+| MoveNet/PoseNet | Pose estimation | ~5-10MB | Real-time on mobile |
+| Face Landmarks | 486 3D face points | ~5MB | |
+| Hand Pose | Hand tracking | ~5MB | Real-time |
+| Universal Sentence Encoder | Text embeddings (512-dim) | ~30MB | |
+| DeepLab | Semantic segmentation | ~10MB | |
+
+### MediaPipe — Pre-built Solutions
+
+| Solution | Tasks | Size | Notes |
+|----------|-------|------|-------|
+| Object Detection | EfficientDet-Lite0/2, SSD-MobileNetV2 | <10MB | |
+| Image Classification | EfficientNet-Lite0/2 | <10MB | |
+| Face Landmarks | 486 points + blendshapes | <5MB | |
+| Hand/Pose Landmarks | Real-time tracking | <5MB each | |
+| Image Segmentation | Selfie, hair, multi-class | <10MB | |
+| Text Classification | General | <5MB | |
+| LLM Inference | Gemma 2B/7B, Phi-2, Falcon, StableLM | 1-5GB | On-device, Web + Android + iOS |
+
+### WebLLM — Browser LLMs (WebGPU Required)
+
+| Model | Size (q4) | Min VRAM | Desktop tok/sec | Notes |
+|-------|-----------|----------|-----------------|-------|
+| SmolLM2-135M | ~100MB | 2GB | ~60+ | Coherent but very limited |
+| Qwen2.5-0.5B-Instruct | ~350MB | 2GB | ~40-50 | Usable for simple tasks |
+| Llama 3.2-1B | ~600MB | 4GB | ~30-40 | Good for basic tasks |
+| Phi-3.5-mini (3.8B) | ~1.8GB | 4GB | ~71 | Sweet spot quality/feasibility |
+| Llama 3.1-8B | ~4.5GB | 8GB | ~41 | Needs high-end hardware |
+
+## Appendix F: Related Prior Research
 
 - `docs/research/browser-slm-learnings.md` — Our evaluation of browser-based SLMs; confirms that small, specialized models outperform large generic ones in-browser
 - `docs/adrs/adr-0008-embedding-similarity-classification.md` — Decision to use MiniLM (23MB) over Llama 3.2 1B (500MB); validates the edge-first approach
@@ -314,3 +415,5 @@ The overlap between these tags and actual verified browser runnability is unknow
 ---
 
 **Next step**: Decide whether to proceed. If yes, Phase 1 can begin immediately — it's mostly editorial work on the existing database and UI copy, with no architectural changes required.
+
+**Research validation note (2026-03-01)**: Web research conducted across 8 areas confirms the original direction is sound. Key finding: the 23MB MiniLM model used by this project sits firmly in the "works great everywhere" zone (<50MB). The practical browser ceiling for good UX is ~200MB (WASM) or ~1-2GB (WebGPU, desktop only). The edge AI ecosystem has matured significantly — Transformers.js v4 now supports ~200 architectures, WebGPU is broadly available, and small models (1-4B) are closing the quality gap with much larger ones. The proposed pivot to "edge/browser AI advisor" is well-timed.
