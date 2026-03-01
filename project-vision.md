@@ -39,6 +39,7 @@ An open source assistant to help you choose the most environmentally efficient A
 ### Phase 2: v1.1 (In Progress)
 **Goals**: Enhanced data quality and expanded features
 
+- 📋 Pre-compute reference embeddings at build time: Ship a static JSON of 320 pre-computed vectors so the browser skips embedding the reference examples on first load, cutting initial classification latency
 - 📋 Additional task categories
 - 📋 Improved accuracy data: Extract real metrics from model cards
 - 📋 Cross-browser support: Firefox, Safari testing
