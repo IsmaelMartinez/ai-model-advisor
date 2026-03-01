@@ -11,10 +11,7 @@ export const CATEGORY_DEFAULTS = {
   natural_language_processing: 'text_classification',
   computer_vision: 'image_classification',
   speech_processing: 'speech_recognition',
-  time_series: 'forecasting',
-  recommendation_systems: 'collaborative_filtering',
-  reinforcement_learning: 'game_playing',
-  data_preprocessing: 'data_cleaning'
+  time_series: 'forecasting'
 };
 
 /**

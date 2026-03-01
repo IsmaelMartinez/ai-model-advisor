@@ -150,7 +150,7 @@ describe('MVP Acceptance Tests', () => {
         totalSubcategories += Object.keys(category.subcategories).length;
       });
 
-      expect(totalSubcategories).toBeGreaterThan(10); // MVP requires 10+ task categories
+      expect(totalSubcategories).toBeGreaterThanOrEqual(10); // 12 focused subcategories
     });
   });
 

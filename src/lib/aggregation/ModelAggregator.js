@@ -128,38 +128,25 @@ export class ModelAggregator {
 
   /**
    * Fetch models from Hugging Face Hub API
+   * Two passes: (1) popular models by downloads, (2) browser-ready models from ONNX orgs
    */
   async fetchHuggingFaceModels(categories) {
     const allModels = [];
 
+    // Pass 1: Fetch most popular models by downloads (existing behavior)
     for (const category of categories) {
       try {
         console.log(`   Fetching ${category.task} models...`);
-
-        const url = new URL('https://huggingface.co/api/models');
-        // Use pipeline_tag instead of filter for newer API
-        url.searchParams.set('pipeline_tag', category.task);
-        url.searchParams.set('sort', 'downloads');
-        url.searchParams.set('direction', '-1'); // Descending
-        url.searchParams.set('limit', '50'); // Fetch more to get diverse model sizes
-        url.searchParams.set('full', 'true'); // Get full model info including safetensors
-
-        const headers = {};
-        if (this.huggingFaceToken) {
-          headers['Authorization'] = `Bearer ${this.huggingFaceToken}`;
-        }
-
-        const response = await fetch(url, { headers });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const models = await response.json();
+        const models = await this.fetchModelsFromHF({
+          pipeline_tag: category.task,
+          sort: 'downloads',
+          direction: '-1',
+          limit: '50',
+          full: 'true'
+        });
 
         console.log(`   Found ${models.length} ${category.task} models`);
 
-        // Add category information to each model
         const categorizedModels = models.map(model => ({
           ...model,
           sourceCategory: category.category,
@@ -169,8 +156,6 @@ export class ModelAggregator {
 
         allModels.push(...categorizedModels);
         this.stats.processed += models.length;
-
-        // Rate limiting - be more conservative
         await this.sleep(500);
 
       } catch (error) {
@@ -179,7 +164,78 @@ export class ModelAggregator {
       }
     }
 
+    // Pass 2: Fetch browser-ready models from known ONNX-publishing organizations
+    // These orgs publish pre-converted ONNX models that actually work in browsers
+    const browserReadyOrgs = ['Xenova', 'onnx-community'];
+    const seenIds = new Set(allModels.map(m => m.id));
+
+    console.log('\n   📦 Fetching browser-ready models (Xenova, onnx-community)...');
+
+    for (const org of browserReadyOrgs) {
+      for (const category of categories) {
+        try {
+          const models = await this.fetchModelsFromHF({
+            author: org,
+            pipeline_tag: category.task,
+            sort: 'downloads',
+            direction: '-1',
+            limit: '20',
+            full: 'true'
+          });
+
+          // Only add models we haven't already seen
+          let added = 0;
+          for (const model of models) {
+            if (!seenIds.has(model.id)) {
+              seenIds.add(model.id);
+              allModels.push({
+                ...model,
+                sourceCategory: category.category,
+                sourceSubcategory: category.subcategory,
+                sourceTask: category.task
+              });
+              added++;
+              this.stats.processed++;
+            }
+          }
+
+          if (added > 0) {
+            console.log(`   Found ${added} new ${category.task} models from ${org}`);
+          }
+
+          await this.sleep(300);
+
+        } catch (error) {
+          // Non-fatal: browser-ready models are a bonus, not a requirement
+          this.stats.errors++;
+        }
+      }
+    }
+
     return allModels;
+  }
+
+  /**
+   * Low-level HuggingFace API fetch with configurable params
+   */
+  async fetchModelsFromHF(params) {
+    const url = new URL('https://huggingface.co/api/models');
+    for (const [key, value] of Object.entries(params)) {
+      url.searchParams.set(key, value);
+    }
+
+    const headers = {};
+    if (this.huggingFaceToken) {
+      headers['Authorization'] = `Bearer ${this.huggingFaceToken}`;
+    }
+
+    const response = await fetch(url, { headers });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
   }
 
   /**
@@ -258,12 +314,12 @@ export class ModelAggregator {
     
     // Calculate environmental score based on size
     const environmentalScore = this.calculateEnvironmentalScore(sizeMB);
-    
-    // Determine deployment options based on size and model type
-    const deploymentOptions = this.determineDeploymentOptions(sizeMB, rawModel);
-    
-    // Extract supported frameworks
+
+    // Extract supported frameworks (must come before deployment options)
     const frameworks = this.extractFrameworks(rawModel, detailedInfo);
+
+    // Determine deployment options based on size AND framework compatibility
+    const deploymentOptions = this.determineDeploymentOptions(sizeMB, rawModel, frameworks);
 
     return {
       id: this.generateModelId(rawModel),
@@ -514,47 +570,88 @@ export class ModelAggregator {
   }
 
   /**
-   * Determine deployment options based on model characteristics
-   * Updated for new tier thresholds: lightweight (≤500MB), standard (≤4GB), advanced (≤20GB)
+   * Determine deployment options based on model size AND runtime compatibility
+   * "browser" requires both: (a) size within browser limits AND (b) a browser-compatible framework
+   * Browser-compatible frameworks: ONNX, Transformers.js, TensorFlow.js
    */
-  determineDeploymentOptions(sizeMB, rawModel) {
-    const options = [];
-    
-    if (sizeMB <= 100) {
-      options.push('browser', 'mobile', 'edge');
-    } else if (sizeMB <= 500) {
-      options.push('edge', 'cloud');
+  determineDeploymentOptions(sizeMB, rawModel, frameworks = []) {
+    const options = new Set();
+    const browserFrameworks = ['ONNX', 'Transformers.js', 'TensorFlow.js'];
+    const hasBrowserRuntime = frameworks.some(f => browserFrameworks.includes(f));
+
+    // Browser: needs browser runtime + size under 500MB (comfortable limit for desktop browsers)
+    if (hasBrowserRuntime && sizeMB <= 500) {
+      options.add('browser');
     }
-    
+
+    // Mobile: browser runtime + under 100MB (realistic for phones)
+    if (hasBrowserRuntime && sizeMB <= 100) {
+      options.add('mobile');
+    }
+
+    // Edge: under 500MB (Pi, cheap laptops, etc.)
+    if (sizeMB <= 500) {
+      options.add('edge');
+    }
+
+    // Cloud/Server based on size
     if (sizeMB <= 4000) {
-      options.push('cloud', 'server');
+      options.add('cloud');
+      options.add('server');
     } else {
-      options.push('server');
+      options.add('server');
     }
-    
-    return [...new Set(options)]; // Remove duplicates
+
+    return [...options];
   }
 
   /**
-   * Extract supported frameworks (simplified)
+   * Extract supported frameworks, including browser-compatible runtimes
+   * Detects ONNX/Transformers.js from file siblings, tags, library_name, and known orgs
    */
   extractFrameworks(rawModel, detailedInfo) {
-    const frameworks = [];
-    
-    // Check for common framework indicators
+    const frameworks = new Set();
+
+    // 1. Check library_name from HuggingFace metadata
     if (detailedInfo) {
-      if (detailedInfo.library_name === 'transformers') frameworks.push('PyTorch', 'TensorFlow');
-      if (detailedInfo.library_name === 'pytorch') frameworks.push('PyTorch');
-      if (detailedInfo.library_name === 'tensorflow') frameworks.push('TensorFlow');
+      const lib = detailedInfo.library_name;
+      if (lib === 'transformers') { frameworks.add('PyTorch'); frameworks.add('TensorFlow'); }
+      if (lib === 'pytorch') frameworks.add('PyTorch');
+      if (lib === 'tensorflow' || lib === 'keras') frameworks.add('TensorFlow');
+      if (lib === 'transformers.js') frameworks.add('Transformers.js');
+      if (lib === 'onnx') frameworks.add('ONNX');
     }
-    
-    // Default frameworks for popular models
-    if (frameworks.length === 0) {
-      frameworks.push('PyTorch');
-      if (rawModel.id.includes('tensorflow')) frameworks.push('TensorFlow');
+
+    // 2. Check for .onnx files in siblings (proves browser-deployable)
+    if (detailedInfo?.siblings) {
+      const hasOnnx = detailedInfo.siblings.some(f => f.rfilename?.endsWith('.onnx'));
+      if (hasOnnx) {
+        frameworks.add('ONNX');
+        frameworks.add('Transformers.js');
+      }
     }
-    
-    return frameworks;
+
+    // 3. Check model tags for browser-compatible runtimes
+    const tags = detailedInfo?.tags || rawModel.tags || [];
+    if (tags.includes('transformers.js')) frameworks.add('Transformers.js');
+    if (tags.includes('onnx')) frameworks.add('ONNX');
+
+    // 4. Known ONNX-publishing organizations (pre-converted, browser-ready)
+    const modelId = rawModel.id || '';
+    const org = modelId.split('/')[0]?.toLowerCase();
+    const browserReadyOrgs = ['xenova', 'onnx-community'];
+    if (browserReadyOrgs.includes(org)) {
+      frameworks.add('ONNX');
+      frameworks.add('Transformers.js');
+    }
+
+    // 5. Default fallback: if nothing detected, assume PyTorch
+    if (frameworks.size === 0) {
+      frameworks.add('PyTorch');
+      if (modelId.includes('tensorflow')) frameworks.add('TensorFlow');
+    }
+
+    return [...frameworks];
   }
 
   /**

@@ -86,13 +86,43 @@ export class ModelSelector {
   }
 
   /**
-   * Get models grouped by tier with accuracy filtering
+   * Filter models by deployment target
+   * @param {Array} models - Models to filter
+   * @param {string|null} deploymentTarget - Target: 'browser', 'edge', 'cloud', or null for all
+   * @returns {Object} Object with filtered models and metadata
+   */
+  filterByDeployment(models, deploymentTarget = null) {
+    if (!deploymentTarget) {
+      return { filtered: models, total: models.length, hidden: 0 };
+    }
+
+    const targetMatches = {
+      browser: ['browser'],
+      edge: ['browser', 'edge', 'mobile'],
+      cloud: ['cloud', 'server', 'edge', 'browser', 'mobile']
+    };
+
+    const allowed = targetMatches[deploymentTarget] || [deploymentTarget];
+    const filtered = models.filter(model =>
+      (model.deploymentOptions || []).some(opt => allowed.includes(opt))
+    );
+
+    return {
+      filtered,
+      total: models.length,
+      hidden: models.length - filtered.length
+    };
+  }
+
+  /**
+   * Get models grouped by tier with accuracy and deployment filtering
    * @param {string} category - Main category
    * @param {string} subcategory - Subcategory
    * @param {number} accuracyThreshold - Minimum accuracy threshold (0-95)
+   * @param {string|null} deploymentTarget - Deployment target filter
    * @returns {Object} Models grouped by tier with filter metadata
    */
-  getTaskModelsGroupedByTier(category, subcategory, accuracyThreshold = 0) {
+  getTaskModelsGroupedByTier(category, subcategory, accuracyThreshold = 0, deploymentTarget = null) {
     const taskData = this.modelsData.models[category]?.[subcategory];
     if (!taskData) {
       return {
@@ -118,17 +148,38 @@ export class ModelSelector {
         subcategory
       }));
 
-      const filterResult = this.filterByAccuracy(tierModels, accuracyThreshold);
+      const accuracyResult = this.filterByAccuracy(tierModels, accuracyThreshold);
+      const deployResult = this.filterByDeployment(accuracyResult.filtered, deploymentTarget);
 
       result[tier] = {
-        models: this.rankBySize(filterResult.filtered),
-        hidden: filterResult.hidden
+        models: this.rankBySize(deployResult.filtered),
+        hidden: accuracyResult.hidden + deployResult.hidden
       };
 
-      result.totalHidden += filterResult.hidden;
-      result.totalShown += filterResult.filtered.length;
+      result.totalHidden += accuracyResult.hidden + deployResult.hidden;
+      result.totalShown += deployResult.filtered.length;
     });
 
+    return result;
+  }
+
+  /**
+   * Get all categories and subcategories that have models
+   * @returns {Object} Map of category → subcategory[] with model counts
+   */
+  getAvailableCategories() {
+    const result = {};
+    for (const [category, subcats] of Object.entries(this.modelsData.models)) {
+      const subs = {};
+      for (const [subcategory, tiers] of Object.entries(subcats)) {
+        let count = 0;
+        TIERS.forEach(tier => {
+          if (Array.isArray(tiers[tier])) count += tiers[tier].length;
+        });
+        if (count > 0) subs[subcategory] = count;
+      }
+      if (Object.keys(subs).length > 0) result[category] = subs;
+    }
     return result;
   }
 }

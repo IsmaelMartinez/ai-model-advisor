@@ -303,5 +303,152 @@ describe('ModelAggregator', () => {
       expect(aggregator.calculateEnvironmentalScore(100000)).toBe(3);
     });
   });
+
+  describe('extractFrameworks', () => {
+    test('detects PyTorch/TensorFlow from library_name "transformers"', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'org/model' },
+        { library_name: 'transformers' }
+      );
+      expect(frameworks).toContain('PyTorch');
+      expect(frameworks).toContain('TensorFlow');
+    });
+
+    test('detects Transformers.js from library_name', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'org/model' },
+        { library_name: 'transformers.js' }
+      );
+      expect(frameworks).toContain('Transformers.js');
+    });
+
+    test('detects ONNX and Transformers.js from .onnx files in siblings', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'org/model' },
+        { siblings: [{ rfilename: 'model.onnx' }, { rfilename: 'config.json' }] }
+      );
+      expect(frameworks).toContain('ONNX');
+      expect(frameworks).toContain('Transformers.js');
+    });
+
+    test('detects Transformers.js from model tags', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'org/model', tags: ['transformers.js'] },
+        {}
+      );
+      expect(frameworks).toContain('Transformers.js');
+    });
+
+    test('detects ONNX from model tags', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'org/model' },
+        { tags: ['onnx'] }
+      );
+      expect(frameworks).toContain('ONNX');
+    });
+
+    test('detects browser-ready frameworks for Xenova org', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'Xenova/whisper-tiny' },
+        {}
+      );
+      expect(frameworks).toContain('ONNX');
+      expect(frameworks).toContain('Transformers.js');
+    });
+
+    test('detects browser-ready frameworks for onnx-community org', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'onnx-community/whisper-base' },
+        {}
+      );
+      expect(frameworks).toContain('ONNX');
+      expect(frameworks).toContain('Transformers.js');
+    });
+
+    test('defaults to PyTorch when no indicators found', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'org/unknown-model' },
+        {}
+      );
+      expect(frameworks).toEqual(['PyTorch']);
+    });
+
+    test('defaults to PyTorch with null detailedInfo', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'org/model' },
+        null
+      );
+      expect(frameworks).toEqual(['PyTorch']);
+    });
+
+    test('combines library_name and siblings detection without duplicates', () => {
+      const frameworks = aggregator.extractFrameworks(
+        { id: 'Xenova/model' },
+        {
+          library_name: 'transformers.js',
+          siblings: [{ rfilename: 'model.onnx' }]
+        }
+      );
+      expect(frameworks).toContain('Transformers.js');
+      expect(frameworks).toContain('ONNX');
+      // No duplicates
+      const tjsCount = frameworks.filter(f => f === 'Transformers.js').length;
+      expect(tjsCount).toBe(1);
+    });
+  });
+
+  describe('determineDeploymentOptions', () => {
+    test('includes browser for small model WITH browser-compatible framework', () => {
+      const options = aggregator.determineDeploymentOptions(50, { id: 'test' }, ['ONNX', 'Transformers.js']);
+      expect(options).toContain('browser');
+      expect(options).toContain('mobile');
+    });
+
+    test('excludes browser for small model WITHOUT browser-compatible framework', () => {
+      const options = aggregator.determineDeploymentOptions(50, { id: 'test' }, ['PyTorch']);
+      expect(options).not.toContain('browser');
+      expect(options).not.toContain('mobile');
+    });
+
+    test('includes browser but not mobile for 200MB model with ONNX', () => {
+      const options = aggregator.determineDeploymentOptions(200, { id: 'test' }, ['ONNX']);
+      expect(options).toContain('browser');
+      expect(options).not.toContain('mobile');
+    });
+
+    test('excludes browser for 600MB model even with ONNX', () => {
+      const options = aggregator.determineDeploymentOptions(600, { id: 'test' }, ['ONNX']);
+      expect(options).not.toContain('browser');
+    });
+
+    test('always includes edge for models ≤500MB', () => {
+      const options = aggregator.determineDeploymentOptions(400, { id: 'test' }, ['PyTorch']);
+      expect(options).toContain('edge');
+    });
+
+    test('includes cloud+server for models ≤4GB', () => {
+      const options = aggregator.determineDeploymentOptions(2000, { id: 'test' }, ['PyTorch']);
+      expect(options).toContain('cloud');
+      expect(options).toContain('server');
+    });
+
+    test('only server for models >4GB', () => {
+      const options = aggregator.determineDeploymentOptions(5000, { id: 'test' }, ['PyTorch']);
+      expect(options).not.toContain('cloud');
+      expect(options).toContain('server');
+    });
+
+    test('handles missing frameworks parameter gracefully', () => {
+      const options = aggregator.determineDeploymentOptions(50, { id: 'test' });
+      expect(options).not.toContain('browser');
+      expect(options).toContain('edge');
+    });
+
+    test('recognizes TensorFlow.js as browser-compatible', () => {
+      const options = aggregator.determineDeploymentOptions(80, { id: 'test' }, ['TensorFlow.js']);
+      expect(options).toContain('browser');
+      expect(options).toContain('mobile');
+    });
+  });
 });
 

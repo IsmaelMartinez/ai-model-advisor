@@ -61,7 +61,7 @@
           ]
         },
         "semantic_segmentation": {
-          "label": "Semantic Segmentation", 
+          "label": "Semantic Segmentation",
           "description": "Pixel-level classification of image regions",
           "keywords": ["segment image", "pixel classification", "region detection", "image segmentation", "mask generation", "pixel-wise labeling", "scene parsing", "instance segmentation", "label pixels"],
           "examples": [
