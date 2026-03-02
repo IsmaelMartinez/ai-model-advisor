@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-02-24",
+  "lastUpdated": "2026-03-02",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -446,30 +446,28 @@
             "lastUpdated": "2025-10-12"
           },
           {
-            "id": "facebook_detr-resnet-50",
-            "name": "Detr Resnet 50",
-            "huggingFaceId": "facebook/detr-resnet-50",
-            "description": "Detr Resnet 50 model for object detection",
-            "sizeMB": 100,
-            "accuracy": 0.75,
-            "environmentalScore": 1,
+            "id": "onnx-community_rfdetr_large-onnx",
+            "name": "Rfdetr Large ONNX",
+            "huggingFaceId": "onnx-community/rfdetr_large-ONNX",
+            "description": "Rfdetr Large ONNX model for object detection",
+            "sizeMB": 1500,
+            "accuracy": 0.85,
+            "environmentalScore": 2,
             "deploymentOptions": [
-              "edge",
-              "cloud",
               "cloud",
               "server"
             ],
             "frameworks": [
-              "PyTorch",
-              "TensorFlow"
+              "Transformers.js",
+              "ONNX"
             ],
-            "lastUpdated": "2025-10-12"
+            "lastUpdated": "2025-03-29T22:55:17.000Z"
           },
           {
-            "id": "pekingu_rtdetr_r101vd_coco_o365",
-            "name": "Rtdetr R101vd Coco O365",
-            "huggingFaceId": "PekingU/rtdetr_r101vd_coco_o365",
-            "description": "Rtdetr R101vd Coco O365 model for object detection",
+            "id": "facebook_detr-resnet-50",
+            "name": "Detr Resnet 50",
+            "huggingFaceId": "facebook/detr-resnet-50",
+            "description": "Detr Resnet 50 model for object detection",
             "sizeMB": 100,
             "accuracy": 0.75,
             "environmentalScore": 1,
@@ -520,6 +518,23 @@
               "PyTorch"
             ],
             "lastUpdated": "2025-11-28T03:15:38.000Z"
+          },
+          {
+            "id": "onnx-community_yolov10b",
+            "name": "Yolov10b",
+            "huggingFaceId": "onnx-community/yolov10b",
+            "description": "Yolov10b model for object detection",
+            "sizeMB": 20000,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "Transformers.js",
+              "ONNX"
+            ],
+            "lastUpdated": "2024-05-30T10:59:49.000Z"
           },
           {
             "id": "yolo_v8x",
