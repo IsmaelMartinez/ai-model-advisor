@@ -1,6 +1,6 @@
 # AI Model Advisor - Current Project Status
 
-**Date**: January 8, 2026
+**Date**: March 1, 2026
 **Status**: MVP Complete & Deployed ✅ + PWA Support ✅ + Mobile Ready ✅
 **Live URL**: https://ismaelmartinez.github.io/ai-model-advisor
 **Classifier**: MiniLM embeddings (23MB, 98.3% accuracy)
@@ -153,35 +153,35 @@ git status         # ✅ Clean working tree
 - Fast, responsive interactions
 - Accessible to users with disabilities
 
-## 📈 Next Iteration: v1.1 (In Planning)
+## 📈 Next Iteration: Phase 2 — Refocus on Edge/Browser AI
 
-### Phase 2 Focus: Enhanced Features & Data Quality
-**Documentation**: See [ADR documentation](docs/adrs/) for architectural decisions  
-**Timeline**: Ongoing  
-**Goal**: Improve data quality and expand features
+**Documentation**: See [project-vision.md](project-vision.md) for full roadmap, [edge-browser-ai-direction.md](docs/research/edge-browser-ai-direction.md) for research
+**Goal**: Reposition as the go-to tool for finding AI models that run without a server
 
-#### Key Objectives
-1. **Pre-compute Reference Embeddings**: Distill the 320 reference example embeddings at build time into a static JSON file, so the browser doesn't need to embed them on first load — significantly reducing initial classification latency
-2. **Phase 2 Auto-Updates**: Add Gemini-based validation for model card parsing
-3. **Improved Accuracy Data**: Extract real metrics from model cards
-4. **Cross-Browser Support**: Expand beyond Chrome-first to Firefox, Safari
-5. **Community Features**: User feedback and model suggestions
+### Strategic Direction
+The project's strongest asset — a 23MB MiniLM classifier running entirely in the browser — is itself proof of what edge AI can do. Phase 2 sharpens the identity around this: helping developers find models they can run in the browser, on mobile, or at the edge.
 
-### Future Priorities (Post-v1.1)
+### Phase 2 Workstreams (run in parallel)
 
-#### High Priority
-1. **Test Coverage**: Fix failing edge case tests for better robustness
-2. **Model Data Expansion**: Add more specialized and recent models
-3. **Performance Optimization**: Further reduce inference time
+| Workstream | Focus | Independent? |
+|-----------|-------|-------------|
+| **A: Data & Metadata** | Add runtime metadata, task maturity labels, edge-ready flags to 40-50 models | Yes |
+| **B: UX & Messaging** | Update positioning, "Edge-Ready" badges, structural environmental story | Yes |
+| **C: Build-Time Optimization** | Pre-compute reference embeddings at build time | Yes |
+| **D: Cross-Browser Testing** | Firefox, Safari, Edge validation | Start early, benefits from A |
 
-#### Medium Priority
-1. **Usage Analytics**: Basic privacy-friendly usage tracking
-2. **Model Comparison**: Side-by-side model feature comparison
+### Future Phases (Post Phase 2)
 
-#### Low Priority
-1. **Model Performance Metrics**: Add benchmarking data where available
-2. **Community Features**: Model ratings, user reviews
-3. **API Integration**: Real-time model updates from Hugging Face
+#### Phase 3: Make It Actionable
+1. **Code snippets** for recommended models (Transformers.js, ONNX Runtime Web, TensorFlow.js)
+2. **Runtime comparison** — side-by-side framework support for each model
+3. **Performance estimates** — cold start, inference latency, memory footprint
+4. **"Can I Run This?"** — input a model name → get edge deployment feasibility report
+
+#### Phase 4: Community & Ecosystem
+1. **Community-reported benchmarks** — real-world performance data
+2. **Automated compatibility testing** — CI job testing models in headless Chrome
+3. **Framework update tracking** — monitor runtime releases for new model support
 
 ## 🔄 Project Workflow Status
 
