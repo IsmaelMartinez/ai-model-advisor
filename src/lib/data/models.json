@@ -51,7 +51,8 @@
               "server"
             ],
             "frameworks": [
-              "PyTorch"
+              "PyTorch",
+              "Transformers.js"
             ],
             "lastUpdated": "2025-12-18"
           },
@@ -102,7 +103,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -131,7 +131,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2024-02-13T21:24:05.000Z"
           }
@@ -285,7 +286,6 @@
             "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -306,7 +306,6 @@
             "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -327,7 +326,6 @@
             "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -356,7 +354,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2025-10-12"
           },
@@ -377,7 +376,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2025-10-12"
           }
@@ -591,7 +591,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2023-04-12"
           },
@@ -631,7 +632,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2025-12-18"
           },
@@ -652,7 +654,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2023-03-16T17:28:05.000Z"
           }
@@ -897,7 +900,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2025-12-18"
           },
@@ -918,7 +922,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2023-03-16T17:28:05.000Z"
           },
@@ -939,7 +944,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2024-04-26T06:33:48.000Z"
           }
@@ -1131,7 +1137,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -1152,7 +1157,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -1173,7 +1177,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -1202,7 +1205,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2025-12-18"
           },
@@ -1215,7 +1219,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -1598,7 +1601,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2024-02-19T11:09:53.000Z"
           }
@@ -1621,42 +1625,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2024-02-19T11:11:02.000Z"
-          },
-          {
-            "id": "qwen_qwen2.5-coder-3b-instruct",
-            "name": "Qwen2.5 Coder 3B Instruct",
-            "huggingFaceId": "Qwen/Qwen2.5-Coder-3B-Instruct",
-            "description": "Balanced code generation model with good accuracy",
-            "sizeMB": 6000,
-            "accuracy": 0.78,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "Transformers"
-            ],
-            "lastUpdated": "2025-11-19"
-          },
-          {
-            "id": "deepseek-ai_deepseek-coder-6.7b-instruct",
-            "name": "DeepSeek Coder 6.7B Instruct",
-            "huggingFaceId": "deepseek-ai/deepseek-coder-6.7b-instruct",
-            "description": "Mid-size code model for complex code tasks",
-            "sizeMB": 13400,
-            "accuracy": 0.82,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "Transformers"
-            ],
-            "lastUpdated": "2025-11-19"
           },
           {
             "id": "openai-community_gpt2",
@@ -1700,6 +1668,42 @@
           }
         ],
         "advanced": [
+          {
+            "id": "qwen_qwen2.5-coder-3b-instruct",
+            "name": "Qwen2.5 Coder 3B Instruct",
+            "huggingFaceId": "Qwen/Qwen2.5-Coder-3B-Instruct",
+            "description": "Balanced code generation model with good accuracy",
+            "sizeMB": 6000,
+            "accuracy": 0.78,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "Transformers"
+            ],
+            "lastUpdated": "2025-11-19"
+          },
+          {
+            "id": "deepseek-ai_deepseek-coder-6.7b-instruct",
+            "name": "DeepSeek Coder 6.7B Instruct",
+            "huggingFaceId": "deepseek-ai/deepseek-coder-6.7b-instruct",
+            "description": "Mid-size code model for complex code tasks",
+            "sizeMB": 13400,
+            "accuracy": 0.82,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "Transformers"
+            ],
+            "lastUpdated": "2025-11-19"
+          },
           {
             "id": "qwen_qwen2.5-coder-7b-instruct",
             "name": "Qwen2.5 Coder 7B Instruct",
@@ -2162,7 +2166,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2025-10-12"
           },
@@ -2238,7 +2243,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2024-02-29T10:57:33.000Z"
           }
@@ -2437,22 +2443,6 @@
       "text_to_speech": {
         "lightweight": [
           {
-            "id": "speecht5_tts",
-            "name": "SpeechT5 TTS",
-            "huggingFaceId": "microsoft/speecht5_tts",
-            "description": "Unified speech and text pre-training for TTS",
-            "sizeMB": 920,
-            "accuracy": 0.85,
-            "environmentalScore": 2,
-            "deploymentOptions": [
-              "cloud"
-            ],
-            "frameworks": [
-              "PyTorch"
-            ],
-            "lastUpdated": "2023-10-05"
-          },
-          {
             "id": "suno_bark-small",
             "name": "Bark Small",
             "huggingFaceId": "suno/bark-small",
@@ -2469,7 +2459,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2025-11-13"
           },
@@ -2490,7 +2481,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2023-09-01T11:17:57.000Z"
           },
@@ -2511,7 +2503,8 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
             "lastUpdated": "2023-09-06T13:32:25.000Z"
           },
@@ -2524,7 +2517,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2537,6 +2529,22 @@
           }
         ],
         "standard": [
+          {
+            "id": "speecht5_tts",
+            "name": "SpeechT5 TTS",
+            "huggingFaceId": "microsoft/speecht5_tts",
+            "description": "Unified speech and text pre-training for TTS",
+            "sizeMB": 920,
+            "accuracy": 0.85,
+            "environmentalScore": 2,
+            "deploymentOptions": [
+              "cloud"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2023-10-05"
+          },
           {
             "id": "parler-tts_parler-tts-large-v1",
             "name": "Parler Tts Large V1",
@@ -2752,7 +2760,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2772,7 +2779,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2792,7 +2798,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2812,7 +2817,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
