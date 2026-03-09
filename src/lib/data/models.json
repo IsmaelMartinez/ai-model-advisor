@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-03-02",
+  "lastUpdated": "2026-03-09",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1448,6 +1448,23 @@
             "lastUpdated": "2024-09-27T07:14:03.000Z"
           },
           {
+            "id": "bullpoint_qwen3-coder-next-awq-4bit",
+            "name": "Qwen3 Coder Next AWQ 4bit",
+            "huggingFaceId": "bullpoint/Qwen3-Coder-Next-AWQ-4bit",
+            "description": "Qwen3 Coder Next AWQ 4bit model for text generation",
+            "sizeMB": 27551,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-02-03T22:09:28.000Z"
+          },
+          {
             "id": "qwen_qwen2.5-14b-instruct",
             "name": "Qwen2.5 14B Instruct",
             "huggingFaceId": "Qwen/Qwen2.5-14B-Instruct",
@@ -1480,23 +1497,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-07-26T03:49:23.000Z"
-          },
-          {
-            "id": "qwen_qwen3-14b-awq",
-            "name": "Qwen3 14B AWQ",
-            "huggingFaceId": "Qwen/Qwen3-14B-AWQ",
-            "description": "Qwen3 14B AWQ model for text generation",
-            "sizeMB": 28168,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-05-21T06:21:57.000Z"
           }
         ]
       },
@@ -1825,6 +1825,23 @@
             "lastUpdated": "2024-09-27T07:14:03.000Z"
           },
           {
+            "id": "bullpoint_qwen3-coder-next-awq-4bit",
+            "name": "Qwen3 Coder Next AWQ 4bit",
+            "huggingFaceId": "bullpoint/Qwen3-Coder-Next-AWQ-4bit",
+            "description": "Qwen3 Coder Next AWQ 4bit model for text generation",
+            "sizeMB": 27551,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-02-03T22:09:28.000Z"
+          },
+          {
             "id": "qwen_qwen2.5-14b-instruct",
             "name": "Qwen2.5 14B Instruct",
             "huggingFaceId": "Qwen/Qwen2.5-14B-Instruct",
@@ -1857,23 +1874,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-07-26T03:49:23.000Z"
-          },
-          {
-            "id": "qwen_qwen3-14b-awq",
-            "name": "Qwen3 14B AWQ",
-            "huggingFaceId": "Qwen/Qwen3-14B-AWQ",
-            "description": "Qwen3 14B AWQ model for text generation",
-            "sizeMB": 28168,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-05-21T06:21:57.000Z"
           }
         ]
       },
