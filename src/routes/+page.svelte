@@ -305,6 +305,7 @@
         {taskSubcategory}
         {isLoading}
         {ensembleInfo}
+        {tasksData}
       />
     </div>
 
