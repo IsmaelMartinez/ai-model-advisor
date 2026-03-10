@@ -100,24 +100,37 @@ export class EmbeddingTaskClassifier {
       this.metrics.fromCache = modelLoadTime < 1000; // Likely from cache if < 1s
       
       this.onProgress({ status: 'processing', message: 'Preparing classifier...' });
-      
-      // Load reference examples from tasks data
-      const examples = this.extractExamples();
-      
-      // Compute embeddings for all reference examples
-      const embeddingStartTime = Date.now();
-      
-      for (const example of examples) {
-        const embedding = await this.getEmbedding(example.text);
-        this.referenceEmbeddings.push({
-          text: example.text,
-          category: example.category,
-          subcategory: example.subcategory,
-          label: example.label,
-          embedding
-        });
+
+      // Try to load pre-computed embeddings first
+      let precomputed = null;
+      try {
+        const mod = await import('../data/reference-embeddings.json', { with: { type: 'json' } });
+        precomputed = mod.default;
+      } catch {
+        // Pre-computed embeddings not available
       }
-      
+
+      const embeddingStartTime = Date.now();
+
+      if (precomputed && precomputed.modelName === this.modelName) {
+        // Use pre-computed embeddings (fast path)
+        this.referenceEmbeddings = precomputed.embeddings;
+      } else {
+        // Compute embeddings at runtime (fallback)
+        const examples = this.extractExamples();
+
+        for (const example of examples) {
+          const embedding = await this.getEmbedding(example.text);
+          this.referenceEmbeddings.push({
+            text: example.text,
+            category: example.category,
+            subcategory: example.subcategory,
+            label: example.label,
+            embedding
+          });
+        }
+      }
+
       this.metrics.loadTimeMs = Date.now() - startTime;
       this.metrics.embeddingTimeMs = Date.now() - embeddingStartTime;
       

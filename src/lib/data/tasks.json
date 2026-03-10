@@ -31,7 +31,9 @@
             "Identify types of clouds in sky images",
             "Classify microscope slides by cell type",
             "Sort recycling items by material type from photos"
-          ]
+          ],
+          "edgeMaturity": "excellent",
+          "edgeNotes": "MobileNet and EfficientNet models under 20MB run in real-time on mobile via TensorFlow.js and Transformers.js"
         },
         "object_detection": {
           "label": "Object Detection",
@@ -58,7 +60,9 @@
             "Detect abandoned luggage in airport footage",
             "Locate solar panels on rooftops from aerial views",
             "Find parking spots from security camera feed"
-          ]
+          ],
+          "edgeMaturity": "excellent",
+          "edgeNotes": "COCO-SSD (~7MB) and YOLOS-Tiny (~8MB) provide real-time detection. MediaPipe solutions under 10MB"
         },
         "semantic_segmentation": {
           "label": "Semantic Segmentation",
@@ -85,7 +89,9 @@
             "Segment skin lesions in dermatology images",
             "Map agricultural crop types from satellite data",
             "Segment lane markings on highway images"
-          ]
+          ],
+          "edgeMaturity": "good",
+          "edgeNotes": "DeepLab and MediaPipe segmenter under 20MB work well. Finer-grained models need more resources"
         }
       }
     },
@@ -118,7 +124,9 @@
             "Sort incoming mail into folders automatically",
             "Categorize help center articles by topic",
             "Classify social media posts as news or opinion"
-          ]
+          ],
+          "edgeMaturity": "excellent",
+          "edgeNotes": "DistilBERT (~67MB) and TinyBERT (~8MB) work reliably in-browser via Transformers.js"
         },
         "sentiment_analysis": {
           "label": "Sentiment Analysis",
@@ -145,7 +153,9 @@
             "Assess tone of internal company communications",
             "Gauge investor sentiment from earnings call Q&A",
             "Classify patient feedback as satisfied or unsatisfied"
-          ]
+          ],
+          "edgeMaturity": "excellent",
+          "edgeNotes": "Same models as text classification. Pre-trained sentiment models under 70MB"
         },
         "text_generation": {
           "label": "Text Generation",
@@ -172,7 +182,9 @@
             "Draft job descriptions from role requirements",
             "Create personalized onboarding messages",
             "Generate quiz questions from educational content"
-          ]
+          ],
+          "edgeMaturity": "limited",
+          "edgeNotes": "Needs WebGPU. Smallest usable: Qwen2.5-0.5B (~500MB q4). Good quality needs 3B+ (~1.8GB)"
         },
         "named_entity_recognition": {
           "label": "Named Entity Recognition",
@@ -199,7 +211,9 @@
             "Pull author and title from bibliography entries",
             "Identify disease names in epidemiology reports",
             "Extract city and country names from travel blogs"
-          ]
+          ],
+          "edgeMaturity": "good",
+          "edgeNotes": "DistilBERT-NER and GLiNER-small under 70MB work via Transformers.js"
         },
         "code_assistant": {
           "label": "Code Assistant",
@@ -234,7 +248,9 @@
             "Write integration tests for my microservice",
             "Refactor this monolith into smaller modules",
             "Create a CLI tool in Rust for file processing"
-          ]
+          ],
+          "edgeMaturity": "limited",
+          "edgeNotes": "Smallest usable: Qwen2.5-Coder-0.5B (~500MB q4). Decent quality needs 3B+. WebGPU required"
         },
         "embedding": {
           "label": "Embeddings & Retrieval",
@@ -268,7 +284,9 @@
             "Build a semantic cache for LLM query deduplication",
             "Index help articles for intelligent search",
             "Embed code snippets for similar code search"
-          ]
+          ],
+          "edgeMaturity": "excellent",
+          "edgeNotes": "MiniLM (~23MB) and BGE-Small (~25MB) are production-proven in-browser. This app uses MiniLM"
         },
         "translation": {
           "label": "Translation",
@@ -301,7 +319,9 @@
             "Convert German research papers to English",
             "Translate social media posts for global monitoring",
             "Real-time translation for multilingual video calls"
-          ]
+          ],
+          "edgeMaturity": "limited",
+          "edgeNotes": "Bilingual pairs work with MarianMT models (~300MB). General translation needs larger models"
         },
         "summarization": {
           "label": "Summarization",
@@ -334,7 +354,9 @@
             "Summarize customer interviews into insights",
             "Generate chapter summaries for textbooks",
             "Create concise briefs from intelligence reports"
-          ]
+          ],
+          "edgeMaturity": "limited",
+          "edgeNotes": "Extractive summarization feasible with small models. Abstractive needs generative models (500MB+)"
         },
         "question_answering": {
           "label": "Question Answering",
@@ -366,7 +388,9 @@
             "Find specific clauses in legal agreements",
             "Answer questions about software from API docs",
             "Build a real estate FAQ from property listings"
-          ]
+          ],
+          "edgeMaturity": "good",
+          "edgeNotes": "DistilBERT-SQuAD (~261MB) and MiniLM-SQuAD (~127MB) work via ONNX in browser"
         }
       }
     },
@@ -399,7 +423,9 @@
             "Automated closed captioning for live streams",
             "Convert multilingual conference talks to text",
             "Transcribe therapy session recordings"
-          ]
+          ],
+          "edgeMaturity": "good",
+          "edgeNotes": "Whisper-tiny.en (~38MB) and Whisper-base.en (~74MB) work well via Transformers.js. WebGPU helps"
         },
         "text_to_speech": {
           "label": "Text to Speech",
@@ -426,7 +452,9 @@
             "Speak notifications for a wearable device",
             "Create synthetic voiceovers for training videos",
             "Text to speech for museum audio guides"
-          ]
+          ],
+          "edgeMaturity": "emerging",
+          "edgeNotes": "VITS and Bark models exist but browser support is limited. Piper TTS works on-device natively"
         }
       }
     },
@@ -459,7 +487,9 @@
             "Predict peak network bandwidth usage",
             "Forecast monthly active users for an app",
             "Predict housing price trends by region"
-          ]
+          ],
+          "edgeMaturity": "good",
+          "edgeNotes": "Chronos-Bolt-Tiny (~8MB) and TTM (~1MB) are very small. Custom models may need ONNX export"
         },
         "anomaly_detection": {
           "label": "Anomaly Detection",
@@ -486,7 +516,9 @@
             "Detect bot traffic on a website",
             "Identify abnormal vibration patterns in machinery",
             "Spot irregular patterns in supply chain data"
-          ]
+          ],
+          "edgeMaturity": "good",
+          "edgeNotes": "Lightweight statistical and small ML models work well. Deep learning models may need ONNX export"
         }
       }
     }

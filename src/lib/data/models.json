@@ -51,9 +51,19 @@
               "server"
             ],
             "frameworks": [
-              "PyTorch"
+              "PyTorch",
+              "Transformers.js"
             ],
-            "lastUpdated": "2025-12-18"
+            "lastUpdated": "2025-12-18",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "timm_tf_mobilenetv3_large_minimal_100.in1k",
@@ -91,7 +101,16 @@
               "PyTorch",
               "ONNX"
             ],
-            "lastUpdated": "2023-09-20"
+            "lastUpdated": "2023-09-20",
+            "runtime": {
+              "browser": {
+                "framework": "tensorflow.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": true
+              }
+            }
           },
           {
             "id": "iitolstykh_mivolo_v2",
@@ -102,7 +121,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -131,9 +149,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2024-02-13T21:24:05.000Z"
+            "lastUpdated": "2024-02-13T21:24:05.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [
@@ -285,7 +313,6 @@
             "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -306,7 +333,6 @@
             "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -327,7 +353,6 @@
             "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -356,9 +381,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2025-10-12"
+            "lastUpdated": "2025-10-12",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "hustvl_yolos-tiny",
@@ -377,9 +412,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2025-10-12"
+            "lastUpdated": "2025-10-12",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [
@@ -461,7 +506,17 @@
               "Transformers.js",
               "ONNX"
             ],
-            "lastUpdated": "2025-03-29T22:55:17.000Z"
+            "lastUpdated": "2025-03-29T22:55:17.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm",
+                  "webgpu"
+                ],
+                "tested": true
+              }
+            }
           },
           {
             "id": "facebook_detr-resnet-50",
@@ -575,7 +630,17 @@
               "TensorFlow",
               "ONNX"
             ],
-            "lastUpdated": "2023-05-20"
+            "lastUpdated": "2023-05-20",
+            "runtime": {
+              "browser": {
+                "framework": "onnx-runtime-web",
+                "backend": [
+                  "wasm",
+                  "webgpu"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "albert_base_v2",
@@ -591,9 +656,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2023-04-12"
+            "lastUpdated": "2023-04-12",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "facebookai_roberta-large-mnli",
@@ -631,9 +706,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2025-12-18"
+            "lastUpdated": "2025-12-18",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "mrm8488_bert-tiny-finetuned-sms-spam-detection",
@@ -652,9 +737,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2023-03-16T17:28:05.000Z"
+            "lastUpdated": "2023-03-16T17:28:05.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [
@@ -897,9 +992,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2025-12-18"
+            "lastUpdated": "2025-12-18",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "mrm8488_bert-tiny-finetuned-sms-spam-detection",
@@ -918,9 +1023,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2023-03-16T17:28:05.000Z"
+            "lastUpdated": "2023-03-16T17:28:05.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "kmack_malicious-url-detection",
@@ -939,9 +1054,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2024-04-26T06:33:48.000Z"
+            "lastUpdated": "2024-04-26T06:33:48.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [
@@ -1131,7 +1256,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -1152,7 +1276,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -1173,7 +1296,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -1202,9 +1324,20 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2025-12-18"
+            "lastUpdated": "2025-12-18",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm",
+                  "webgpu"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "openai_gpt-oss-20b",
@@ -1215,7 +1348,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -1598,9 +1730,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2024-02-19T11:09:53.000Z"
+            "lastUpdated": "2024-02-19T11:09:53.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [
@@ -1621,42 +1763,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2024-02-19T11:11:02.000Z"
-          },
-          {
-            "id": "qwen_qwen2.5-coder-3b-instruct",
-            "name": "Qwen2.5 Coder 3B Instruct",
-            "huggingFaceId": "Qwen/Qwen2.5-Coder-3B-Instruct",
-            "description": "Balanced code generation model with good accuracy",
-            "sizeMB": 6000,
-            "accuracy": 0.78,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "Transformers"
-            ],
-            "lastUpdated": "2025-11-19"
-          },
-          {
-            "id": "deepseek-ai_deepseek-coder-6.7b-instruct",
-            "name": "DeepSeek Coder 6.7B Instruct",
-            "huggingFaceId": "deepseek-ai/deepseek-coder-6.7b-instruct",
-            "description": "Mid-size code model for complex code tasks",
-            "sizeMB": 13400,
-            "accuracy": 0.82,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "Transformers"
-            ],
-            "lastUpdated": "2025-11-19"
           },
           {
             "id": "openai-community_gpt2",
@@ -1700,6 +1806,42 @@
           }
         ],
         "advanced": [
+          {
+            "id": "qwen_qwen2.5-coder-3b-instruct",
+            "name": "Qwen2.5 Coder 3B Instruct",
+            "huggingFaceId": "Qwen/Qwen2.5-Coder-3B-Instruct",
+            "description": "Balanced code generation model with good accuracy",
+            "sizeMB": 6000,
+            "accuracy": 0.78,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "Transformers"
+            ],
+            "lastUpdated": "2025-11-19"
+          },
+          {
+            "id": "deepseek-ai_deepseek-coder-6.7b-instruct",
+            "name": "DeepSeek Coder 6.7B Instruct",
+            "huggingFaceId": "deepseek-ai/deepseek-coder-6.7b-instruct",
+            "description": "Mid-size code model for complex code tasks",
+            "sizeMB": 13400,
+            "accuracy": 0.82,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "Transformers"
+            ],
+            "lastUpdated": "2025-11-19"
+          },
           {
             "id": "qwen_qwen2.5-coder-7b-instruct",
             "name": "Qwen2.5 Coder 7B Instruct",
@@ -1899,7 +2041,16 @@
               "ONNX",
               "Transformers.js"
             ],
-            "lastUpdated": "2026-02-05"
+            "lastUpdated": "2026-02-05",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "sentence-transformers_paraphrase-MiniLM-L3-v2",
@@ -1920,7 +2071,16 @@
               "PyTorch",
               "ONNX"
             ],
-            "lastUpdated": "2026-02-05"
+            "lastUpdated": "2026-02-05",
+            "runtime": {
+              "browser": {
+                "framework": "onnx-runtime-web",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "sentence-transformers_all-MiniLM-L12-v2",
@@ -1940,7 +2100,16 @@
               "PyTorch",
               "ONNX"
             ],
-            "lastUpdated": "2026-02-05"
+            "lastUpdated": "2026-02-05",
+            "runtime": {
+              "browser": {
+                "framework": "onnx-runtime-web",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [
@@ -2057,7 +2226,17 @@
               "TensorFlow",
               "ONNX"
             ],
-            "lastUpdated": "2026-02-05"
+            "lastUpdated": "2026-02-05",
+            "runtime": {
+              "browser": {
+                "framework": "onnx-runtime-web",
+                "backend": [
+                  "wasm",
+                  "webgpu"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "deepset_minilm-uncased-squad2",
@@ -2078,7 +2257,17 @@
               "PyTorch",
               "ONNX"
             ],
-            "lastUpdated": "2026-02-05"
+            "lastUpdated": "2026-02-05",
+            "runtime": {
+              "browser": {
+                "framework": "onnx-runtime-web",
+                "backend": [
+                  "wasm",
+                  "webgpu"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [
@@ -2162,9 +2351,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2025-10-12"
+            "lastUpdated": "2025-10-12",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "wav2vec2_base_960h",
@@ -2238,9 +2437,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2024-02-29T10:57:33.000Z"
+            "lastUpdated": "2024-02-29T10:57:33.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [
@@ -2437,22 +2646,6 @@
       "text_to_speech": {
         "lightweight": [
           {
-            "id": "speecht5_tts",
-            "name": "SpeechT5 TTS",
-            "huggingFaceId": "microsoft/speecht5_tts",
-            "description": "Unified speech and text pre-training for TTS",
-            "sizeMB": 920,
-            "accuracy": 0.85,
-            "environmentalScore": 2,
-            "deploymentOptions": [
-              "cloud"
-            ],
-            "frameworks": [
-              "PyTorch"
-            ],
-            "lastUpdated": "2023-10-05"
-          },
-          {
             "id": "suno_bark-small",
             "name": "Bark Small",
             "huggingFaceId": "suno/bark-small",
@@ -2469,9 +2662,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2025-11-13"
+            "lastUpdated": "2025-11-13",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "facebook_mms-tts-fin",
@@ -2490,9 +2693,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2023-09-01T11:17:57.000Z"
+            "lastUpdated": "2023-09-01T11:17:57.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "facebook_mms-tts-eng",
@@ -2511,9 +2724,19 @@
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow"
+              "TensorFlow",
+              "Transformers.js"
             ],
-            "lastUpdated": "2023-09-06T13:32:25.000Z"
+            "lastUpdated": "2023-09-06T13:32:25.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "coqui_xtts-v2",
@@ -2524,7 +2747,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2537,6 +2759,22 @@
           }
         ],
         "standard": [
+          {
+            "id": "speecht5_tts",
+            "name": "SpeechT5 TTS",
+            "huggingFaceId": "microsoft/speecht5_tts",
+            "description": "Unified speech and text pre-training for TTS",
+            "sizeMB": 920,
+            "accuracy": 0.85,
+            "environmentalScore": 2,
+            "deploymentOptions": [
+              "cloud"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2023-10-05"
+          },
           {
             "id": "parler-tts_parler-tts-large-v1",
             "name": "Parler Tts Large V1",
@@ -2629,7 +2867,17 @@
             "frameworks": [
               "PyTorch"
             ],
-            "lastUpdated": "2025-10-12"
+            "lastUpdated": "2025-10-12",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm",
+                  "webgpu"
+                ],
+                "tested": true
+              }
+            }
           }
         ],
         "advanced": [
@@ -2752,7 +3000,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2772,7 +3019,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2792,7 +3038,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2812,7 +3057,6 @@
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
               "mobile",
               "edge",
               "cloud",
@@ -2986,7 +3230,16 @@
               "scikit-learn",
               "ONNX"
             ],
-            "lastUpdated": "2023-12-05"
+            "lastUpdated": "2023-12-05",
+            "runtime": {
+              "browser": {
+                "framework": "onnx-runtime-web",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           }
         ],
         "standard": [

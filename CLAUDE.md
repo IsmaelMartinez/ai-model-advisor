@@ -2,10 +2,10 @@
 
 ## Project Overview
 
-**Mission:** Build sustainable AI by helping users choose environmentally efficient models ("smaller is better" philosophy)
+**Mission:** Find AI models you can run in the browser, on mobile, or at the edge — no server required. Focused on sustainability, privacy, and simplicity.
 
 **Live:** https://ismaelmartinez.github.io/ai-model-advisor
-**Status:** MVP Complete ✅ + PWA Support (98.3% accuracy, installable)
+**Status:** Phase 2 Complete ✅ — Edge/browser AI advisor with runtime metadata, edge-ready badges, and pre-computed embeddings
 **Tech:** SvelteKit 2 + Vite 5 + Transformers.js (MiniLM embedding classifier, 23MB)
 **Platform:** Desktop & Mobile (PWA installable, ~23MB model download)
 **Details:** See `project-status.md`, `project-vision.md`, `README.md`
@@ -21,6 +21,9 @@ npm run build && npm run preview  # Build + preview production
 
 # Testing
 npm test                       # Run tests (~2s) - Use for CI
+
+# Build
+npm run precompute-embeddings  # Regenerate pre-computed embeddings
 
 # Data
 npm run update-models          # Update model database from HuggingFace
@@ -40,8 +43,9 @@ npm run update-models:dry-run  # Preview updates
 - `src/lib/environmental/EnvironmentalImpactCalculator.js` - Environmental scoring (1-3 scale)
 
 **Data:**
-- `src/lib/data/models.json` - Model database (7 categories, 3 tiers: lightweight/standard/advanced)
+- `src/lib/data/models.json` - Model database (4 categories, 4 tiers: lightweight/standard/advanced/xlarge) with runtime metadata
 - `src/lib/data/tasks.json` - Task taxonomy with keywords
+- `src/lib/data/reference-embeddings.json` - Pre-computed MiniLM embeddings (~320 examples, generated at build time)
 
 **Config:**
 - `vite.config.js` - WebGPU headers, transformers.js exclusions
@@ -176,8 +180,15 @@ describe('Module', () => {
   "accuracy": 0.92,
   "environmentalScore": 1,
   "deploymentOptions": ["browser"],
-  "frameworks": ["transformers.js"],
-  "lastUpdated": "2025-01-15"
+  "frameworks": ["Transformers.js"],
+  "lastUpdated": "2025-01-15",
+  "runtime": {
+    "browser": {
+      "framework": "transformers.js",
+      "backend": ["wasm"],
+      "tested": true
+    }
+  }
 }
 ```
 
@@ -219,5 +230,5 @@ describe('Module', () => {
 
 ---
 
-**Last Updated:** 2025-12-18
+**Last Updated:** 2026-03-10
 **License:** MIT

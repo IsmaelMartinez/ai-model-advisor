@@ -37,6 +37,9 @@
 
   /** @type {EnsembleInfo|null} */
   export let ensembleInfo = null;
+
+  /** @type {Object|null} */
+  export let tasksData = null;
   
   function getEnvironmentalBadge(score) {
     switch (score) {
@@ -79,7 +82,38 @@
       default: return { label: tier, icon: '📦', desc: '' };
     }
   }
-  
+
+  function getEdgeReadyInfo(model) {
+    if (!model.runtime?.browser) return null;
+    const { framework, tested } = model.runtime.browser;
+    return {
+      label: tested ? 'Edge-Ready' : 'Edge-Compatible',
+      class: tested ? 'edge-verified' : 'edge-compatible',
+      tooltip: tested
+        ? `Verified in-browser via ${framework}`
+        : `Potentially runs in-browser via ${framework} (not yet verified)`
+    };
+  }
+
+  function getEdgeMaturity(category, subcategory) {
+    if (!tasksData?.taskTaxonomy) return null;
+    const subcat = tasksData.taskTaxonomy[category]?.subcategories?.[subcategory];
+    if (!subcat?.edgeMaturity) return null;
+
+    const maturityStyles = {
+      excellent: { label: 'Excellent edge support', class: 'maturity-excellent', color: '#10b981' },
+      good:      { label: 'Good edge support', class: 'maturity-good', color: '#3b82f6' },
+      limited:   { label: 'Limited edge support', class: 'maturity-limited', color: '#f59e0b' },
+      emerging:  { label: 'Emerging edge support', class: 'maturity-emerging', color: '#94a3b8' }
+    };
+
+    return {
+      ...maturityStyles[subcat.edgeMaturity],
+      notes: subcat.edgeNotes,
+      level: subcat.edgeMaturity
+    };
+  }
+
   function formatSize(sizeMB) {
     if (sizeMB < 1) return `${(sizeMB * 1000).toFixed(0)}KB`;
     if (sizeMB < 1000) return `${sizeMB.toFixed(0)}MB`;
@@ -146,13 +180,22 @@
 
     <div class="efficiency-banner">
       <span class="banner-icon">🌍</span>
-      <span>Ranked by environmental efficiency — smaller, greener models first</span>
+      <span>Ranked by efficiency — smaller models that run on your device first</span>
     </div>
-    
+
+    {@const maturity = getEdgeMaturity(taskCategory, taskSubcategory)}
+    {#if maturity}
+      <div class="maturity-banner {maturity.class}" style="--maturity-color: {maturity.color}">
+        <span class="maturity-label">{maturity.label}</span>
+        <span class="maturity-notes">{maturity.notes}</span>
+      </div>
+    {/if}
+
     <div class="models-grid">
       {#each recommendations as model, index}
         {@const envBadge = getEnvironmentalBadge(model.environmentalScore)}
         {@const tierInfo = getTierInfo(model.tier)}
+        {@const edgeInfo = getEdgeReadyInfo(model)}
         <article
           class="model-card"
           style="animation-delay: {index * 50}ms"
@@ -163,13 +206,21 @@
               <span class="badge tier-badge" title={tierInfo.desc}>
                 {tierInfo.icon} {tierInfo.label}
               </span>
-              <span 
-                class="badge env-badge {envBadge.class}" 
+              <span
+                class="badge env-badge {envBadge.class}"
                 title={envBadge.tooltip}
                 style="--env-color: {envBadge.color}"
               >
                 {envBadge.icon} {envBadge.label}
               </span>
+              {#if edgeInfo}
+                <span
+                  class="badge edge-badge {edgeInfo.class}"
+                  title={edgeInfo.tooltip}
+                >
+                  {edgeInfo.label}
+                </span>
+              {/if}
             </div>
           </div>
           
@@ -366,6 +417,28 @@
     font-size: 1rem;
   }
 
+  .maturity-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, var(--maturity-color) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--maturity-color) 20%, transparent);
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .maturity-label {
+    font-weight: 600;
+    color: var(--maturity-color);
+  }
+
+  .maturity-notes {
+    color: #94a3b8;
+  }
+
   /* Models Grid */
   .models-grid {
     display: grid;
@@ -459,6 +532,50 @@
   }
 
   .env-badge[title]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1e293b;
+    z-index: 10;
+  }
+
+  .edge-badge {
+    cursor: help;
+    position: relative;
+  }
+
+  .edge-badge.edge-verified {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+  }
+
+  .edge-badge.edge-compatible {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+  }
+
+  .edge-badge[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 400;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .edge-badge[title]:hover::before {
     content: '';
     position: absolute;
     bottom: calc(100% + 2px);

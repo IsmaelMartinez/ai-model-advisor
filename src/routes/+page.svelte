@@ -201,8 +201,8 @@
 </script>
 
 <svelte:head>
-  <title>AI Model Advisor — Find the Right AI Model</title>
-  <meta name="description" content="Find the right AI model for your task. We help you choose between specialized smaller models and powerful larger ones." />
+  <title>AI Model Advisor — Find AI That Runs Without a Server</title>
+  <meta name="description" content="Find AI models you can run in the browser, on mobile, or at the edge. No server required." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@
       </h1>
 
       <p class="hero-subtitle">
-        Find the <em>right AI model</em> for your task.
+        Find <em>AI models you can run</em> in the browser, on mobile, or at the edge — no server required.
       </p>
 
       <div class="stats-bar">
@@ -242,10 +242,10 @@
       <div class="disclaimer-icon">💡</div>
       <div class="disclaimer-content">
         <p>
-          <strong>This is a starting point, not a final answer.</strong>
-          We point you toward models that might fit your task, but you decide what works best for your use case,
-          data, and constraints. Smaller models are often highly specialized and can match or outperform
-          larger ones for specific tasks while using far fewer resources.
+          <strong>Run AI without a server.</strong>
+          We recommend models that can run directly on your device — in the browser, on mobile, or at the edge.
+          On-device inference means no data center, no network round-trip, and your data never leaves your device.
+          Smaller, specialized models often match larger ones for specific tasks while using far fewer resources.
         </p>
       </div>
     </div>
@@ -305,6 +305,7 @@
         {taskSubcategory}
         {isLoading}
         {ensembleInfo}
+        {tasksData}
       />
     </div>
 
@@ -312,7 +313,7 @@
       <div class="footer-content">
         <div class="footer-brand">
           <span class="footer-logo">🌍</span>
-          <span>Building sustainable AI, one model at a time</span>
+          <span>AI that runs on your device, not in a data center</span>
         </div>
         <div class="footer-meta">
           <span>Data from Hugging Face Hub</span>
