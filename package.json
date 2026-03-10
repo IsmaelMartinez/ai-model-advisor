@@ -10,7 +10,8 @@
     "test": "vitest",
     "update-models": "node src/lib/aggregation/cli.js",
     "update-models:dry-run": "node src/lib/aggregation/cli.js --dry-run",
-    "generate-icons": "node scripts/generate-icons.js"
+    "generate-icons": "node scripts/generate-icons.js",
+    "precompute-embeddings": "node scripts/precompute-embeddings.js"
   },
   "dependencies": {
     "@huggingface/transformers": "^3.8.1"
