@@ -79,7 +79,19 @@
       default: return { label: tier, icon: '📦', desc: '' };
     }
   }
-  
+
+  function getEdgeReadyInfo(model) {
+    if (!model.runtime?.browser) return null;
+    const { framework, tested } = model.runtime.browser;
+    return {
+      label: tested ? 'Edge-Ready' : 'Edge-Compatible',
+      class: tested ? 'edge-verified' : 'edge-compatible',
+      tooltip: tested
+        ? `Verified in-browser via ${framework}`
+        : `Potentially runs in-browser via ${framework} (not yet verified)`
+    };
+  }
+
   function formatSize(sizeMB) {
     if (sizeMB < 1) return `${(sizeMB * 1000).toFixed(0)}KB`;
     if (sizeMB < 1000) return `${sizeMB.toFixed(0)}MB`;
@@ -153,6 +165,7 @@
       {#each recommendations as model, index}
         {@const envBadge = getEnvironmentalBadge(model.environmentalScore)}
         {@const tierInfo = getTierInfo(model.tier)}
+        {@const edgeInfo = getEdgeReadyInfo(model)}
         <article
           class="model-card"
           style="animation-delay: {index * 50}ms"
@@ -163,13 +176,21 @@
               <span class="badge tier-badge" title={tierInfo.desc}>
                 {tierInfo.icon} {tierInfo.label}
               </span>
-              <span 
-                class="badge env-badge {envBadge.class}" 
+              <span
+                class="badge env-badge {envBadge.class}"
                 title={envBadge.tooltip}
                 style="--env-color: {envBadge.color}"
               >
                 {envBadge.icon} {envBadge.label}
               </span>
+              {#if edgeInfo}
+                <span
+                  class="badge edge-badge {edgeInfo.class}"
+                  title={edgeInfo.tooltip}
+                >
+                  {edgeInfo.label}
+                </span>
+              {/if}
             </div>
           </div>
           
@@ -459,6 +480,50 @@
   }
 
   .env-badge[title]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1e293b;
+    z-index: 10;
+  }
+
+  .edge-badge {
+    cursor: help;
+    position: relative;
+  }
+
+  .edge-badge.edge-verified {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+  }
+
+  .edge-badge.edge-compatible {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+  }
+
+  .edge-badge[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 400;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .edge-badge[title]:hover::before {
     content: '';
     position: absolute;
     bottom: calc(100% + 2px);
