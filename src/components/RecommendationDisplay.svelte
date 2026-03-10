@@ -158,7 +158,7 @@
 
     <div class="efficiency-banner">
       <span class="banner-icon">🌍</span>
-      <span>Ranked by environmental efficiency — smaller, greener models first</span>
+      <span>Ranked by efficiency — smaller models that run on your device first</span>
     </div>
     
     <div class="models-grid">
