@@ -26,7 +26,7 @@
   let selectedSubcategory = '';
   let selectedDeployment = '';
   let taskDescription = '';
-  let showTextInput = false;
+  let showTextInput = true;
 
   // Deployment target options
   const deploymentOptions = [
@@ -48,8 +48,8 @@
     }
   }
 
-  // Accept pre-fill from classifier
-  $: if (prefillCategory && !selectedCategory) {
+  // Update dropdowns when classifier returns a result (whether or not already selected)
+  $: if (prefillCategory) {
     selectedCategory = prefillCategory;
     if (prefillSubcategory) {
       selectedSubcategory = prefillSubcategory;
@@ -114,6 +114,12 @@
   function formatCategory(cat) {
     return cat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
+
+  function confidenceClass(confidence) {
+    if (confidence >= 0.75) return 'confidence-high';
+    if (confidence >= 0.5) return 'confidence-medium';
+    return 'confidence-low';
+  }
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -130,7 +136,7 @@
       {#if showTextInput}
         Hide text assist
       {:else}
-        Describe your task to auto-fill
+        Describe your task to auto-detect category
       {/if}
     </button>
 
@@ -147,9 +153,8 @@
           disabled={isLoading}
         ></textarea>
         {#if prefillConfidence > 0}
-          <div class="prefill-indicator" role="status">
+          <div class="prefill-indicator {confidenceClass(prefillConfidence)}" role="status">
             Detected: {formatCategory(prefillCategory)} — {formatCategory(prefillSubcategory)}
-            <span class="confidence">({(prefillConfidence * 100).toFixed(0)}%)</span>
           </div>
         {/if}
       </div>
@@ -300,14 +305,27 @@
   .prefill-indicator {
     margin-top: 0.5rem;
     padding: 0.4rem 0.75rem;
-    background: rgba(16, 185, 129, 0.1);
     border-radius: 6px;
     font-size: 0.8rem;
-    color: #34d399;
+    border-left: 3px solid;
   }
 
-  .confidence {
-    opacity: 0.7;
+  .prefill-indicator.confidence-high {
+    background: rgba(16, 185, 129, 0.1);
+    color: #34d399;
+    border-left-color: #10b981;
+  }
+
+  .prefill-indicator.confidence-medium {
+    background: rgba(245, 158, 11, 0.1);
+    color: #fbbf24;
+    border-left-color: #f59e0b;
+  }
+
+  .prefill-indicator.confidence-low {
+    background: rgba(148, 163, 184, 0.1);
+    color: #94a3b8;
+    border-left-color: #64748b;
   }
 
   /* Form grid */
