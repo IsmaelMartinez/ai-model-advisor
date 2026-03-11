@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-03-09",
+  "lastUpdated": "2026-03-11",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1803,6 +1803,42 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-11-27"
+          },
+          {
+            "id": "qwen_qwen2.5-0.5b-instruct",
+            "name": "Qwen2.5 0.5B Instruct",
+            "huggingFaceId": "Qwen/Qwen2.5-0.5B-Instruct",
+            "description": "Qwen2.5 0.5B Instruct model for text generation",
+            "sizeMB": 942,
+            "accuracy": 0.75,
+            "environmentalScore": 2,
+            "deploymentOptions": [
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2024-09-25T12:32:56.000Z"
+          },
+          {
+            "id": "qwen_qwen2.5-0.5b",
+            "name": "Qwen2.5 0.5B",
+            "huggingFaceId": "Qwen/Qwen2.5-0.5B",
+            "description": "Qwen2.5 0.5B model for text generation",
+            "sizeMB": 942,
+            "accuracy": 0.75,
+            "environmentalScore": 2,
+            "deploymentOptions": [
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2024-09-25T12:32:36.000Z"
           }
         ],
         "advanced": [
@@ -1895,40 +1931,6 @@
               "Transformers"
             ],
             "lastUpdated": "2025-11-19"
-          },
-          {
-            "id": "h2oai_h2ovl-mississippi-2b",
-            "name": "H2ovl Mississippi 2b",
-            "huggingFaceId": "h2oai/h2ovl-mississippi-2b",
-            "description": "H2ovl Mississippi 2b model for text generation",
-            "sizeMB": 4105,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-09-29T20:11:28.000Z"
-          },
-          {
-            "id": "microsoft_phi-2",
-            "name": "Phi 2",
-            "huggingFaceId": "microsoft/phi-2",
-            "description": "Phi 2 model for text generation",
-            "sizeMB": 5302,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-12-08T11:35:44.000Z"
           }
         ],
         "xlarge": [
@@ -2756,25 +2758,28 @@
               "PyTorch"
             ],
             "lastUpdated": "2025-12-18"
+          },
+          {
+            "id": "facebook_mms-tts-hat",
+            "name": "Mms Tts Hat",
+            "huggingFaceId": "facebook/mms-tts-hat",
+            "description": "Mms Tts Hat model for text to speech",
+            "sizeMB": 69,
+            "accuracy": 0.75,
+            "environmentalScore": 1,
+            "deploymentOptions": [
+              "edge",
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2023-09-01T10:13:11.000Z"
           }
         ],
         "standard": [
-          {
-            "id": "speecht5_tts",
-            "name": "SpeechT5 TTS",
-            "huggingFaceId": "microsoft/speecht5_tts",
-            "description": "Unified speech and text pre-training for TTS",
-            "sizeMB": 920,
-            "accuracy": 0.85,
-            "environmentalScore": 2,
-            "deploymentOptions": [
-              "cloud"
-            ],
-            "frameworks": [
-              "PyTorch"
-            ],
-            "lastUpdated": "2023-10-05"
-          },
           {
             "id": "parler-tts_parler-tts-large-v1",
             "name": "Parler Tts Large V1",
@@ -2792,6 +2797,22 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-12-18"
+          },
+          {
+            "id": "speecht5_tts",
+            "name": "SpeechT5 TTS",
+            "huggingFaceId": "microsoft/speecht5_tts",
+            "description": "Unified speech and text pre-training for TTS",
+            "sizeMB": 920,
+            "accuracy": 0.85,
+            "environmentalScore": 2,
+            "deploymentOptions": [
+              "cloud"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2023-10-05"
           },
           {
             "id": "coqui_xtts-v2",
@@ -2849,35 +2870,6 @@
               "PyTorch"
             ],
             "lastUpdated": "2025-10-12"
-          },
-          {
-            "id": "xenova_speecht5_tts",
-            "name": "Speecht5 Tts",
-            "huggingFaceId": "Xenova/speecht5_tts",
-            "description": "Speecht5 Tts model for text to speech",
-            "sizeMB": 100,
-            "accuracy": 0.75,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "edge",
-              "cloud",
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch"
-            ],
-            "lastUpdated": "2025-10-12",
-            "runtime": {
-              "browser": {
-                "framework": "transformers.js",
-                "backend": [
-                  "wasm",
-                  "webgpu"
-                ],
-                "tested": true
-              }
-            }
           }
         ],
         "advanced": [
