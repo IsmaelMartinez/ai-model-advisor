@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-03-11",
+  "lastUpdated": "2026-03-18",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -847,13 +847,14 @@
         ],
         "advanced": [
           {
-            "id": "microsoft_deberta-large-mnli",
-            "name": "Deberta Large Mnli",
-            "huggingFaceId": "microsoft/deberta-large-mnli",
-            "description": "Deberta Large Mnli model for text classification",
+            "id": "xuhui_toxdect-roberta-large",
+            "name": "ToxDect Roberta Large",
+            "huggingFaceId": "Xuhui/ToxDect-roberta-large",
+            "description": "ToxDect Roberta Large model for text classification",
             "sizeMB": 800,
             "accuracy": 0.85,
             "environmentalScore": 2,
+            "specialization": "task:toxicity",
             "deploymentOptions": [
               "cloud",
               "server"
@@ -865,14 +866,13 @@
             "lastUpdated": "2025-10-12"
           },
           {
-            "id": "xuhui_toxdect-roberta-large",
-            "name": "ToxDect Roberta Large",
-            "huggingFaceId": "Xuhui/ToxDect-roberta-large",
-            "description": "ToxDect Roberta Large model for text classification",
+            "id": "microsoft_deberta-large-mnli",
+            "name": "Deberta Large Mnli",
+            "huggingFaceId": "microsoft/deberta-large-mnli",
+            "description": "Deberta Large Mnli model for text classification",
             "sizeMB": 800,
             "accuracy": 0.85,
             "environmentalScore": 2,
-            "specialization": "task:toxicity",
             "deploymentOptions": [
               "cloud",
               "server"
@@ -1171,13 +1171,14 @@
         ],
         "advanced": [
           {
-            "id": "microsoft_deberta-large-mnli",
-            "name": "Deberta Large Mnli",
-            "huggingFaceId": "microsoft/deberta-large-mnli",
-            "description": "Deberta Large Mnli model for text classification",
+            "id": "xuhui_toxdect-roberta-large",
+            "name": "ToxDect Roberta Large",
+            "huggingFaceId": "Xuhui/ToxDect-roberta-large",
+            "description": "ToxDect Roberta Large model for text classification",
             "sizeMB": 800,
             "accuracy": 0.85,
             "environmentalScore": 2,
+            "specialization": "task:toxicity",
             "deploymentOptions": [
               "cloud",
               "server"
@@ -1189,14 +1190,13 @@
             "lastUpdated": "2025-10-12"
           },
           {
-            "id": "xuhui_toxdect-roberta-large",
-            "name": "ToxDect Roberta Large",
-            "huggingFaceId": "Xuhui/ToxDect-roberta-large",
-            "description": "ToxDect Roberta Large model for text classification",
+            "id": "microsoft_deberta-large-mnli",
+            "name": "Deberta Large Mnli",
+            "huggingFaceId": "microsoft/deberta-large-mnli",
+            "description": "Deberta Large Mnli model for text classification",
             "sizeMB": 800,
             "accuracy": 0.85,
             "environmentalScore": 2,
-            "specialization": "task:toxicity",
             "deploymentOptions": [
               "cloud",
               "server"
@@ -1242,6 +1242,23 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-11-13"
+          },
+          {
+            "id": "jinaai_jina-reranker-m0",
+            "name": "Jina Reranker M0",
+            "huggingFaceId": "jinaai/jina-reranker-m0",
+            "description": "Jina Reranker M0 model for text classification",
+            "sizeMB": 4663,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2025-07-25T01:11:10.000Z"
           }
         ]
       },
@@ -2908,6 +2925,22 @@
             "lastUpdated": "2025-09-25T00:32:21.000Z"
           },
           {
+            "id": "humeai_tada-1b",
+            "name": "Tada 1b",
+            "huggingFaceId": "HumeAI/tada-1b",
+            "description": "Tada 1b model for text to speech",
+            "sizeMB": 4125,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-03-17T18:08:47.000Z"
+          },
+          {
             "id": "openmoss-team_moss-tts-realtime",
             "name": "MOSS TTS Realtime",
             "huggingFaceId": "OpenMOSS-Team/MOSS-TTS-Realtime",
@@ -2940,23 +2973,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-09-01T07:30:16.000Z"
-          },
-          {
-            "id": "vibevoice_vibevoice-1.5b",
-            "name": "VibeVoice 1.5B",
-            "huggingFaceId": "vibevoice/VibeVoice-1.5B",
-            "description": "VibeVoice 1.5B model for text to speech",
-            "sizeMB": 5158,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-09-05T04:08:25.000Z"
           }
         ]
       }
