@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-03-18",
+  "lastUpdated": "2026-03-29",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -573,6 +573,23 @@
               "PyTorch"
             ],
             "lastUpdated": "2025-11-28T03:15:38.000Z"
+          },
+          {
+            "id": "mradermacher_polaris-vga-4b-post1.0e-i1-gguf",
+            "name": "Polaris VGA 4B Post1.0e I1 GGUF",
+            "huggingFaceId": "mradermacher/Polaris-VGA-4B-Post1.0e-i1-GGUF",
+            "description": "Polaris VGA 4B Post1.0e I1 GGUF model for object detection",
+            "sizeMB": 8000,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-03-27T23:51:10.000Z"
           },
           {
             "id": "onnx-community_yolov10b",
