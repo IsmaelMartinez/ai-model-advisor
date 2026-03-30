@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-03-29",
+  "lastUpdated": "2026-03-30",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -592,6 +592,23 @@
             "lastUpdated": "2026-03-27T23:51:10.000Z"
           },
           {
+            "id": "mradermacher_polaris-vga-9b-post1.0e-i1-gguf",
+            "name": "Polaris VGA 9B Post1.0e I1 GGUF",
+            "huggingFaceId": "mradermacher/Polaris-VGA-9B-Post1.0e-i1-GGUF",
+            "description": "Polaris VGA 9B Post1.0e I1 GGUF model for object detection",
+            "sizeMB": 18000,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-03-28T07:44:49.000Z"
+          },
+          {
             "id": "onnx-community_yolov10b",
             "name": "Yolov10b",
             "huggingFaceId": "onnx-community/yolov10b",
@@ -607,22 +624,25 @@
               "ONNX"
             ],
             "lastUpdated": "2024-05-30T10:59:49.000Z"
-          },
+          }
+        ],
+        "xlarge": [
           {
-            "id": "yolo_v8x",
-            "name": "YOLOv8 Extra Large",
-            "huggingFaceId": "ultralytics/yolov8x",
-            "description": "High-accuracy object detection for production use",
-            "sizeMB": 136.7,
-            "accuracy": 0.537,
-            "environmentalScore": 1,
+            "id": "mradermacher_polaris-vga-27b-post1.0e-i1-gguf",
+            "name": "Polaris VGA 27B Post1.0e I1 GGUF",
+            "huggingFaceId": "mradermacher/Polaris-VGA-27B-Post1.0e-i1-GGUF",
+            "description": "Polaris VGA 27B Post1.0e I1 GGUF model for object detection",
+            "sizeMB": 54000,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
             "deploymentOptions": [
-              "cloud"
+              "server"
             ],
             "frameworks": [
-              "PyTorch"
+              "PyTorch",
+              "TensorFlow"
             ],
-            "lastUpdated": "2023-11-15"
+            "lastUpdated": "2026-03-28T09:00:09.000Z"
           }
         ]
       }
