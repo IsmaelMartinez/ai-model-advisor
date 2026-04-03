@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-03-30",
+  "lastUpdated": "2026-04-03",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1322,6 +1322,27 @@
             "lastUpdated": "2025-10-12"
           },
           {
+            "id": "xenova_llama2.c-stories15m",
+            "name": "Llama2.C Stories15M",
+            "huggingFaceId": "Xenova/llama2.c-stories15M",
+            "description": "Llama2.C Stories15M model for text generation",
+            "sizeMB": 29,
+            "accuracy": 0.75,
+            "environmentalScore": 1,
+            "deploymentOptions": [
+              "browser",
+              "mobile",
+              "edge",
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "Transformers.js",
+              "ONNX"
+            ],
+            "lastUpdated": "2025-07-26T03:49:40.000Z"
+          },
+          {
             "id": "meta-llama_llama-3.1-8b-instruct",
             "name": "Llama 3.1 8B Instruct",
             "huggingFaceId": "meta-llama/Llama-3.1-8B-Instruct",
@@ -1392,26 +1413,6 @@
                 "tested": false
               }
             }
-          },
-          {
-            "id": "openai_gpt-oss-20b",
-            "name": "Gpt Oss 20b",
-            "huggingFaceId": "openai/gpt-oss-20b",
-            "description": "Gpt Oss 20b model for text generation",
-            "sizeMB": 100,
-            "accuracy": 0.75,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "mobile",
-              "edge",
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-12-18"
           }
         ],
         "standard": [
