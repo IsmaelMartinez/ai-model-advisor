@@ -1340,7 +1340,16 @@
               "Transformers.js",
               "ONNX"
             ],
-            "lastUpdated": "2025-07-26T03:49:40.000Z"
+            "lastUpdated": "2025-07-26T03:49:40.000Z",
+            "runtime": {
+              "browser": {
+                "framework": "transformers.js",
+                "backend": [
+                  "wasm"
+                ],
+                "tested": false
+              }
+            }
           },
           {
             "id": "meta-llama_llama-3.1-8b-instruct",
@@ -3314,13 +3323,13 @@
     "scoringCriteria": {
       "1": {
         "label": "Low Impact",
-        "description": "Lightweight models (≤500MB), suitable for edge/mobile",
-        "sizeThreshold": "≤ 500 MB"
+        "description": "Lightweight models (\u2264500MB), suitable for edge/mobile",
+        "sizeThreshold": "\u2264 500 MB"
       },
       "2": {
         "label": "Medium Impact",
-        "description": "Standard models (≤4GB), suitable for cloud deployment",
-        "sizeThreshold": "≤ 4 GB"
+        "description": "Standard models (\u22644GB), suitable for cloud deployment",
+        "sizeThreshold": "\u2264 4 GB"
       },
       "3": {
         "label": "High Impact",
