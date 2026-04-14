@@ -22,7 +22,7 @@ Find AI models you can run in the browser, on mobile, or at the edge — no serv
 - ✅ Automated model dataset updates (daily via GitHub Actions)
 - ✅ PWA with offline capability (installable on desktop & mobile)
 - ✅ Full accessibility support
-- ✅ 152 curated models across 4 categories, 10 subcategories
+- ✅ 156 curated models across 4 categories, 16 subcategories
 
 **Live**: https://ismaelmartinez.github.io/ai-model-advisor
 
@@ -35,7 +35,7 @@ Find AI models you can run in the browser, on mobile, or at the edge — no serv
 
 **Achieved**:
 - <1 second to recommendations (target was <30s)
-- 4 AI task categories, 10 subcategories, 98.3% classification accuracy
+- 4 AI task categories, 16 subcategories, 98.3% classification accuracy
 - ~40KB bundle size (target was <2MB)
 - Full accessibility support
 - Mobile & desktop PWA support
