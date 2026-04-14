@@ -10,7 +10,7 @@ Helps you find AI models for your task, prioritizing smaller and more efficient 
 2. Get model recommendations ranked by efficiency (smaller first)
 3. See environmental impact estimates
 
-Supports: Computer Vision, NLP, Speech, Time Series, Recommendations, Reinforcement Learning, Data Preprocessing
+Supports: Computer Vision, NLP, Speech, Time Series
 
 ## Development
 

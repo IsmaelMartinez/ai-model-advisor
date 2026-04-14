@@ -13,26 +13,11 @@ Thank you for your interest in contributing to the AI Model Advisor project!
 
 ### Branch Protection (For Maintainers)
 
-The main branch is protected to ensure code quality. To set up branch protection on a new fork or repository:
+The `main` branch is protected to ensure code quality. Configure protection rules
+in GitHub under **Settings → Branches → Branch protection rules**:
 
-**Prerequisites:**
-- gh CLI installed ([installation guide](https://cli.github.com))
-- gh CLI authenticated (`gh auth login`)
-- Repository admin permissions
-
-**Setup:**
-```bash
-./scripts/setup-branch-protection.sh
-```
-
-**Verification:**
-- View settings at: Settings → Branches → Branch protection rules
-- Test by creating a PR and verifying status checks are required
-
-The protection enforces:
-- ✓ All tests must pass
-- ✓ Production build must succeed
-- ✗ No code review required (automated checks only)
+- Require status checks to pass before merging (CI tests + build)
+- Require branches to be up to date before merging
 
 ## Development
 

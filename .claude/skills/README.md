@@ -1,18 +1,15 @@
-# Claude Skills for AI Model Selector
+# Claude Skills for AI Model Advisor
 
-This directory contains specialized skills to help AI assistants work effectively with the Model Selector project.
+This directory contains specialized skills to help AI assistants work effectively with the AI Model Advisor project.
 
 ## Available Skills
 
 ### 🧪 test-runner
-**Purpose:** Smart test execution based on context
+**Purpose:** Run the Vitest suite and interpret results
 **Use when:** User asks to run tests, before commits, or validating changes
 
-**Key decisions:**
-- CI/CD → Fast tests only (`npm test`)
-- Classification changes → Both fast and LLM tests
-- Accuracy validation → LLM tests
-- General changes → Fast tests
+**Commands:**
+- `npm test` — full suite (10 files, 136 tests, ~2s)
 
 ### 📦 model-updater
 **Purpose:** Update model database from HuggingFace Hub
@@ -100,6 +97,7 @@ To add a new skill:
 ## Resources
 
 - Main documentation: `/CLAUDE.md`
-- Project status: `/PROJECT_STATUS.md`
+- Project status: `/project-status.md`
+- Project vision: `/project-vision.md`
 - Architecture decisions: `/docs/adrs/`
-- Model curation: `/docs/MODEL_CURATION_PROCESS.md`
+- Model curation: `/docs/model-curation-process.md`

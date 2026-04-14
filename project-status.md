@@ -1,6 +1,6 @@
 # AI Model Advisor - Current Project Status
 
-**Date**: March 10, 2026
+**Date**: April 14, 2026
 **Status**: Phase 2 Complete ✅ — Edge/Browser AI Advisor
 **Live URL**: https://ismaelmartinez.github.io/ai-model-advisor
 **Classifier**: MiniLM embeddings (23MB, 98.3% accuracy)
@@ -15,7 +15,7 @@ MVP and Phase 2 (edge/browser pivot) complete. The app now includes runtime meta
 - **Task Classification**: MiniLM sentence embeddings with voting mode (5 votes)
   - Similarity-based matching, ~2ms, 98.3% accuracy
   - **Model Size**: ~23MB (vs previous 700MB), mobile-friendly
-- **Model Recommendations**: 3-tiered system (Lightweight/Standard/Advanced)
+- **Model Recommendations**: 4-tiered system (Lightweight/Standard/Advanced/Extra Large)
 - **Environmental Focus**: "Smaller is better" algorithm prioritizing efficient models
 - **Accessibility**: Full keyboard navigation, ARIA labels, screen reader support
 - **Responsive Design**: Works on desktop and mobile devices
@@ -26,11 +26,11 @@ MVP and Phase 2 (edge/browser pivot) complete. The app now includes runtime meta
 - **Bundle Size**: ~40KB (well under target)
 - **Performance**: <1 second response time
 - **Browser Support**: Chrome-first (primary target achieved)
-- **Data**: Comprehensive model dataset with 7 categories and 17 subcategories
+- **Data**: Curated dataset of 156 models across 4 categories and 16 subcategories
 - **Deployment**: Automated GitHub Actions → GitHub Pages
 
 ### ✅ Quality Assurance
-- **MVP Acceptance Tests**: 11/11 passing ✅
+- **Test Suite**: 136 tests across 10 files, all passing ✅ (~2s)
 - **Core Functionality**: All user workflows working
 - **Error Handling**: Graceful fallbacks for edge cases
 - **Documentation**: Complete user guide and deployment docs
@@ -42,23 +42,31 @@ MVP and Phase 2 (edge/browser pivot) complete. The app now includes runtime meta
 src/
 ├── lib/
 │   ├── data/
-│   │   ├── models.json ✅ (Comprehensive dataset)
-│   │   └── tasks.json ✅ (Task taxonomy with keywords)
+│   │   ├── models.json ✅ (156 models across 4 categories/16 subcategories)
+│   │   ├── tasks.json ✅ (Task taxonomy with keywords)
+│   │   └── reference-embeddings.json ✅ (Pre-computed MiniLM embeddings)
 │   ├── classification/
 │   │   ├── EmbeddingTaskClassifier.js ✅ (MiniLM 23MB, 98.3% accuracy)
-│   │   └── BrowserTaskClassifier.js ✅ (Semantic fallback)
-│   └── recommendation/
-│       └── ModelSelector.js ✅ ("Smaller is better" ranking)
+│   │   ├── BrowserTaskClassifier.js ✅ (Semantic fallback)
+│   │   └── classifierConfig.js ✅ (Classifier configuration)
+│   ├── recommendation/
+│   │   └── ModelSelector.js ✅ ("Smaller is better" ranking)
+│   ├── environmental/
+│   │   └── EnvironmentalImpactCalculator.js ✅ (1-3 impact scoring)
+│   └── aggregation/
+│       ├── ModelAggregator.js ✅ (HuggingFace updater)
+│       └── cli.js ✅ (Update CLI)
 ├── components/
-│   ├── TaskInput.svelte ✅ (Accessible input)
+│   ├── TaskForm.svelte ✅ (Accessible input)
 │   └── RecommendationDisplay.svelte ✅ (Tiered display with scroll feedback)
-├── static/
-│   ├── sw.js ✅ (Service worker for PWA)
-│   ├── manifest.webmanifest ✅ (PWA manifest)
-│   └── icon-*.png ✅ (PWA icons)
 └── routes/
     ├── +layout.svelte ✅ (SW registration)
     └── +page.svelte ✅ (Main application)
+
+static/
+├── sw.js ✅ (Service worker for PWA)
+├── manifest.webmanifest ✅ (PWA manifest)
+└── icon-*.png ✅ (PWA icons)
 ```
 
 ### Infrastructure
@@ -79,12 +87,12 @@ src/
   - PWA installable
 
 ### Test Status (All Passing ✅)
-- **Tests (CI/CD)**: All passing (acceptance + integration + model selector + code assistant, ~2s)
+- **Tests (CI/CD)**: 136/136 passing (acceptance, integration, data quality, runtime metadata, edge maturity, deployment filter, accuracy filter, code assistant, model aggregator, precomputed embeddings; ~2s)
 - **Note**: Classification uses MiniLM embedding model (23MB, 98.3% accuracy)
 
 ### Classification Accuracy
 - **Production**: 98.3% accuracy with MiniLM sentence embeddings
-- **Strengths**: Excellent performance across all 7 categories
+- **Strengths**: Excellent performance across all 4 categories
 - **Model**: Xenova/all-MiniLM-L6-v2 (23MB, cached in IndexedDB)
 - **Improvement**: Upgraded from Llama 3.2 1B (700MB) to MiniLM (23MB)
 
@@ -111,14 +119,20 @@ src/
 ## 🧪 Test Results Summary
 
 ```
-✅ MVP Acceptance Tests: passing (100%)
+✅ Acceptance Tests: passing (100%)
 ✅ Integration Tests: passing (100%)
-✅ Model Selector Tests: passing (100%)
+✅ Data Quality Tests: passing (100%)
+✅ Runtime Metadata Tests: passing (100%)
+✅ Edge Maturity Tests: passing (100%)
+✅ Deployment Filter Tests: passing (100%)
+✅ Accuracy Filter Tests: passing (100%)
 ✅ Code Assistant Tests: passing (100%)
+✅ Model Aggregator Tests: passing (100%)
+✅ Precomputed Embeddings Tests: passing (100%)
 ```
 
 **Test Command:**
-- `npm test`: Run all tests (~2s)
+- `npm test`: Run all 136 tests (~2s)
 
 ## 📋 Development Environment
 
@@ -131,9 +145,9 @@ src/
 ```bash
 npm install          # ✅ Dependencies installed
 npm run dev         # ✅ Development server
-npm run build       # ✅ Production build (warnings but successful)
+npm run build       # ✅ Production build
 npm run preview     # ✅ Preview server (localhost:4174)
-npm test           # ⚠️  Tests run but some failures
+npm test           # ✅ 136/136 tests passing (~2s)
 git status         # ✅ Clean working tree
 ```
 
@@ -198,7 +212,7 @@ The project's strongest asset — a 23MB MiniLM classifier running entirely in t
 
 ## 📝 Final Notes
 
-The AI Model Advisor MVP has been **successfully completed and deployed**. While there are some test failures in edge cases, the core functionality works as designed and meets all MVP requirements. The application is live, accessible, and provides valuable environmental-conscious AI model recommendations.
+The AI Model Advisor MVP has been **successfully completed and deployed**. All tests pass, the core functionality works as designed, and the application meets all MVP requirements. The application is live, accessible, and provides valuable environmental-conscious AI model recommendations.
 
 The project demonstrates a complete end-to-end development process from PRD to deployment, with systematic task management and quality assurance practices.
 
