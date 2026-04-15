@@ -51,6 +51,9 @@ jobs:
           npm run update-models
           echo "Aggregation complete"
 
+      - name: Validate updated dataset
+        run: npm test -- --run
+
       - name: Check for changes
         id: changes
         run: |
