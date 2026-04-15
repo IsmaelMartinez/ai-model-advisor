@@ -4,3 +4,16 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      # Keep SvelteKit + vite + vite-plugin-svelte + svelte bumped together.
+      # These share peer-dep constraints, so splitting them across PRs causes
+      # ERESOLVE failures (see PRs #117, #124, #125).
+      sveltekit:
+        patterns:
+          - "@sveltejs/*"
+          - "svelte"
+          - "vite"
+          - "vite-plugin-*"
+      # Group the rest of the dev-dep churn into a single PR per week.
+      dev-dependencies:
+        dependency-type: "development"
