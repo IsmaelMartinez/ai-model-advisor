@@ -13,21 +13,24 @@
 - [ ] 1.4 Update `tests/runtime-metadata.test.js` to assert `framework` is always an array and that every entry is a known framework identifier.
 - [ ] 1.5 Add a thin helper `src/lib/data/runtimeSchema.js` exporting `listFrameworks(model)` that returns `model.runtime?.browser?.framework ?? []`, so consumers have a stable accessor even when `runtime` is absent.
 - [ ] 1.6 Run `npm test` to confirm the audit script, schema change, and normalization helper leave the existing suite green.
+- [ ] 1.7 **Migration safety rule:** the array migration of `runtime.browser.framework` (Task 1.3), the test update (Task 1.4), and the helper (Task 1.5) MUST land in a **single commit**. Landing them separately leaves the repo in a state where `runtime-metadata.test.js` fails against the new data shape or vice-versa. Enforce with a pre-commit check: if `models.json` shows array-form `framework` entries, `runtime-metadata.test.js` must already assert the array form.
 
 ## Parent Task 2: Build the snippet generator core and framework template modules
 
 - [ ] 2.1 Create `src/lib/snippets/SnippetGenerator.js` exposing `generateSnippets(model, tasksData)` which returns `Array<{ framework: string, minimal: string, full: string }>`, one entry per framework declared in the model's runtime metadata.
 - [ ] 2.2 Define a small internal contract (JSDoc typedef) for `TemplateFn: (model, task) => { minimal: string, full: string }` inside `src/lib/snippets/templates/index.js`, plus a registry map `{ 'transformers.js': transformersTemplate, ... }`.
 - [ ] 2.3 Implement `src/lib/snippets/templates/transformersjs.js` covering at least: text classification, feature extraction, token classification, image classification, and zero-shot — one `switch` on `task.category`/`task.subcategory` selecting the correct `pipeline()` call. Return Minimal (5–10 lines) and Full (standalone `.html`) variants.
-- [ ] 2.4 Implement `src/lib/snippets/templates/onnxruntimeweb.js` with a generic `InferenceSession.create` + feeds/fetches skeleton; include a TODO placeholder section for task-specific tensor shapes where the model's subcategory doesn't map cleanly. Gate emission on an explicit `runtime.browser.onnxruntime` entry (per PRD §9.3 lean).
+- [ ] 2.4 Implement `src/lib/snippets/templates/onnxruntimeweb.js` with a generic `InferenceSession.create` + feeds/fetches skeleton; include a TODO placeholder section for task-specific tensor shapes where the model's subcategory doesn't map cleanly. Gate emission on `"onnxruntime-web"` being present in `runtime.browser.framework` (resolved per PRD §9.3 — single-shape schema, no separate `onnxruntime` key).
 - [ ] 2.5 Implement `src/lib/snippets/templates/tensorflowjs.js` covering the core TF.js task mapping (image classification via MobileNet-style `model.predict`, text tasks via USE-style encoders). Minimal + Full variants as above.
 - [ ] 2.6 Pin framework versions in all templates (Transformers.js `@huggingface/transformers@4.x`, ONNX `onnxruntime-web@1.x`, TF.js `@tensorflow/tfjs@4.x`) per PRD §9.6.
-- [ ] 2.7 Add graceful fallback: if the template cannot handle the task, `generateSnippets` returns `[]` for that framework rather than throwing — logged via `console.warn` in dev.
+- [ ] 2.7 Centralize the pins in a single `src/lib/snippets/templates/versions.js` map so templates import from one place, and add a CI check (unit test) that every template's snippet output references a version from that map — prevents silent drift when a template is edited in isolation.
+- [ ] 2.8 Extend `.github/dependabot.yml` so bumps to `@huggingface/transformers`, `onnxruntime-web`, and `@tensorflow/tfjs` group together and surface a reminder in the PR body to update `versions.js`. (The repo already uses dependabot — reuse the existing config.)
+- [ ] 2.9 Add graceful fallback: if the template cannot handle the task, `generateSnippets` returns `[]` for that framework rather than throwing — logged via `console.warn` in dev.
 
 ## Parent Task 3: Add the test harness (unit + integration + coverage gate)
 
 - [ ] 3.1 Create `tests/fixtures/snippet-models.json` with one minimal model fixture per task category × framework combination (covers the matrix used in template switches).
-- [ ] 3.2 Create `tests/snippets.test.js` with a `describe('SnippetGenerator')` block that unit-tests each template: render the fixture and assert both Minimal and Full variants using Vitest's `toMatchSnapshot()` (or `toMatchInlineSnapshot()` for small cases). Snapshots are the canonical way to cover multi-line template output and tolerate whitespace/format-neutral changes while still flagging real regressions.
+- [ ] 3.2 Create `tests/snippets.test.js` with a `describe('SnippetGenerator')` block that unit-tests each template: render the fixture and assert both Minimal and Full variants using Vitest's `toMatchSnapshot()` (or `toMatchInlineSnapshot()` for small cases). Snapshots are the canonical way to cover multi-line template output and tolerate whitespace/format-neutral changes while still flagging real regressions. **Reviewer discipline:** snapshot diffs MUST be read line-by-line before approval — never blindly regenerate with `-u` / `--update-snapshots`. Add a one-liner to `CLAUDE.md` under "Testing Strategy" documenting this rule.
 - [ ] 3.3 Add an integration test: iterate `models.json`, filter to Lightweight + Standard tiers, assert that for every model with a framework in `runtime.browser`, `generateSnippets` returns at least one non-empty `{ minimal, full }` for that framework.
 - [ ] 3.4 Add a coverage test: compute `(models with ≥1 snippet) / (Lightweight + Standard total)`; fail if < 0.80. Emit the computed percentage via `console.log` so CI logs surface regressions.
 - [ ] 3.5 Add a negative test: a model missing `runtime.browser` entirely must return `[]` from `generateSnippets` (and the UI must not show an empty panel — covered in Task 6).
@@ -35,7 +38,7 @@
 
 ## Parent Task 4: Fill runtime metadata gaps to clear the 80% coverage bar
 
-- [ ] 4.1 Run the audit script from Task 1.1 and write its output to `tasks/audit-runtime-coverage.md` (gitignored-safe, kept for traceability during this task; can be deleted after ship).
+- [ ] 4.1 Run the audit script from Task 1.1 and write its output to `tasks/audit-runtime-coverage.md`. Add `tasks/audit-runtime-coverage.md` to `.gitignore` in the same commit so the working file doesn't land in history; it can be deleted locally once Task 4.5 passes.
 - [ ] 4.2 For each Lightweight + Standard tier model missing a framework, research on Hugging Face whether a Transformers.js / ONNX / TF.js export exists and record findings directly in the audit file.
 - [ ] 4.3 Update `src/lib/data/models.json` in small batches (grouped by category), adding the correct `runtime.browser` entries. Commit each batch separately with a descriptive message.
 - [ ] 4.4 After each batch, re-run `npm test` to confirm the coverage test is trending up and nothing else broke.
@@ -87,6 +90,7 @@
 - `src/lib/snippets/templates/transformersjs.js` — Transformers.js template
 - `src/lib/snippets/templates/onnxruntimeweb.js` — ONNX Runtime Web template
 - `src/lib/snippets/templates/tensorflowjs.js` — TensorFlow.js template
+- `src/lib/snippets/templates/versions.js` — centralized framework version pins
 - `src/lib/data/runtimeSchema.js` — `listFrameworks(model)` normalization helper
 - `src/components/SnippetPanel.svelte` — tabs / toggle / copy UI
 - `tests/snippets.test.js` — unit + integration + coverage gate
@@ -97,11 +101,14 @@
 - `docs/adrs/adr-0009-snippet-ui-treatment.md` — UI + highlighter decision
 
 **Modified files**
-- `src/lib/data/models.json` — schema extension + metadata backfill
+- `src/lib/data/models.json` — array-form `framework` migration + metadata backfill
 - `src/components/RecommendationDisplay.svelte` — integrate `SnippetPanel`
-- `tests/runtime-metadata.test.js` — accept array-form `framework`
+- `tests/runtime-metadata.test.js` — assert array-form `framework`
 - `docs/model-curation-process.md` — runtime schema docs
-- `CLAUDE.md`, `README.md`, `project-status.md`, `project-vision.md` — feature docs
+- `.github/dependabot.yml` — group framework bumps + versions.js reminder
+- `.gitignore` — ignore working file `tasks/audit-runtime-coverage.md`
+- `CLAUDE.md` — add snapshot-review discipline note + snippet architecture subsection
+- `README.md`, `project-status.md`, `project-vision.md` — feature docs
 
 ---
 

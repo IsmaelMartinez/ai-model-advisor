@@ -183,11 +183,9 @@ Needs wireframes before choosing between inline expandable, modal, dedicated rou
 ### 9.2 Syntax highlighter choice
 Prism, Shiki, or hand-rolled? Decision depends on bundle-size measurements. Recommend spiking both during implementation.
 
-### 9.3 ONNX Runtime Web model availability
-Not every model in `models.json` has a published ONNX export. How should we detect this and degrade gracefully?
-- Option A: Require an explicit `runtime.browser.onnxruntime` entry; only generate a snippet if present.
-- Option B: Auto-probe Hugging Face at build time and cache results (adds build complexity).
-- **Lean:** Option A — keeps the metadata contract explicit.
+### 9.3 ONNX Runtime Web model availability — RESOLVED
+
+Not every model in `models.json` has a published ONNX export. To keep the schema single-shape (one array of framework strings per model, per Task 1.3), ONNX support is represented the same way as the other frameworks: an entry `"onnxruntime-web"` inside `runtime.browser.framework`. Models without that entry don't get an ONNX snippet. This supersedes the earlier "separate `runtime.browser.onnxruntime` key" idea, which would have forced a dual-shape schema. If per-model tensor-shape hints are needed later, add a sibling `runtime.browser.onnxHints` object — that's strictly additive and doesn't change the framework-array contract.
 
 ### 9.4 Full-variant boilerplate
 For browser-only examples, should the "Full" variant be a complete standalone `.html` file, or a `<script type="module">` fragment a user embeds in their own page? Leaning toward full `.html` — maximizes copy-paste-to-run ergonomics.

@@ -109,6 +109,19 @@ Phase 3 runs as four sequential workstreams. WS1 is scoped and ready to execute;
 3. **Workstream 3 — Performance estimates** — Cold start time, inference latency, memory footprint from community benchmarks and our own testing. *Builds on WS1's runtime metadata.*
 4. **Workstream 4 — "Can I Run This?"** — Input a model name or Hugging Face URL → get an edge deployment feasibility report (estimated browser memory, compatible runtimes, quantization options, WebGPU vs WASM expectations). *Largest scope; tackled last.*
 
+**Dependency map:**
+```
+WS1: Code snippets (multi-framework metadata + templates + UI surface)
+     │
+     ├──→ WS2: Runtime comparison (reuses multi-framework metadata)
+     │
+     ├──→ WS3: Performance estimates (reuses runtime metadata, adds benchmarks)
+     │
+     └──→ WS4: "Can I Run This?" (reuses everything above)
+```
+
+WS2 and WS3 can run in parallel once WS1's metadata migration is done; WS4 comes last.
+
 ---
 
 ### Phase 4: Community & Ecosystem
