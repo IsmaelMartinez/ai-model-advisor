@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-04-03",
+  "lastUpdated": "2026-04-17",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1591,21 +1591,21 @@
             "lastUpdated": "2024-09-25T12:33:00.000Z"
           },
           {
-            "id": "meta-llama_llama-3.2-3b-instruct",
-            "name": "Llama 3.2 3B Instruct",
-            "huggingFaceId": "meta-llama/Llama-3.2-3B-Instruct",
-            "description": "Llama 3.2 3B Instruct model for text generation",
-            "sizeMB": 6128,
+            "id": "onnx-community_llama-3.2-3b-instruct-onnx",
+            "name": "Llama 3.2 3B Instruct ONNX",
+            "huggingFaceId": "onnx-community/Llama-3.2-3B-Instruct-ONNX",
+            "description": "Llama 3.2 3B Instruct ONNX model for text generation",
+            "sizeMB": 6000,
             "accuracy": 0.75,
             "environmentalScore": 3,
             "deploymentOptions": [
               "server"
             ],
             "frameworks": [
-              "PyTorch",
-              "TensorFlow"
+              "Transformers.js",
+              "ONNX"
             ],
-            "lastUpdated": "2024-10-24T15:07:29.000Z"
+            "lastUpdated": "2025-11-29T23:01:28.000Z"
           }
         ],
         "xlarge": [
@@ -3323,13 +3323,13 @@
     "scoringCriteria": {
       "1": {
         "label": "Low Impact",
-        "description": "Lightweight models (\u2264500MB), suitable for edge/mobile",
-        "sizeThreshold": "\u2264 500 MB"
+        "description": "Lightweight models (≤500MB), suitable for edge/mobile",
+        "sizeThreshold": "≤ 500 MB"
       },
       "2": {
         "label": "Medium Impact",
-        "description": "Standard models (\u22644GB), suitable for cloud deployment",
-        "sizeThreshold": "\u2264 4 GB"
+        "description": "Standard models (≤4GB), suitable for cloud deployment",
+        "sizeThreshold": "≤ 4 GB"
       },
       "3": {
         "label": "High Impact",
