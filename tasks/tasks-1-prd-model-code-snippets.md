@@ -9,9 +9,9 @@
 
 - [ ] 1.1 Write `scripts/audit-runtime-metadata.js` that loads `src/lib/data/models.json`, iterates every category → subcategory → tier, and prints a table of: model id, tier, `deploymentOptions`, and any existing `runtime.browser.framework` values.
 - [ ] 1.2 From the audit output, compute current snippet-eligible coverage across Lightweight + Standard tiers (models with at least one framework vs. total) and record the baseline in a comment at the top of `tasks-1-prd-model-code-snippets.md`.
-- [ ] 1.3 Extend the `runtime.browser` schema in `src/lib/data/models.json` so `framework` may be either a string (legacy, still valid) or an array of strings (new). Capture the grammar in a short "Schema" section added to `docs/model-curation-process.md`.
-- [ ] 1.4 Update `tests/runtime-metadata.test.js` to accept both the string and array form of `framework` without breaking existing assertions.
-- [ ] 1.5 Add a normalization helper `src/lib/data/runtimeSchema.js` exporting `listFrameworks(model)` that returns an array regardless of input shape, so consumers can iterate uniformly.
+- [ ] 1.3 Migrate the `runtime.browser.framework` schema in `src/lib/data/models.json` to **always be an array of strings** (one-time migration; no dual string/array support). Rewrite every existing single-string entry to the array form in the same change. Capture the grammar in a short "Schema" section added to `docs/model-curation-process.md`.
+- [ ] 1.4 Update `tests/runtime-metadata.test.js` to assert `framework` is always an array and that every entry is a known framework identifier.
+- [ ] 1.5 Add a thin helper `src/lib/data/runtimeSchema.js` exporting `listFrameworks(model)` that returns `model.runtime?.browser?.framework ?? []`, so consumers have a stable accessor even when `runtime` is absent.
 - [ ] 1.6 Run `npm test` to confirm the audit script, schema change, and normalization helper leave the existing suite green.
 
 ## Parent Task 2: Build the snippet generator core and framework template modules
@@ -27,7 +27,7 @@
 ## Parent Task 3: Add the test harness (unit + integration + coverage gate)
 
 - [ ] 3.1 Create `tests/fixtures/snippet-models.json` with one minimal model fixture per task category × framework combination (covers the matrix used in template switches).
-- [ ] 3.2 Create `tests/snippets.test.js` with a `describe('SnippetGenerator')` block that unit-tests each template: render the fixture, assert exact Minimal and Full strings (use snapshot-style `toBe` on inlined expected strings so diffs are obvious).
+- [ ] 3.2 Create `tests/snippets.test.js` with a `describe('SnippetGenerator')` block that unit-tests each template: render the fixture and assert both Minimal and Full variants using Vitest's `toMatchSnapshot()` (or `toMatchInlineSnapshot()` for small cases). Snapshots are the canonical way to cover multi-line template output and tolerate whitespace/format-neutral changes while still flagging real regressions.
 - [ ] 3.3 Add an integration test: iterate `models.json`, filter to Lightweight + Standard tiers, assert that for every model with a framework in `runtime.browser`, `generateSnippets` returns at least one non-empty `{ minimal, full }` for that framework.
 - [ ] 3.4 Add a coverage test: compute `(models with ≥1 snippet) / (Lightweight + Standard total)`; fail if < 0.80. Emit the computed percentage via `console.log` so CI logs surface regressions.
 - [ ] 3.5 Add a negative test: a model missing `runtime.browser` entirely must return `[]` from `generateSnippets` (and the UI must not show an empty panel — covered in Task 6).
@@ -55,14 +55,14 @@
 - [ ] 6.3 Integrate `SnippetPanel` into `src/components/RecommendationDisplay.svelte` per the UI treatment chosen in Task 5.
 - [ ] 6.4 Add keyboard navigation: ArrowLeft/Right cycle tabs, Enter activates, Tab moves to code block, Ctrl/Cmd+C copies when focused.
 - [ ] 6.5 Handle the empty state: if `generateSnippets` returns `[]`, hide the panel entirely (no empty framework tabs, no disabled Copy button).
-- [ ] 6.6 Integrate a lightweight syntax highlighter — start with a hand-rolled regex-based JS/HTML highlighter (~2KB); upgrade to Prism/Shiki only if visual quality demands it (decision logged in Task 7).
+- [ ] 6.6 Integrate a lightweight syntax highlighter via one of two safe paths (no hand-rolled regex highlighter — XSS risk if rendered via `{@html}`): (a) **build-time pre-computation** that ships plain HTML with tokens already wrapped in spans (preferred; zero runtime cost); or (b) a small vetted library such as Prism core or Shiki. Decision logged in Task 7 after bundle measurements.
 - [ ] 6.7 Style to match existing minimalist aesthetic (use existing CSS custom properties / design tokens from `+page.svelte` / `RecommendationDisplay.svelte`).
 - [ ] 6.8 Manual UX pass: open in `npm run dev`, verify the golden path (classify → see recommendation → copy a snippet → paste into a sandbox → it runs) on desktop Chrome + one mobile viewport via devtools.
 
 ## Parent Task 7: Verify bundle-size budget and emit a build-time coverage report
 
 - [ ] 7.1 Capture a baseline bundle size: `npm run build` on `main`, record total JS/CSS gzipped in `docs/design/bundle-baseline.md`.
-- [ ] 7.2 Build the feature branch, compare, and record the delta. Fail the task if delta > 20KB gzipped; iterate on highlighter choice if needed.
+- [ ] 7.2 Build the feature branch, compare, and record the delta split into two numbers: (a) runtime code (templates + generator + panel) — fail if > 5KB gzipped; (b) syntax highlighter — fail if > 10KB gzipped (or 0 if pre-computed at build time). Iterate on highlighter approach if either budget is exceeded.
 - [ ] 7.3 Decide between the hand-rolled highlighter, Prism core, or Shiki static output based on measured delta and visual quality. Record the decision in the ADR from Task 5.2.
 - [ ] 7.4 Add a `scripts/snippet-coverage-report.js` (or extend the Task 1 audit script) that emits a JSON summary of coverage and is invoked by `npm run build` (via a `prebuild` script or Vite plugin). Output path: `build-artifacts/snippet-coverage.json`.
 - [ ] 7.5 Add a build-log line like `"Snippet coverage (L+S tiers): 84% (131/156)"` so regressions are visible in CI output.

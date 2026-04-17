@@ -23,7 +23,7 @@ This is the first Workstream of Phase 3 and the highest-leverage conversion of a
 2. **Achieve 80% snippet coverage** of all models in the Lightweight and Standard tiers.
 3. **Support all three target runtimes** (Transformers.js, ONNX Runtime Web, TensorFlow.js) via per-framework templates.
 4. **Guarantee snippet correctness** through automated tests — every generated snippet must parse and match expected template output for its framework + task combination.
-5. **Preserve bundle size discipline** — templates and snippet generation logic must not push the site bundle meaningfully past the current ~40KB target.
+5. **Preserve bundle size discipline** — cap the runtime bundle delta for this feature at **< 5KB gzipped** (templates, `SnippetGenerator`, `SnippetPanel`). Syntax highlighting MUST be handled via build-time pre-computation or a small vetted library; its weight is measured separately and must not regress the overall page load budget. The current total bundle is ~40KB; a 20KB increase would be ~50% and is not acceptable.
 
 ---
 
@@ -142,7 +142,7 @@ Snippets should match the project's existing environmental-conscious, minimalist
 
 ### 7.3 Bundle size
 
-- Template strings are small, but a syntax highlighter can add weight. Target: total snippet-related bundle delta < 20KB gzipped.
+- Template strings are small. Target: runtime bundle delta for templates + generator + panel < 5KB gzipped. Syntax highlighter weight is tracked separately (ideally 0KB via build-time pre-computation; ≤10KB gzipped if a vetted library is chosen).
 - Consider generating syntax-highlighted HTML at build time (via a Vite plugin or pre-computation step similar to `precompute-embeddings`) so the runtime ships plain HTML.
 
 ### 7.4 Static-first constraint
@@ -165,7 +165,8 @@ Snippets should match the project's existing environmental-conscious, minimalist
 | Frameworks supported | 3 (Transformers.js, ONNX Runtime Web, TF.js) | Presence of template modules + passing tests |
 | Time to copy first snippet from recommendation | < 5 seconds | Manual UX review / stopwatch test |
 | Template test coverage | 100% of templates have Minimal + Full variant tests | Test file assertions |
-| Bundle size delta | < 20KB gzipped | `npm run build` comparison before/after |
+| Runtime bundle delta (templates + generator + panel) | < 5KB gzipped | `npm run build` comparison before/after |
+| Syntax highlighter footprint (runtime) | ≤ 0 KB if pre-computed, else ≤ 10KB gzipped for a vetted lib | `npm run build` comparison |
 | Full test suite time | Remains ~2s (best effort) | `npm test` timing |
 
 Post-launch (tracked on project dashboard, not a launch blocker):
