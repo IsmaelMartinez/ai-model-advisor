@@ -187,10 +187,10 @@ The project's strongest asset — a 23MB MiniLM classifier running entirely in t
 ### Future Phases (Post Phase 2)
 
 #### Phase 3: Make It Actionable
-1. **Code snippets** for recommended models (Transformers.js, ONNX Runtime Web, TensorFlow.js)
-2. **Runtime comparison** — side-by-side framework support for each model
-3. **Performance estimates** — cold start, inference latency, memory footprint
-4. **"Can I Run This?"** — input a model name → get edge deployment feasibility report
+1. **Workstream 1 — Code snippets** 📝 *Planned (PRD + task list ready)* — Transformers.js, ONNX Runtime Web, TensorFlow.js snippets per recommended model. See [tasks/1-prd-model-code-snippets.md](tasks/1-prd-model-code-snippets.md) and [tasks/tasks-1-prd-model-code-snippets.md](tasks/tasks-1-prd-model-code-snippets.md).
+2. **Workstream 2 — Runtime comparison** — side-by-side framework support for each model (builds on WS1)
+3. **Workstream 3 — Performance estimates** — cold start, inference latency, memory footprint (builds on WS1)
+4. **Workstream 4 — "Can I Run This?"** — input a model name → get edge deployment feasibility report (largest scope; tackled last)
 
 #### Phase 4: Community & Ecosystem
 1. **Community-reported benchmarks** — real-world performance data

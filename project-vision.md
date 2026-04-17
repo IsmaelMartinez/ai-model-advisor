@@ -99,10 +99,28 @@ Start ───┼─── B: UX & Messaging ───────────�
 
 *Depends on Phase 2 data work being complete.*
 
-1. **Code snippets** — "Get started" snippets for Transformers.js, ONNX Runtime Web, TensorFlow.js for each recommended model
-2. **Runtime comparison** — Side-by-side framework comparison showing which runtimes support each model
-3. **Performance estimates** — Cold start time, inference latency, memory footprint from community benchmarks and our own testing
-4. **"Can I Run This?" feature** — Input a model name or Hugging Face URL → get an edge deployment feasibility report (estimated browser memory, compatible runtimes, quantization options, WebGPU vs WASM expectations)
+Phase 3 runs as four sequential workstreams. WS1 is scoped and ready to execute; WS2–WS4 build on its data model and UI surface.
+
+1. **Workstream 1 — Code snippets** 📝 *Planned, PRD + task list ready*
+   "Get started" snippets for Transformers.js, ONNX Runtime Web, and TensorFlow.js for each recommended model, generated from per-framework templates driven by existing runtime metadata. Target: 80% snippet coverage on Lightweight + Standard tiers.
+   - PRD: [tasks/1-prd-model-code-snippets.md](tasks/1-prd-model-code-snippets.md)
+   - Task list: [tasks/tasks-1-prd-model-code-snippets.md](tasks/tasks-1-prd-model-code-snippets.md)
+2. **Workstream 2 — Runtime comparison** — Side-by-side framework comparison showing which runtimes support each model. *Builds on WS1's multi-framework metadata.*
+3. **Workstream 3 — Performance estimates** — Cold start time, inference latency, memory footprint from community benchmarks and our own testing. *Builds on WS1's runtime metadata.*
+4. **Workstream 4 — "Can I Run This?"** — Input a model name or Hugging Face URL → get an edge deployment feasibility report (estimated browser memory, compatible runtimes, quantization options, WebGPU vs WASM expectations). *Largest scope; tackled last.*
+
+**Dependency map:**
+```
+WS1: Code snippets (multi-framework metadata + templates + UI surface)
+     │
+     ├──→ WS2: Runtime comparison (reuses multi-framework metadata)
+     │
+     ├──→ WS3: Performance estimates (reuses runtime metadata, adds benchmarks)
+     │
+     └──→ WS4: "Can I Run This?" (reuses everything above)
+```
+
+WS2 and WS3 can run in parallel once WS1's metadata migration is done; WS4 comes last.
 
 ---
 
