@@ -14,7 +14,7 @@
     "precompute-embeddings": "node scripts/precompute-embeddings.js"
   },
   "dependencies": {
-    "@huggingface/transformers": "^4.0.1"
+    "@huggingface/transformers": "^4.1.0"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
