@@ -17,3 +17,14 @@ updates:
       # Group the rest of the dev-dep churn into a single PR per week.
       dev-dependencies:
         dependency-type: "development"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      # Single weekly PR for all action bumps to minimize noise,
+      # mirroring the npm dev-dependencies grouping above.
+      actions:
+        patterns:
+          - "*"
