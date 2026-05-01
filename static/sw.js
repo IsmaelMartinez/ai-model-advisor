@@ -65,9 +65,10 @@ self.addEventListener('fetch', (event) => {
   // Skip external resources that should always be fetched fresh
   // - HuggingFace CDN (ML models - too large to cache, browser handles caching)
   // - Analytics/tracking
-  if (url.hostname.includes('huggingface.co') ||
-      url.hostname.includes('cdn-lfs') ||
-      url.hostname.includes('jsdelivr.net')) {
+  const hostname = url.hostname;
+  const isHost = (host) => hostname === host || hostname.endsWith('.' + host);
+  if (isHost('huggingface.co') ||
+      isHost('jsdelivr.net')) {
     return;
   }
 
