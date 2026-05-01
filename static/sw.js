@@ -68,9 +68,7 @@ self.addEventListener('fetch', (event) => {
   const hostname = url.hostname;
   const isHost = (host) => hostname === host || hostname.endsWith('.' + host);
   if (isHost('huggingface.co') ||
-      isHost('jsdelivr.net') ||
-      hostname.startsWith('cdn-lfs.') ||
-      hostname.startsWith('cdn-lfs-')) {
+      isHost('jsdelivr.net')) {
     return;
   }
 
