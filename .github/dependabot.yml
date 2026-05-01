@@ -22,3 +22,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      # Single weekly PR for all action bumps to minimize noise,
+      # mirroring the npm dev-dependencies grouping above.
+      actions:
+        patterns:
+          - "*"
