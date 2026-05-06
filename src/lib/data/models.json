@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-04-17",
+  "lastUpdated": "2026-05-06",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1869,6 +1869,24 @@
             "lastUpdated": "2025-11-27"
           },
           {
+            "id": "google_t5gemma-s-s-prefixlm",
+            "name": "T5gemma S S Prefixlm",
+            "huggingFaceId": "google/t5gemma-s-s-prefixlm",
+            "description": "T5gemma S S Prefixlm model for text generation",
+            "sizeMB": 596,
+            "accuracy": 0.75,
+            "environmentalScore": 2,
+            "deploymentOptions": [
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2025-07-09T14:25:58.000Z"
+          },
+          {
             "id": "qwen_qwen2.5-0.5b-instruct",
             "name": "Qwen2.5 0.5B Instruct",
             "huggingFaceId": "Qwen/Qwen2.5-0.5B-Instruct",
@@ -1885,24 +1903,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2024-09-25T12:32:56.000Z"
-          },
-          {
-            "id": "qwen_qwen2.5-0.5b",
-            "name": "Qwen2.5 0.5B",
-            "huggingFaceId": "Qwen/Qwen2.5-0.5B",
-            "description": "Qwen2.5 0.5B model for text generation",
-            "sizeMB": 942,
-            "accuracy": 0.75,
-            "environmentalScore": 2,
-            "deploymentOptions": [
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2024-09-25T12:32:36.000Z"
           }
         ],
         "advanced": [
