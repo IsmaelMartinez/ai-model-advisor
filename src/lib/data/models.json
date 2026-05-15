@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-06",
+  "lastUpdated": "2026-05-15",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1869,6 +1869,24 @@
             "lastUpdated": "2025-11-27"
           },
           {
+            "id": "google_gemma-3-270m",
+            "name": "Gemma 3 270m",
+            "huggingFaceId": "google/gemma-3-270m",
+            "description": "Gemma 3 270m model for text generation",
+            "sizeMB": 511,
+            "accuracy": 0.75,
+            "environmentalScore": 2,
+            "deploymentOptions": [
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2025-08-14T07:35:01.000Z"
+          },
+          {
             "id": "google_t5gemma-s-s-prefixlm",
             "name": "T5gemma S S Prefixlm",
             "huggingFaceId": "google/t5gemma-s-s-prefixlm",
@@ -1885,24 +1903,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-07-09T14:25:58.000Z"
-          },
-          {
-            "id": "qwen_qwen2.5-0.5b-instruct",
-            "name": "Qwen2.5 0.5B Instruct",
-            "huggingFaceId": "Qwen/Qwen2.5-0.5B-Instruct",
-            "description": "Qwen2.5 0.5B Instruct model for text generation",
-            "sizeMB": 942,
-            "accuracy": 0.75,
-            "environmentalScore": 2,
-            "deploymentOptions": [
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2024-09-25T12:32:56.000Z"
           }
         ],
         "advanced": [
@@ -3264,6 +3264,23 @@
               "TensorFlow"
             ],
             "lastUpdated": "2024-12-17T02:36:20.000Z"
+          },
+          {
+            "id": "bytedance-research_timer-s1",
+            "name": "Timer S1",
+            "huggingFaceId": "bytedance-research/Timer-S1",
+            "description": "Timer S1 model for time series forecasting",
+            "sizeMB": 15838,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-04-21T06:54:31.000Z"
           }
         ]
       },
