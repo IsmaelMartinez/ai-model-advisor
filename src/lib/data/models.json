@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-15",
+  "lastUpdated": "2026-05-23",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -3005,11 +3005,11 @@
             "lastUpdated": "2026-02-15T15:26:05.000Z"
           },
           {
-            "id": "microsoft_vibevoice-1.5b",
-            "name": "VibeVoice 1.5B",
-            "huggingFaceId": "microsoft/VibeVoice-1.5B",
-            "description": "VibeVoice 1.5B model for text to speech",
-            "sizeMB": 5158,
+            "id": "aratako_miotts-2.6b",
+            "name": "MioTTS 2.6B",
+            "huggingFaceId": "Aratako/MioTTS-2.6B",
+            "description": "MioTTS 2.6B model for text to speech",
+            "sizeMB": 4946,
             "accuracy": 0.75,
             "environmentalScore": 3,
             "deploymentOptions": [
@@ -3019,7 +3019,7 @@
               "PyTorch",
               "TensorFlow"
             ],
-            "lastUpdated": "2025-09-01T07:30:16.000Z"
+            "lastUpdated": "2026-02-10T08:28:35.000Z"
           }
         ]
       }
