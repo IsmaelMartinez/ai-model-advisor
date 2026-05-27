@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-23",
+  "lastUpdated": "2026-05-27",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -2988,6 +2988,22 @@
             "lastUpdated": "2026-03-17T18:08:47.000Z"
           },
           {
+            "id": "openbmb_voxcpm2",
+            "name": "VoxCPM2",
+            "huggingFaceId": "openbmb/VoxCPM2",
+            "description": "VoxCPM2 model for text to speech",
+            "sizeMB": 4368,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-04-16T03:30:11.000Z"
+          },
+          {
             "id": "openmoss-team_moss-tts-realtime",
             "name": "MOSS TTS Realtime",
             "huggingFaceId": "OpenMOSS-Team/MOSS-TTS-Realtime",
@@ -3003,23 +3019,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2026-02-15T15:26:05.000Z"
-          },
-          {
-            "id": "aratako_miotts-2.6b",
-            "name": "MioTTS 2.6B",
-            "huggingFaceId": "Aratako/MioTTS-2.6B",
-            "description": "MioTTS 2.6B model for text to speech",
-            "sizeMB": 4946,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2026-02-10T08:28:35.000Z"
           }
         ]
       }
