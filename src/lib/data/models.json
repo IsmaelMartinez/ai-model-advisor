@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27",
+  "lastUpdated": "2026-06-07",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -3246,6 +3246,22 @@
               "PyTorch"
             ],
             "lastUpdated": "2025-12-10"
+          },
+          {
+            "id": "datadog_toto-2.0-2.5b",
+            "name": "Toto 2.0 2.5B",
+            "huggingFaceId": "Datadog/Toto-2.0-2.5B",
+            "description": "Toto 2.0 2.5B model for time series forecasting",
+            "sizeMB": 4681,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-06-04T11:43:04.000Z"
           },
           {
             "id": "chengsenwang_chattime-1-7b-chat",
