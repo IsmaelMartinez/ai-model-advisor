@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-06-07",
+  "lastUpdated": "2026-06-24",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1644,6 +1644,22 @@
             "lastUpdated": "2024-09-27T07:14:03.000Z"
           },
           {
+            "id": "nvidia_gemma-4-26b-a4b-nvfp4",
+            "name": "Gemma 4 26B A4B NVFP4",
+            "huggingFaceId": "nvidia/Gemma-4-26B-A4B-NVFP4",
+            "description": "Gemma 4 26B A4B NVFP4 model for text generation",
+            "sizeMB": 27441,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-05-11T15:58:52.000Z"
+          },
+          {
             "id": "bullpoint_qwen3-coder-next-awq-4bit",
             "name": "Qwen3 Coder Next AWQ 4bit",
             "huggingFaceId": "bullpoint/Qwen3-Coder-Next-AWQ-4bit",
@@ -1676,23 +1692,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2024-09-25T12:33:04.000Z"
-          },
-          {
-            "id": "qwen_qwen3-14b",
-            "name": "Qwen3 14B",
-            "huggingFaceId": "Qwen/Qwen3-14B",
-            "description": "Qwen3 14B model for text generation",
-            "sizeMB": 28168,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-07-26T03:49:23.000Z"
           }
         ]
       },
@@ -2033,6 +2032,22 @@
             "lastUpdated": "2024-09-27T07:14:03.000Z"
           },
           {
+            "id": "nvidia_gemma-4-26b-a4b-nvfp4",
+            "name": "Gemma 4 26B A4B NVFP4",
+            "huggingFaceId": "nvidia/Gemma-4-26B-A4B-NVFP4",
+            "description": "Gemma 4 26B A4B NVFP4 model for text generation",
+            "sizeMB": 27441,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-05-11T15:58:52.000Z"
+          },
+          {
             "id": "bullpoint_qwen3-coder-next-awq-4bit",
             "name": "Qwen3 Coder Next AWQ 4bit",
             "huggingFaceId": "bullpoint/Qwen3-Coder-Next-AWQ-4bit",
@@ -2065,23 +2080,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2024-09-25T12:33:04.000Z"
-          },
-          {
-            "id": "qwen_qwen3-14b",
-            "name": "Qwen3 14B",
-            "huggingFaceId": "Qwen/Qwen3-14B",
-            "description": "Qwen3 14B model for text generation",
-            "sizeMB": 28168,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-07-26T03:49:23.000Z"
           }
         ]
       },
