@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-06-24",
+  "lastUpdated": "2026-07-11",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1660,6 +1660,22 @@
             "lastUpdated": "2026-05-11T15:58:52.000Z"
           },
           {
+            "id": "nvidia_diffusiongemma-26b-a4b-it-nvfp4",
+            "name": "Diffusiongemma 26B A4B It NVFP4",
+            "huggingFaceId": "nvidia/diffusiongemma-26B-A4B-it-NVFP4",
+            "description": "Diffusiongemma 26B A4B It NVFP4 model for text generation",
+            "sizeMB": 27475,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-07-04T17:57:49.000Z"
+          },
+          {
             "id": "bullpoint_qwen3-coder-next-awq-4bit",
             "name": "Qwen3 Coder Next AWQ 4bit",
             "huggingFaceId": "bullpoint/Qwen3-Coder-Next-AWQ-4bit",
@@ -1675,23 +1691,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2026-02-03T22:09:28.000Z"
-          },
-          {
-            "id": "qwen_qwen2.5-14b-instruct",
-            "name": "Qwen2.5 14B Instruct",
-            "huggingFaceId": "Qwen/Qwen2.5-14B-Instruct",
-            "description": "Qwen2.5 14B Instruct model for text generation",
-            "sizeMB": 28172,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2024-09-25T12:33:04.000Z"
           }
         ]
       },
@@ -2048,6 +2047,22 @@
             "lastUpdated": "2026-05-11T15:58:52.000Z"
           },
           {
+            "id": "nvidia_diffusiongemma-26b-a4b-it-nvfp4",
+            "name": "Diffusiongemma 26B A4B It NVFP4",
+            "huggingFaceId": "nvidia/diffusiongemma-26B-A4B-it-NVFP4",
+            "description": "Diffusiongemma 26B A4B It NVFP4 model for text generation",
+            "sizeMB": 27475,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-07-04T17:57:49.000Z"
+          },
+          {
             "id": "bullpoint_qwen3-coder-next-awq-4bit",
             "name": "Qwen3 Coder Next AWQ 4bit",
             "huggingFaceId": "bullpoint/Qwen3-Coder-Next-AWQ-4bit",
@@ -2063,23 +2078,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2026-02-03T22:09:28.000Z"
-          },
-          {
-            "id": "qwen_qwen2.5-14b-instruct",
-            "name": "Qwen2.5 14B Instruct",
-            "huggingFaceId": "Qwen/Qwen2.5-14B-Instruct",
-            "description": "Qwen2.5 14B Instruct model for text generation",
-            "sizeMB": 28172,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2024-09-25T12:33:04.000Z"
           }
         ]
       },
