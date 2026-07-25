@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-07-11",
+  "lastUpdated": "2026-07-25",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1352,6 +1352,25 @@
             }
           },
           {
+            "id": "deepreinforce-ai_ornith-1.0-35b",
+            "name": "Ornith 1.0 35B",
+            "huggingFaceId": "deepreinforce-ai/Ornith-1.0-35B",
+            "description": "Ornith 1.0 35B model for text generation",
+            "sizeMB": 1,
+            "accuracy": 0.75,
+            "environmentalScore": 1,
+            "deploymentOptions": [
+              "edge",
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-06-25T14:30:28.000Z"
+          },
+          {
             "id": "meta-llama_llama-3.1-8b-instruct",
             "name": "Llama 3.1 8B Instruct",
             "huggingFaceId": "meta-llama/Llama-3.1-8B-Instruct",
@@ -1390,38 +1409,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-12-18"
-          },
-          {
-            "id": "openai-community_gpt2",
-            "name": "Gpt2",
-            "huggingFaceId": "openai-community/gpt2",
-            "description": "Gpt2 model for text generation",
-            "sizeMB": 100,
-            "accuracy": 0.75,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "browser",
-              "mobile",
-              "edge",
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow",
-              "Transformers.js"
-            ],
-            "lastUpdated": "2025-12-18",
-            "runtime": {
-              "browser": {
-                "framework": "transformers.js",
-                "backend": [
-                  "wasm",
-                  "webgpu"
-                ],
-                "tested": false
-              }
-            }
           }
         ],
         "standard": [
@@ -1757,6 +1744,25 @@
             "lastUpdated": "2025-12-18"
           },
           {
+            "id": "deepreinforce-ai_ornith-1.0-35b",
+            "name": "Ornith 1.0 35B",
+            "huggingFaceId": "deepreinforce-ai/Ornith-1.0-35B",
+            "description": "Ornith 1.0 35B model for text generation",
+            "sizeMB": 1,
+            "accuracy": 0.75,
+            "environmentalScore": 1,
+            "deploymentOptions": [
+              "edge",
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-06-25T14:30:28.000Z"
+          },
+          {
             "id": "openai-community_gpt2",
             "name": "Gpt2",
             "huggingFaceId": "openai-community/gpt2",
@@ -1774,37 +1780,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2024-02-19T10:57:45.000Z"
-          },
-          {
-            "id": "distilbert_distilgpt2",
-            "name": "Distilgpt2",
-            "huggingFaceId": "distilbert/distilgpt2",
-            "description": "Distilgpt2 model for text generation",
-            "sizeMB": 84,
-            "accuracy": 0.75,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "browser",
-              "mobile",
-              "edge",
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow",
-              "Transformers.js"
-            ],
-            "lastUpdated": "2024-02-19T11:09:53.000Z",
-            "runtime": {
-              "browser": {
-                "framework": "transformers.js",
-                "backend": [
-                  "wasm"
-                ],
-                "tested": false
-              }
-            }
           }
         ],
         "standard": [
