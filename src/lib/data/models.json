@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-07-25",
+  "lastUpdated": "2026-08-01",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1371,15 +1371,14 @@
             "lastUpdated": "2026-06-25T14:30:28.000Z"
           },
           {
-            "id": "meta-llama_llama-3.1-8b-instruct",
-            "name": "Llama 3.1 8B Instruct",
-            "huggingFaceId": "meta-llama/Llama-3.1-8B-Instruct",
-            "description": "Llama 3.1 8B Instruct model for text generation",
-            "sizeMB": 100,
+            "id": "deepreinforce-ai_ornith-1.0-9b",
+            "name": "Ornith 1.0 9B",
+            "huggingFaceId": "deepreinforce-ai/Ornith-1.0-9B",
+            "description": "Ornith 1.0 9B model for text generation",
+            "sizeMB": 3,
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "mobile",
               "edge",
               "cloud",
               "server"
@@ -1388,13 +1387,13 @@
               "PyTorch",
               "TensorFlow"
             ],
-            "lastUpdated": "2025-12-18"
+            "lastUpdated": "2026-06-25T14:08:32.000Z"
           },
           {
-            "id": "qwen_qwen2.5-3b-instruct",
-            "name": "Qwen2.5 3B Instruct",
-            "huggingFaceId": "Qwen/Qwen2.5-3B-Instruct",
-            "description": "Qwen2.5 3B Instruct model for text generation",
+            "id": "meta-llama_llama-3.1-8b-instruct",
+            "name": "Llama 3.1 8B Instruct",
+            "huggingFaceId": "meta-llama/Llama-3.1-8B-Instruct",
+            "description": "Llama 3.1 8B Instruct model for text generation",
             "sizeMB": 100,
             "accuracy": 0.75,
             "environmentalScore": 1,
@@ -1763,11 +1762,11 @@
             "lastUpdated": "2026-06-25T14:30:28.000Z"
           },
           {
-            "id": "openai-community_gpt2",
-            "name": "Gpt2",
-            "huggingFaceId": "openai-community/gpt2",
-            "description": "Gpt2 model for text generation",
-            "sizeMB": 131,
+            "id": "deepreinforce-ai_ornith-1.0-9b",
+            "name": "Ornith 1.0 9B",
+            "huggingFaceId": "deepreinforce-ai/Ornith-1.0-9B",
+            "description": "Ornith 1.0 9B model for text generation",
+            "sizeMB": 3,
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
@@ -1779,7 +1778,7 @@
               "PyTorch",
               "TensorFlow"
             ],
-            "lastUpdated": "2024-02-19T10:57:45.000Z"
+            "lastUpdated": "2026-06-25T14:08:32.000Z"
           }
         ],
         "standard": [
