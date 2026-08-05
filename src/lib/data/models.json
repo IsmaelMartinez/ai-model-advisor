@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-08-01",
+  "lastUpdated": "2026-08-05",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1390,15 +1390,14 @@
             "lastUpdated": "2026-06-25T14:08:32.000Z"
           },
           {
-            "id": "meta-llama_llama-3.1-8b-instruct",
-            "name": "Llama 3.1 8B Instruct",
-            "huggingFaceId": "meta-llama/Llama-3.1-8B-Instruct",
-            "description": "Llama 3.1 8B Instruct model for text generation",
-            "sizeMB": 100,
+            "id": "ornith-ai_ornith-1.0-35b",
+            "name": "Ornith 1.0 35B",
+            "huggingFaceId": "ornith-ai/Ornith-1.0-35B",
+            "description": "Ornith 1.0 35B model for text generation",
+            "sizeMB": 1,
             "accuracy": 0.75,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "mobile",
               "edge",
               "cloud",
               "server"
@@ -1407,7 +1406,7 @@
               "PyTorch",
               "TensorFlow"
             ],
-            "lastUpdated": "2025-12-18"
+            "lastUpdated": "2026-06-25T14:30:28.000Z"
           }
         ],
         "standard": [
