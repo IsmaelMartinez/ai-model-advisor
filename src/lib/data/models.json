@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-08-05",
+  "lastUpdated": "2026-08-07",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -64,6 +64,24 @@
                 "tested": false
               }
             }
+          },
+          {
+            "id": "timm_mobilenetv4_conv_large.e600_r384_in1k",
+            "name": "Mobilenetv4 Conv Large.E600 R384 In1k",
+            "huggingFaceId": "timm/mobilenetv4_conv_large.e600_r384_in1k",
+            "description": "Mobilenetv4 Conv Large.E600 R384 In1k model for image classification",
+            "sizeMB": 62,
+            "accuracy": 0.85,
+            "environmentalScore": 1,
+            "deploymentOptions": [
+              "edge",
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2025-01-21T21:57:06.000Z"
           },
           {
             "id": "timm_tf_mobilenetv3_large_minimal_100.in1k",
@@ -131,37 +149,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-07-08T08:11:59.000Z"
-          },
-          {
-            "id": "microsoft_resnet-50",
-            "name": "Resnet 50",
-            "huggingFaceId": "microsoft/resnet-50",
-            "description": "Resnet 50 model for image classification",
-            "sizeMB": 24,
-            "accuracy": 0.75,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "browser",
-              "mobile",
-              "edge",
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow",
-              "Transformers.js"
-            ],
-            "lastUpdated": "2024-02-13T21:24:05.000Z",
-            "runtime": {
-              "browser": {
-                "framework": "transformers.js",
-                "backend": [
-                  "wasm"
-                ],
-                "tested": false
-              }
-            }
           }
         ],
         "standard": [
