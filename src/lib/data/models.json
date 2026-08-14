@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-08-07",
+  "lastUpdated": "2026-08-14",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1529,6 +1529,23 @@
             "lastUpdated": "2025-09-29T20:11:28.000Z"
           },
           {
+            "id": "radixark_kimi-k3-dspark",
+            "name": "Kimi K3 DSpark",
+            "huggingFaceId": "RadixArk/Kimi-K3-DSpark",
+            "description": "Kimi K3 DSpark model for text generation",
+            "sizeMB": 4290,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-08-01T05:10:55.000Z"
+          },
+          {
             "id": "microsoft_phi-2",
             "name": "Phi 2",
             "huggingFaceId": "microsoft/phi-2",
@@ -1561,23 +1578,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2024-09-25T12:33:00.000Z"
-          },
-          {
-            "id": "onnx-community_llama-3.2-3b-instruct-onnx",
-            "name": "Llama 3.2 3B Instruct ONNX",
-            "huggingFaceId": "onnx-community/Llama-3.2-3B-Instruct-ONNX",
-            "description": "Llama 3.2 3B Instruct ONNX model for text generation",
-            "sizeMB": 6000,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "Transformers.js",
-              "ONNX"
-            ],
-            "lastUpdated": "2025-11-29T23:01:28.000Z"
           }
         ],
         "xlarge": [
