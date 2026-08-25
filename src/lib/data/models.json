@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-08-14",
+  "lastUpdated": "2026-08-25",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1546,6 +1546,22 @@
             "lastUpdated": "2026-08-01T05:10:55.000Z"
           },
           {
+            "id": "prism-ml_ternary-bonsai-27b-mlx-2bit",
+            "name": "Ternary Bonsai 27B Mlx 2bit",
+            "huggingFaceId": "prism-ml/Ternary-Bonsai-27B-mlx-2bit",
+            "description": "Ternary Bonsai 27B Mlx 2bit model for text generation",
+            "sizeMB": 4891,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-07-14T21:39:03.000Z"
+          },
+          {
             "id": "microsoft_phi-2",
             "name": "Phi 2",
             "huggingFaceId": "microsoft/phi-2",
@@ -1561,23 +1577,6 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-12-08T11:35:44.000Z"
-          },
-          {
-            "id": "qwen_qwen2.5-3b-instruct",
-            "name": "Qwen2.5 3B Instruct",
-            "huggingFaceId": "Qwen/Qwen2.5-3B-Instruct",
-            "description": "Qwen2.5 3B Instruct model for text generation",
-            "sizeMB": 5886,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2024-09-25T12:33:00.000Z"
           }
         ],
         "xlarge": [
