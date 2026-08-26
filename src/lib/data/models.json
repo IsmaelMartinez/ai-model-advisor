@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-08-25",
+  "lastUpdated": "2026-08-26",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -352,43 +352,31 @@
             "lastUpdated": "2025-05-05T11:35:56.000Z"
           },
           {
-            "id": "hustvl_yolos-small",
-            "name": "Yolos Small",
-            "huggingFaceId": "hustvl/yolos-small",
-            "description": "Yolos Small model for object detection",
-            "sizeMB": 25,
-            "accuracy": 0.72,
+            "id": "roboflow_rf-detr-large",
+            "name": "Rf Detr Large",
+            "huggingFaceId": "Roboflow/rf-detr-large",
+            "description": "Rf Detr Large model for object detection",
+            "sizeMB": 65,
+            "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
-              "mobile",
               "edge",
               "cloud",
               "server"
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow",
-              "Transformers.js"
+              "TensorFlow"
             ],
-            "lastUpdated": "2025-10-12",
-            "runtime": {
-              "browser": {
-                "framework": "transformers.js",
-                "backend": [
-                  "wasm"
-                ],
-                "tested": false
-              }
-            }
+            "lastUpdated": "2026-05-20T16:47:07.000Z"
           },
           {
-            "id": "hustvl_yolos-tiny",
-            "name": "Yolos Tiny",
-            "huggingFaceId": "hustvl/yolos-tiny",
-            "description": "Yolos Tiny model for object detection",
-            "sizeMB": 8,
-            "accuracy": 0.75,
+            "id": "hustvl_yolos-small",
+            "name": "Yolos Small",
+            "huggingFaceId": "hustvl/yolos-small",
+            "description": "Yolos Small model for object detection",
+            "sizeMB": 25,
+            "accuracy": 0.72,
             "environmentalScore": 1,
             "deploymentOptions": [
               "browser",
