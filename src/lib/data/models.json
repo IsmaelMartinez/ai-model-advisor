@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-08-26",
+  "lastUpdated": "2026-08-27",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -2915,6 +2915,22 @@
             "lastUpdated": "2025-09-25T00:32:21.000Z"
           },
           {
+            "id": "openmoss-team_moss-voicegenerator",
+            "name": "MOSS VoiceGenerator",
+            "huggingFaceId": "OpenMOSS-Team/MOSS-VoiceGenerator",
+            "description": "MOSS VoiceGenerator model for text to speech",
+            "sizeMB": 4032,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-02-11T15:10:06.000Z"
+          },
+          {
             "id": "humeai_tada-1b",
             "name": "Tada 1b",
             "huggingFaceId": "HumeAI/tada-1b",
@@ -2945,23 +2961,6 @@
               "PyTorch"
             ],
             "lastUpdated": "2026-04-16T03:30:11.000Z"
-          },
-          {
-            "id": "openmoss-team_moss-tts-realtime",
-            "name": "MOSS TTS Realtime",
-            "huggingFaceId": "OpenMOSS-Team/MOSS-TTS-Realtime",
-            "description": "MOSS TTS Realtime model for text to speech",
-            "sizeMB": 4448,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2026-02-15T15:26:05.000Z"
           }
         ]
       }
