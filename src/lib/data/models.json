@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-08-27",
+  "lastUpdated": "2026-09-07",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -102,6 +102,24 @@
             "lastUpdated": "2025-01-21T18:21:25.000Z"
           },
           {
+            "id": "timm_convnextv2_large.fcmae_ft_in22k_in1k_384",
+            "name": "Convnextv2 Large.Fcmae Ft In22k In1k 384",
+            "huggingFaceId": "timm/convnextv2_large.fcmae_ft_in22k_in1k_384",
+            "description": "Convnextv2 Large.Fcmae Ft In22k In1k 384 model for image classification",
+            "sizeMB": 378,
+            "accuracy": 0.85,
+            "environmentalScore": 1,
+            "deploymentOptions": [
+              "edge",
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2025-01-21T21:15:57.000Z"
+          },
+          {
             "id": "efficientnet_b0",
             "name": "EfficientNet B0",
             "huggingFaceId": "google/efficientnet-b0",
@@ -129,26 +147,6 @@
                 "tested": true
               }
             }
-          },
-          {
-            "id": "iitolstykh_mivolo_v2",
-            "name": "Mivolo V2",
-            "huggingFaceId": "iitolstykh/mivolo_v2",
-            "description": "Mivolo V2 model for image classification",
-            "sizeMB": 27,
-            "accuracy": 0.75,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "mobile",
-              "edge",
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-07-08T08:11:59.000Z"
           }
         ],
         "standard": [
