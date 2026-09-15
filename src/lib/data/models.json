@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-09-07",
+  "lastUpdated": "2026-09-15",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -2746,6 +2746,24 @@
             }
           },
           {
+            "id": "remsky_kokoro-inno-clone-tuner",
+            "name": "Kokoro Inno Clone Tuner",
+            "huggingFaceId": "remsky/kokoro-inno-clone-tuner",
+            "description": "Kokoro Inno Clone Tuner model for text to speech",
+            "sizeMB": 18,
+            "accuracy": 0.75,
+            "environmentalScore": 1,
+            "deploymentOptions": [
+              "edge",
+              "cloud",
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch"
+            ],
+            "lastUpdated": "2026-09-12T23:50:56.000Z"
+          },
+          {
             "id": "coqui_xtts-v2",
             "name": "XTTS V2",
             "huggingFaceId": "coqui/XTTS-v2",
@@ -2763,25 +2781,6 @@
               "PyTorch"
             ],
             "lastUpdated": "2025-12-18"
-          },
-          {
-            "id": "facebook_mms-tts-hat",
-            "name": "Mms Tts Hat",
-            "huggingFaceId": "facebook/mms-tts-hat",
-            "description": "Mms Tts Hat model for text to speech",
-            "sizeMB": 69,
-            "accuracy": 0.75,
-            "environmentalScore": 1,
-            "deploymentOptions": [
-              "edge",
-              "cloud",
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2023-09-01T10:13:11.000Z"
           }
         ],
         "standard": [
