@@ -8,6 +8,7 @@
 **Status:** Phase 2 Complete ✅ — Edge/browser AI advisor with runtime metadata, edge-ready badges, and pre-computed embeddings
 **Tech:** SvelteKit 2 + Vite 5 + Transformers.js (MiniLM embedding classifier, 23MB)
 **Platform:** Desktop & Mobile (PWA installable, ~23MB model download)
+**Active plan:** `ROADMAP.md` (tracking issue #227) — "continue" means the first unchecked item there
 **Details:** See `project-status.md`, `project-vision.md`, `README.md`
 
 ---
