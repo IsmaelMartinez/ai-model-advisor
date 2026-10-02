@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-09-23",
+  "lastUpdated": "2026-10-02",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -120,33 +120,22 @@
             "lastUpdated": "2025-01-21T21:15:57.000Z"
           },
           {
-            "id": "efficientnet_b0",
-            "name": "EfficientNet B0",
-            "huggingFaceId": "google/efficientnet-b0",
-            "description": "Efficient CNN with excellent accuracy-to-size ratio",
-            "sizeMB": 20.3,
-            "accuracy": 0.772,
+            "id": "timm_convnext_large.fb_in22k_ft_in1k_384",
+            "name": "Convnext Large.Fb In22k Ft In1k 384",
+            "huggingFaceId": "timm/convnext_large.fb_in22k_ft_in1k_384",
+            "description": "Convnext Large.Fb In22k Ft In1k 384 model for image classification",
+            "sizeMB": 377,
+            "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
-              "mobile",
-              "cloud"
+              "edge",
+              "cloud",
+              "server"
             ],
             "frameworks": [
-              "TensorFlow.js",
-              "PyTorch",
-              "ONNX"
+              "PyTorch"
             ],
-            "lastUpdated": "2023-09-20",
-            "runtime": {
-              "browser": {
-                "framework": "tensorflow.js",
-                "backend": [
-                  "wasm"
-                ],
-                "tested": true
-              }
-            }
+            "lastUpdated": "2025-01-21T21:14:24.000Z"
           }
         ],
         "standard": [
