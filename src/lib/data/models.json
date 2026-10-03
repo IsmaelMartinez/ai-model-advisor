@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-10-02",
+  "lastUpdated": "2026-10-03",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -358,35 +358,23 @@
             "lastUpdated": "2026-05-20T16:47:07.000Z"
           },
           {
-            "id": "hustvl_yolos-small",
-            "name": "Yolos Small",
-            "huggingFaceId": "hustvl/yolos-small",
-            "description": "Yolos Small model for object detection",
-            "sizeMB": 25,
-            "accuracy": 0.72,
+            "id": "ustc-community_dfine-large-obj2coco-e25",
+            "name": "Dfine Large Obj2coco E25",
+            "huggingFaceId": "ustc-community/dfine-large-obj2coco-e25",
+            "description": "Dfine Large Obj2coco E25 model for object detection",
+            "sizeMB": 60,
+            "accuracy": 0.85,
             "environmentalScore": 1,
             "deploymentOptions": [
-              "browser",
-              "mobile",
               "edge",
               "cloud",
               "server"
             ],
             "frameworks": [
               "PyTorch",
-              "TensorFlow",
-              "Transformers.js"
+              "TensorFlow"
             ],
-            "lastUpdated": "2025-10-12",
-            "runtime": {
-              "browser": {
-                "framework": "transformers.js",
-                "backend": [
-                  "wasm"
-                ],
-                "tested": false
-              }
-            }
+            "lastUpdated": "2025-05-05T11:38:34.000Z"
           }
         ],
         "standard": [
