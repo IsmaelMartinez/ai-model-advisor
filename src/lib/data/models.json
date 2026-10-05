@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-10-03",
+  "lastUpdated": "2026-10-05",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -923,6 +923,25 @@
             ],
             "lastUpdated": "2023-03-15"
           }
+        ],
+        "xlarge": [
+          {
+            "id": "autotrust_gev-26b-decide",
+            "name": "GEV 26B Decide",
+            "huggingFaceId": "autotrust/GEV-26B-Decide",
+            "description": "GEV 26B Decide model for text classification",
+            "sizeMB": 49221,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-10-03T11:00:46.000Z"
+          }
         ]
       },
       "sentiment_analysis": {
@@ -1234,6 +1253,25 @@
               "TensorFlow"
             ],
             "lastUpdated": "2025-07-25T01:11:10.000Z"
+          }
+        ],
+        "xlarge": [
+          {
+            "id": "autotrust_gev-26b-decide",
+            "name": "GEV 26B Decide",
+            "huggingFaceId": "autotrust/GEV-26B-Decide",
+            "description": "GEV 26B Decide model for text classification",
+            "sizeMB": 49221,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-10-03T11:00:46.000Z"
           }
         ]
       },
