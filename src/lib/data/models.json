@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-10-07",
+  "lastUpdated": "2026-10-18",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -958,6 +958,23 @@
               "TensorFlow"
             ],
             "lastUpdated": "2026-10-02T12:06:06.000Z"
+          },
+          {
+            "id": "autotrust_jev-35b",
+            "name": "JEV 35B",
+            "huggingFaceId": "autotrust/JEV-35B",
+            "description": "JEV 35B model for text classification",
+            "sizeMB": 68573,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-10-14T06:16:34.000Z"
           }
         ]
       },
@@ -1306,6 +1323,23 @@
               "TensorFlow"
             ],
             "lastUpdated": "2026-10-02T12:06:06.000Z"
+          },
+          {
+            "id": "autotrust_jev-35b",
+            "name": "JEV 35B",
+            "huggingFaceId": "autotrust/JEV-35B",
+            "description": "JEV 35B model for text classification",
+            "sizeMB": 68573,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-10-14T06:16:34.000Z"
           }
         ]
       },
