@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-10-18",
+  "lastUpdated": "2026-10-21",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -1603,6 +1603,23 @@
             "lastUpdated": "2026-08-01T05:10:55.000Z"
           },
           {
+            "id": "openbmb_minicpm5-2b",
+            "name": "MiniCPM5 2B",
+            "huggingFaceId": "openbmb/MiniCPM5-2B",
+            "description": "MiniCPM5 2B model for text generation",
+            "sizeMB": 4800,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-09-29T06:12:33.000Z"
+          },
+          {
             "id": "prism-ml_ternary-bonsai-27b-mlx-2bit",
             "name": "Ternary Bonsai 27B Mlx 2bit",
             "huggingFaceId": "prism-ml/Ternary-Bonsai-27B-mlx-2bit",
@@ -1617,23 +1634,6 @@
               "PyTorch"
             ],
             "lastUpdated": "2026-07-14T21:39:03.000Z"
-          },
-          {
-            "id": "microsoft_phi-2",
-            "name": "Phi 2",
-            "huggingFaceId": "microsoft/phi-2",
-            "description": "Phi 2 model for text generation",
-            "sizeMB": 5302,
-            "accuracy": 0.75,
-            "environmentalScore": 3,
-            "deploymentOptions": [
-              "server"
-            ],
-            "frameworks": [
-              "PyTorch",
-              "TensorFlow"
-            ],
-            "lastUpdated": "2025-12-08T11:35:44.000Z"
           }
         ],
         "xlarge": [
