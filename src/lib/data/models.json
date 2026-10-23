@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-10-21",
+  "lastUpdated": "2026-10-23",
   "tiers": {
     "lightweight": {
       "label": "Lightweight Models",
@@ -926,6 +926,23 @@
         ],
         "xlarge": [
           {
+            "id": "autotrust_jev-35b-nvfp4",
+            "name": "JEV 35B NVFP4",
+            "huggingFaceId": "autotrust/JEV-35B-NVFP4",
+            "description": "JEV 35B NVFP4 model for text classification",
+            "sizeMB": 37853,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-10-11T03:50:40.000Z"
+          },
+          {
             "id": "autotrust_gev-26b-decide",
             "name": "GEV 26B Decide",
             "huggingFaceId": "autotrust/GEV-26B-Decide",
@@ -1290,6 +1307,23 @@
           }
         ],
         "xlarge": [
+          {
+            "id": "autotrust_jev-35b-nvfp4",
+            "name": "JEV 35B NVFP4",
+            "huggingFaceId": "autotrust/JEV-35B-NVFP4",
+            "description": "JEV 35B NVFP4 model for text classification",
+            "sizeMB": 37853,
+            "accuracy": 0.75,
+            "environmentalScore": 3,
+            "deploymentOptions": [
+              "server"
+            ],
+            "frameworks": [
+              "PyTorch",
+              "TensorFlow"
+            ],
+            "lastUpdated": "2026-10-11T03:50:40.000Z"
+          },
           {
             "id": "autotrust_gev-26b-decide",
             "name": "GEV 26B Decide",
