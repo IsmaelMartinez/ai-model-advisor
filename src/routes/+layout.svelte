@@ -1,12 +1,12 @@
 <script>
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
-  import { base } from '$app/paths';
+  import { asset } from '$app/paths';
 
   onMount(() => {
     if (browser && 'serviceWorker' in navigator) {
-      // Determine service worker path based on base path
-      const swPath = `${base}/sw.js`;
+      // Resolve the service worker URL against the base path
+      const swPath = asset('sw.js');
 
       // Register service worker for PWA functionality
       navigator.serviceWorker.register(swPath)
