@@ -82,7 +82,7 @@ grep -A2 "Cross-Origin-Embedder-Policy" vite.config.js
 grep -A2 "optimizeDeps" vite.config.js
 
 # Verify static adapter
-grep "adapter-static" svelte.config.js
+grep "adapter-static" vite.config.js
 ```
 
 **All must be present and correct** ✅

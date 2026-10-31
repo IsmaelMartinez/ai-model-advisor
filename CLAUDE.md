@@ -49,8 +49,7 @@ npm run update-models:dry-run  # Preview updates
 - `src/lib/data/reference-embeddings.json` - Pre-computed MiniLM embeddings (~320 examples, generated at build time)
 
 **Config:**
-- `vite.config.js` - WebGPU headers, transformers.js exclusions
-- `svelte.config.js` - Static adapter for GitHub Pages
+- `vite.config.js` - WebGPU headers, transformers.js exclusions, and the SvelteKit 3 config passed to `sveltekit({...})` (static adapter, base path and CSP for GitHub Pages; `svelte.config.js` is no longer read)
 - `.github/workflows/deploy.yml` - Auto-deploy on push to main
 
 ### Classification Pipeline
