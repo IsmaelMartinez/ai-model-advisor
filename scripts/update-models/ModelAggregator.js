@@ -393,7 +393,9 @@ export class ModelAggregator {
           // browser support with ONNX available but still apply the size limits
           const frameworks = [...new Set([...model.frameworks, 'ONNX'])];
           model.deploymentOptions = this.determineDeploymentOptions(model.sizeMB, { id: model.huggingFaceId }, frameworks);
-          if (!model.deploymentOptions.includes('browser')) {
+          if (model.deploymentOptions.includes('browser')) {
+            model.frameworks = frameworks;
+          } else {
             delete model.runtime;
             delete model.browserModelId;
           }
@@ -743,8 +745,9 @@ export class ModelAggregator {
   /**
    * Carry curated fields over from the existing entry onto the fresh one.
    * Specialization, runtime and browserModelId are assigned by hand and win
-   * over the generated defaults; accuracy is kept because the Hub cannot
-   * supply one, so a sourced value must survive a refresh.
+   * over the generated defaults. Accuracy is kept only when it has a source
+   * (legacy bare numbers were estimated from model names), since the Hub
+   * cannot supply one.
    */
   preserveCuratedFields(model, existing) {
     for (const field of ['specialization', 'runtime', 'browserModelId']) {
@@ -752,7 +755,7 @@ export class ModelAggregator {
         model[field] = existing[field];
       }
     }
-    if (existing.accuracy && !model.accuracy) {
+    if (existing.accuracy?.source && !model.accuracy) {
       model.accuracy = existing.accuracy;
     }
     return model;
