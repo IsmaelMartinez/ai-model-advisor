@@ -79,6 +79,7 @@
       case 'lightweight': return { label: 'Lightweight', icon: '🪶', desc: 'Minimal resources' };
       case 'standard': return { label: 'Standard', icon: '⚖️', desc: 'Balanced performance' };
       case 'advanced': return { label: 'Advanced', icon: '🚀', desc: 'Maximum capability' };
+      case 'xlarge': return { label: 'Extra Large', icon: '🏭', desc: 'Server-class, beyond on-device scope' };
       default: return { label: tier, icon: '📦', desc: '' };
     }
   }
