@@ -326,6 +326,12 @@ export class ModelAggregator {
 
         // Get detailed model info
         const modelInfo = await this.getDetailedModelInfo(rawModel.id);
+
+        // Without details the size and frameworks would be guesses, and
+        // a refresh would overwrite known data with them
+        if (!modelInfo) {
+          continue;
+        }
         
         // Extract and validate metadata
         const processedModel = await this.extractModelMetadata(rawModel, modelInfo);
@@ -451,10 +457,8 @@ export class ModelAggregator {
    * Merge new data with existing dataset
    */
   mergeWithExistingData(newTieredModels, config) {
-    const merged = {
-      ...this.currentModels,
-      models: { ...this.currentModels.models }
-    };
+    // Work on a copy so currentModels stays intact for the change summary
+    const merged = structuredClone(this.currentModels);
 
     // Track whether we made substantive changes
     let hasSubstantiveChanges = false;
@@ -472,6 +476,20 @@ export class ModelAggregator {
 
         for (const [tier, models] of Object.entries(tiers)) {
           if (models.length > 0) {
+            // A refreshed model can move tier when its size changes: drop its
+            // stale copy from the other tiers of this task, keeping curated fields
+            for (const [otherTier, otherModels] of Object.entries(merged.models[category][subcategory])) {
+              if (otherTier === tier) continue;
+              const moving = models.map(m => m.huggingFaceId);
+              const stale = otherModels.filter(m => moving.includes(m.huggingFaceId));
+              stale.forEach(old => {
+                const fresh = models.find(m => m.huggingFaceId === old.huggingFaceId);
+                this.preserveCuratedFields(fresh, [old]);
+              });
+              merged.models[category][subcategory][otherTier] =
+                otherModels.filter(m => !moving.includes(m.huggingFaceId));
+            }
+
             // Keep best models from existing + new (limit per tier)
             const existing = merged.models[category][subcategory][tier] || [];
 
@@ -557,14 +575,19 @@ export class ModelAggregator {
   estimateModelSize(rawModel, detailedInfo) {
     // 1. Weight file sizes from siblings (MOST ACCURATE)
     // Formats are alternative copies of the same weights, so count only one:
-    // safetensors, else .bin, else the largest single .onnx (a repo lists many variants).
+    // safetensors, else pickled checkpoints, else the largest variant of the
+    // repo's ONNX or GGUF files.
     const files = (detailedInfo?.siblings || []).filter(f => f.size > 0);
-    const sizes = ext => files.filter(f => f.rfilename?.endsWith(ext)).map(f => f.size);
+    const sizes = exts => files
+      .filter(f => exts.some(ext => f.rfilename?.endsWith(ext)))
+      .map(f => f.size);
     const sum = list => list.reduce((total, size) => total + size, 0);
     const totalBytes =
-      sum(sizes('.safetensors')) || sum(sizes('.bin')) || Math.max(0, ...sizes('.onnx'));
+      sum(sizes(['.safetensors'])) ||
+      sum(sizes(['.bin', '.pt', '.pth', '.ckpt'])) ||
+      Math.max(0, ...this.variantSizes(files));
     if (totalBytes > 0) {
-      return Math.round(totalBytes / (1024 * 1024));
+      return this.bytesToMB(totalBytes);
     }
 
     // 2. Safetensors parameter counts per dtype (safetensors.total is a bare count
@@ -576,13 +599,13 @@ export class ModelAggregator {
         if (DTYPE_BYTES[dtype]) bytes += count * DTYPE_BYTES[dtype];
       }
       if (bytes > 0) {
-        return Math.round(bytes / (1024 * 1024));
+        return this.bytesToMB(bytes);
       }
     }
 
     // 3. Only a bare total: assume fp16 (2 bytes per param)
     if (detailedInfo?.safetensors?.total) {
-      return Math.round((detailedInfo.safetensors.total * 2) / (1024 * 1024));
+      return this.bytesToMB(detailedInfo.safetensors.total * 2);
     }
 
     // 4. Try to extract parameter count from model name (e.g., "7b", "70b", "1.3b")
@@ -627,6 +650,33 @@ export class ModelAggregator {
     if (sizeMB <= 500) return 1;   // Low impact (lightweight)
     if (sizeMB <= 4000) return 2;  // Medium impact (standard)
     return 3;                       // High impact (advanced/xlarge)
+  }
+
+  /**
+   * Whole megabytes, at least 1 so tiny models never get a size of 0
+   */
+  bytesToMB(bytes) {
+    return Math.max(1, Math.round(bytes / (1024 * 1024)));
+  }
+
+  /**
+   * Sizes of the complete ONNX variants and the GGUF files in a file list.
+   * An ONNX variant is one precision (fp32, fp16, q4, ...) of every graph in
+   * the repo, e.g. encoder and decoder together, plus the external data files
+   * stored next to them (model_q4.onnx, model_q4.onnx_data_1, ...).
+   */
+  variantSizes(files) {
+    const variants = new Map();
+    for (const { rfilename = '', size } of files) {
+      const onnxAt = rfilename.indexOf('.onnx');
+      if (onnxAt !== -1) {
+        const precision = rfilename.slice(0, onnxAt).match(/_(?:fp16|q4f16|q4|int8|uint8|quantized|bnb4)$/)?.[0] ?? '';
+        variants.set(precision, (variants.get(precision) || 0) + size);
+      } else if (rfilename.endsWith('.gguf')) {
+        variants.set(rfilename, size);
+      }
+    }
+    return [...variants.values()];
   }
 
   /**

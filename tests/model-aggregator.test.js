@@ -111,6 +111,46 @@ describe('ModelAggregator', () => {
       });
     });
 
+    describe('ONNX variants', () => {
+      const MB = 1024 * 1024;
+
+      test('sums the encoder and decoder of one precision, not every precision', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'onnx/encoder_model.onnx', size: 100 * MB },
+            { rfilename: 'onnx/decoder_model.onnx', size: 200 * MB },
+            { rfilename: 'onnx/encoder_model_q4.onnx', size: 30 * MB },
+            { rfilename: 'onnx/decoder_model_q4.onnx', size: 60 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/whisper' }, detailedInfo)).toBe(300);
+      });
+
+      test('adds external data files to their variant and never reports 0 MB', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'onnx/model.onnx', size: 1 * MB },
+            { rfilename: 'onnx/model.onnx_data', size: 1000 * MB },
+            { rfilename: 'onnx/model.onnx_data_1', size: 500 * MB },
+            { rfilename: 'onnx/model_q4.onnx', size: 1 * MB },
+            { rfilename: 'onnx/model_q4.onnx_data', size: 600 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(1501);
+        expect(aggregator.estimateModelSize({ id: 'test/tiny' }, { siblings: [{ rfilename: 'model.onnx', size: 200 * 1024 }] })).toBe(1);
+      });
+
+      test('counts the largest GGUF quantization, not all of them', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'model.Q4_K_M.gguf', size: 400 * MB },
+            { rfilename: 'model.Q8_0.gguf', size: 700 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(700);
+      });
+    });
+
     describe('Weight formats are alternatives, not additive', () => {
       test('counts safetensors only when .bin copies exist', () => {
         const detailedInfo = {
@@ -487,6 +527,24 @@ describe('ModelAggregator', () => {
     });
   });
 
+  describe('processModels', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    test('skips models whose details could not be fetched instead of guessing', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+        ok: false, status: 429, statusText: '429', headers: { get: () => null }, json: async () => ({})
+      }));
+      const agg = new ModelAggregator({ retryBaseDelayMs: 0 });
+
+      const processed = await agg.processModels([{ id: 'a/b', downloads: 5 }], {});
+
+      expect(processed).toEqual([]);
+      expect(agg.stats.failedRequests).toBe(1);
+    });
+  });
+
   describe('Hugging Face requests', () => {
     afterEach(() => {
       vi.unstubAllGlobals();
@@ -562,6 +620,28 @@ describe('ModelAggregator', () => {
       const [model] = agg.deduplicateModels([...existing, ...fresh]);
 
       expect(model).toMatchObject({ sizeMB: 500, specialization: 'coding', runtime: 'ort' });
+    });
+
+    test('moves a resized model to its new tier without leaving a stale copy or mutating the old data', () => {
+      const agg = new ModelAggregator({ dataPath: '/nonexistent' });
+      const stale = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 1, specialization: 'coding' };
+      agg.currentModels = {
+        lastUpdated: '2026-01-01',
+        models: { cat: { sub: { lightweight: [stale], standard: [], advanced: [], xlarge: [] } } }
+      };
+      const fresh = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 66000 };
+
+      const merged = agg.mergeWithExistingData(
+        { cat: { sub: { lightweight: [], standard: [], advanced: [], xlarge: [fresh] } } },
+        {}
+      );
+
+      expect(merged.models.cat.sub.lightweight).toEqual([]);
+      expect(merged.models.cat.sub.xlarge).toEqual([{ ...fresh, specialization: 'coding' }]);
+      expect(agg.currentModels.models.cat.sub.lightweight).toEqual([stale]);
+      expect(agg.summarizeChanges(agg.currentModels, merged).sizeChanged).toEqual([
+        { id: 'a/b', from: 1, to: 66000 }
+      ]);
     });
 
     test('summarizes added, removed, updated and resized models', () => {
