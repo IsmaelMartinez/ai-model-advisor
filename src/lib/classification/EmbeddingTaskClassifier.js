@@ -3,7 +3,8 @@
  * Uses MiniLM sentence embeddings for similarity-based classification
  * 
  * Model: Xenova/all-MiniLM-L6-v2 (~23MB)
- * Accuracy: 98.3% on task classification
+ * Leave-one-out accuracy on the reference examples: 95.3% category, 74.7% subcategory
+ * (enforced by tests/embedding-classifier.test.js)
  * Cache: IndexedDB (automatic via @huggingface/transformers)
  */
 

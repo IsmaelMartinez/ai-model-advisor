@@ -2,7 +2,7 @@ import { describe, test, expect, beforeAll } from 'vitest';
 import { BrowserTaskClassifier } from '../src/lib/classification/BrowserTaskClassifier.js';
 import { ModelSelector } from '../src/lib/recommendation/ModelSelector.js';
 import { getDefaultSubcategory, TIERS } from '../src/lib/data/constants.js';
-import modelsData from '../src/lib/data/models.json';
+import { fixtureModels } from './fixtures/models.js';
 
 describe('Integration Tests - Real User Scenarios', () => {
   let taskClassifier;
@@ -10,7 +10,7 @@ describe('Integration Tests - Real User Scenarios', () => {
 
   beforeAll(() => {
     taskClassifier = new BrowserTaskClassifier();
-    modelSelector = new ModelSelector(modelsData);
+    modelSelector = new ModelSelector(fixtureModels);
   });
 
   describe('End-to-End Workflow', () => {
@@ -124,34 +124,15 @@ describe('Integration Tests - Real User Scenarios', () => {
 
     test('should implement "smaller is better" logic', () => {
       const models = modelSelector.selectModels('computer_vision', 'image_classification', 5);
-      
-      if (models.length > 1) {
-        // Check tier prioritization
-        const tiers = models.map(m => m.tierPriority);
-        let currentTier = -1;
-        
-        tiers.forEach(tier => {
-          expect(tier).toBeGreaterThanOrEqual(currentTier);
-          currentTier = tier;
-        });
-        
-        // Within same tier, check size ordering
-        const groupedByTier = {};
-        models.forEach(model => {
-          if (!groupedByTier[model.tier]) {
-            groupedByTier[model.tier] = [];
-          }
-          groupedByTier[model.tier].push(model);
-        });
-        
-        Object.values(groupedByTier).forEach(tierModels => {
-          if (tierModels.length > 1) {
-            for (let i = 1; i < tierModels.length; i++) {
-              expect(tierModels[i].sizeMB).toBeGreaterThanOrEqual(tierModels[i-1].sizeMB);
-            }
-          }
-        });
-      }
+
+      // Tier first, then size within the tier, whatever order the data lists them in
+      expect(models.map(m => [m.tier, m.sizeMB])).toEqual([
+        ['lightweight', 20],
+        ['lightweight', 80],
+        ['standard', 1000],
+        ['advanced', 10000],
+        ['xlarge', 40000]
+      ]);
     });
   });
 
@@ -218,8 +199,7 @@ describe('Integration Tests - Real User Scenarios', () => {
         
         const models = modelSelector.selectModels(classification.category, classification.subcategory, 3);
         
-        // Even for edge cases, should get some models
-        expect(models.length).toBeGreaterThanOrEqual(0);
+        expect(models.length).toBeGreaterThan(0);
       }
     });
 
