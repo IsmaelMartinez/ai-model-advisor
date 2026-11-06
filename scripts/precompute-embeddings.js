@@ -67,4 +67,7 @@ async function main() {
   console.log(`Wrote ${embeddings.length} embeddings to ${outputPath} (${sizeMB}MB)`);
 }
 
-main().catch(console.error);
+main().catch(error => {
+  console.error(error);
+  process.exit(1);
+});
