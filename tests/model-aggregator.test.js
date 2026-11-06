@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, afterEach, vi } from 'vitest';
-import { ModelAggregator } from '../src/lib/aggregation/ModelAggregator.js';
+import { ModelAggregator } from '../scripts/update-models/ModelAggregator.js';
 import { tierForSize, environmentalScoreForSize } from '../src/lib/data/constants.js';
 
 describe('ModelAggregator', () => {

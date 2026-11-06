@@ -1,7 +1,6 @@
 <script>
   import TaskForm from "../components/TaskForm.svelte";
   import RecommendationDisplay from "../components/RecommendationDisplay.svelte";
-  import { EmbeddingTaskClassifier } from "../lib/classification/EmbeddingTaskClassifier.js";
   import { BrowserTaskClassifier } from "../lib/classification/BrowserTaskClassifier.js";
   import { ModelSelector } from "../lib/recommendation/ModelSelector.js";
 
@@ -55,31 +54,7 @@
 
       totalModelCount = modelsData.models.length;
 
-      // Initialize embedding classifier (loads in background, not blocking)
-      taskClassifier = new EmbeddingTaskClassifier({
-        onProgress: (progress) => {
-          if (progress.status === "downloading") {
-            modelLoadProgress = progress.message;
-            downloadPercentage = progress.progress;
-            isModelLoading = true;
-          } else if (progress.status === "loading") {
-            modelLoadProgress = progress.message;
-            isModelLoading = true;
-          } else if (progress.status === "ready") {
-            modelLoadProgress = "";
-            downloadPercentage = 100;
-            isModelLoading = false;
-            classifierReady = true;
-          } else if (progress.status === "error") {
-            modelLoadProgress = "";
-            isModelLoading = false;
-            console.warn("Embedding classifier failed, using keyword fallback");
-            usingFallback = true;
-          }
-        },
-      });
-
-      // 2. Handle URL parameters first so shared links do not wait for the model download
+      // 2. Handle URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const catFromUrl = urlParams.get("category");
       const subFromUrl = urlParams.get("task");
@@ -99,17 +74,53 @@
           }
         });
       }
-
-      // 3. Load the classifier in the background; the form works without it
-      taskClassifier.initialize(tasksData).then((initResult) => {
-        usingFallback = !initResult.success;
-        classifierReady = initResult.success;
-      });
     } catch (err) {
       console.error("Failed to initialize:", err);
       error = "Failed to initialize the AI model advisor. Please refresh the page.";
     }
   });
+
+  // The embedding classifier and transformers.js (~52 MB on first use) are only
+  // fetched when the visitor opens "Describe your task"; the keyword classifier
+  // answers until it is ready.
+  async function loadClassifier() {
+    if (taskClassifier) return;
+
+    let EmbeddingTaskClassifier;
+    try {
+      ({ EmbeddingTaskClassifier } = await import(
+        "../lib/classification/EmbeddingTaskClassifier.js"
+      ));
+    } catch (err) {
+      console.warn("Could not load the embedding classifier, using keyword fallback:", err);
+      usingFallback = true;
+      return;
+    }
+    taskClassifier = new EmbeddingTaskClassifier({
+      onProgress: (progress) => {
+        if (progress.status === "downloading") {
+          modelLoadProgress = progress.message;
+          downloadPercentage = progress.progress;
+          isModelLoading = true;
+        } else if (progress.status === "loading") {
+          modelLoadProgress = progress.message;
+          isModelLoading = true;
+        } else if (progress.status === "ready") {
+          modelLoadProgress = "";
+          downloadPercentage = 100;
+          isModelLoading = false;
+        } else if (progress.status === "error") {
+          modelLoadProgress = "";
+          isModelLoading = false;
+          console.warn("Embedding classifier failed, using keyword fallback");
+        }
+      },
+    });
+
+    const initResult = await taskClassifier.initialize(tasksData);
+    usingFallback = !initResult.success;
+    classifierReady = initResult.success;
+  }
 
   async function handleClassify(event) {
     const { taskDescription } = event.detail;
@@ -205,9 +216,6 @@
 <svelte:head>
   <title>AI Model Advisor — Find AI That Runs Without a Server</title>
   <meta name="description" content="Find AI models you can run in the browser, on mobile, or at the edge. No server required." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </svelte:head>
 
 <div class="app">
@@ -300,6 +308,7 @@
       {prefillRevision}
       on:submit={handleFormSubmit}
       on:classify={handleClassify}
+      on:assistopen={loadClassifier}
     />
 
     <div bind:this={recommendationsSection} class:results-highlight={showResultsHighlight}>
@@ -332,6 +341,15 @@
 </div>
 
 <style>
+  /* Self-hosted so visitors' IP addresses are not sent to Google (Plus Jakarta Sans, SIL OFL 1.1; variable weight, latin subset) */
+  @font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 200 800;
+    font-display: swap;
+    src: url('../lib/assets/plus-jakarta-sans-latin.woff2') format('woff2');
+  }
+
   :global(*) {
     box-sizing: border-box;
   }

@@ -46,7 +46,8 @@ async function main() {
       category: example.category,
       subcategory: example.subcategory,
       label: example.label,
-      embedding: Array.from(output.data)
+      // 4 decimals keeps classification identical and shrinks the file about 5x
+      embedding: Array.from(output.data, v => Math.round(v * 1e4) / 1e4)
     });
 
     if ((i + 1) % 50 === 0) {

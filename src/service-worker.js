@@ -1,10 +1,14 @@
 /**
- * Service Worker for AI Model Selector PWA
- * Caches static assets for offline access
+ * Service Worker for AI Model Advisor PWA
+ * Caches same-origin assets for offline access
  * Compatible with SvelteKit static adapter and GitHub Pages deployment
  */
 
-const CACHE_NAME = 'model-selector-v2';
+import { version } from '$app/env';
+
+// One cache per build: the activate step below deletes every older build's cache,
+// so hashed assets from previous deployments are evicted instead of piling up.
+const CACHE_NAME = `model-selector-${version}`;
 
 // Assets to cache on install
 // Note: SvelteKit generates hashed filenames, so we cache dynamically
@@ -18,7 +22,7 @@ const PRECACHE_ASSETS = [
 
 // Install event - cache core assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker v2...');
+  console.log('[SW] Installing service worker', version);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -35,7 +39,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker v2...');
+  console.log('[SW] Activating service worker', version);
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
@@ -67,8 +71,7 @@ self.addEventListener('fetch', (event) => {
   // - Analytics/tracking
   const hostname = url.hostname;
   const isHost = (host) => hostname === host || hostname.endsWith('.' + host);
-  if (isHost('huggingface.co') ||
-      isHost('jsdelivr.net')) {
+  if (isHost('huggingface.co') || isHost('hf.co')) {
     return;
   }
 
