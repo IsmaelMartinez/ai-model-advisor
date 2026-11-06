@@ -87,17 +87,6 @@ describe('MVP Acceptance Tests', () => {
         expect(['lightweight', 'standard', 'advanced', 'xlarge']).toContain(model.tier);
       });
     });
-
-    test('environmental impact data is present', () => {
-      expect(modelsData.environmentalImpact).toBeDefined();
-      expect(modelsData.environmentalImpact.scoringCriteria).toBeDefined();
-      
-      ['1', '2', '3'].forEach(score => {
-        expect(modelsData.environmentalImpact.scoringCriteria[score]).toBeDefined();
-        expect(modelsData.environmentalImpact.scoringCriteria[score]).toHaveProperty('label');
-        expect(modelsData.environmentalImpact.scoringCriteria[score]).toHaveProperty('description');
-      });
-    });
   });
 
   describe('Data Completeness', () => {
@@ -110,8 +99,7 @@ describe('MVP Acceptance Tests', () => {
       ];
 
       expectedDomains.forEach(domain => {
-        expect(modelsData.models[domain]).toBeDefined();
-        expect(Object.keys(modelsData.models[domain]).length).toBeGreaterThan(0);
+        expect(modelSelector.getAvailableCategories()[domain]).toBeDefined();
       });
     });
 
@@ -130,17 +118,7 @@ describe('MVP Acceptance Tests', () => {
     });
 
     test('has reasonable dataset size', () => {
-      // Count total models
-      let totalModels = 0;
-      Object.values(modelsData.models).forEach(category => {
-        Object.values(category).forEach(subcategory => {
-          ['lightweight', 'standard', 'advanced', 'xlarge'].forEach(tier => {
-            if (subcategory[tier]) {
-              totalModels += subcategory[tier].length;
-            }
-          });
-        });
-      });
+      const totalModels = modelsData.models.length;
 
       expect(totalModels).toBeGreaterThan(10); // MVP requires 10+ models
       

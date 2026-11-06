@@ -5,27 +5,20 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { ModelSelector } from '../src/lib/recommendation/ModelSelector.js';
 
-// Mock model data for testing
+const tasks = [{ category: 'computer_vision', subcategory: 'image_classification' }];
+const acc = value => ({ metric: 'top-1', value, source: 'fixture' });
+
+// Mock model data for testing. Tiers are derived from sizeMB (<=500, <=4000, <=20000).
 const mockModelsData = {
-  models: {
-    computer_vision: {
-      image_classification: {
-        lightweight: [
-          { id: 'model1', name: 'Model 1', accuracy: 0.75, sizeMB: 50 },
-          { id: 'model2', name: 'Model 2', accuracy: 0.82, sizeMB: 60 },
-          { id: 'model3', name: 'Model 3', accuracy: null, sizeMB: 40 } // Missing accuracy
-        ],
-        standard: [
-          { id: 'model4', name: 'Model 4', accuracy: 0.88, sizeMB: 200 },
-          { id: 'model5', name: 'Model 5', accuracy: 0.70, sizeMB: 150 }
-        ],
-        advanced: [
-          { id: 'model6', name: 'Model 6', accuracy: 0.95, sizeMB: 500 },
-          { id: 'model7', name: 'Model 7', accuracy: 0.65, sizeMB: 450 }
-        ]
-      }
-    }
-  }
+  models: [
+    { id: 'model1', name: 'Model 1', accuracy: acc(0.75), sizeMB: 50, tasks },
+    { id: 'model2', name: 'Model 2', accuracy: acc(0.82), sizeMB: 60, tasks },
+    { id: 'model3', name: 'Model 3', accuracy: null, sizeMB: 40, tasks }, // Missing accuracy
+    { id: 'model4', name: 'Model 4', accuracy: acc(0.88), sizeMB: 2000, tasks },
+    { id: 'model5', name: 'Model 5', accuracy: acc(0.70), sizeMB: 1500, tasks },
+    { id: 'model6', name: 'Model 6', accuracy: acc(0.95), sizeMB: 8000, tasks },
+    { id: 'model7', name: 'Model 7', accuracy: acc(0.65), sizeMB: 6000, tasks }
+  ]
 };
 
 describe('ModelSelector - Accuracy Filtering', () => {
@@ -38,9 +31,9 @@ describe('ModelSelector - Accuracy Filtering', () => {
   describe('filterByAccuracy', () => {
     test('returns all models when threshold is 0', () => {
       const models = [
-        { id: 'model1', accuracy: 0.75 },
-        { id: 'model2', accuracy: 0.82 },
-        { id: 'model3', accuracy: 0.65 }
+        { id: 'model1', accuracy: acc(0.75) },
+        { id: 'model2', accuracy: acc(0.82) },
+        { id: 'model3', accuracy: acc(0.65) }
       ];
 
       const result = modelSelector.filterByAccuracy(models, 0);
@@ -52,9 +45,9 @@ describe('ModelSelector - Accuracy Filtering', () => {
 
     test('filters models below threshold', () => {
       const models = [
-        { id: 'model1', accuracy: 0.75 },
-        { id: 'model2', accuracy: 0.82 },
-        { id: 'model3', accuracy: 0.65 }
+        { id: 'model1', accuracy: acc(0.75) },
+        { id: 'model2', accuracy: acc(0.82) },
+        { id: 'model3', accuracy: acc(0.65) }
       ];
 
       const result = modelSelector.filterByAccuracy(models, 75);
@@ -67,7 +60,7 @@ describe('ModelSelector - Accuracy Filtering', () => {
 
     test('treats missing accuracy as 0', () => {
       const models = [
-        { id: 'model1', accuracy: 0.75 },
+        { id: 'model1', accuracy: acc(0.75) },
         { id: 'model2', accuracy: null },
         { id: 'model3', accuracy: undefined }
       ];
@@ -81,9 +74,9 @@ describe('ModelSelector - Accuracy Filtering', () => {
 
     test('returns empty array when all models below threshold', () => {
       const models = [
-        { id: 'model1', accuracy: 0.60 },
-        { id: 'model2', accuracy: 0.65 },
-        { id: 'model3', accuracy: 0.70 }
+        { id: 'model1', accuracy: acc(0.60) },
+        { id: 'model2', accuracy: acc(0.65) },
+        { id: 'model3', accuracy: acc(0.70) }
       ];
 
       const result = modelSelector.filterByAccuracy(models, 75);
@@ -94,8 +87,8 @@ describe('ModelSelector - Accuracy Filtering', () => {
 
     test('handles edge case of exact threshold match', () => {
       const models = [
-        { id: 'model1', accuracy: 0.75 },
-        { id: 'model2', accuracy: 0.7499 }
+        { id: 'model1', accuracy: acc(0.75) },
+        { id: 'model2', accuracy: acc(0.7499) }
       ];
 
       const result = modelSelector.filterByAccuracy(models, 75);
@@ -106,9 +99,9 @@ describe('ModelSelector - Accuracy Filtering', () => {
 
     test('handles maximum threshold (95%)', () => {
       const models = [
-        { id: 'model1', accuracy: 0.95 },
-        { id: 'model2', accuracy: 0.96 },
-        { id: 'model3', accuracy: 0.90 }
+        { id: 'model1', accuracy: acc(0.95) },
+        { id: 'model2', accuracy: acc(0.96) },
+        { id: 'model3', accuracy: acc(0.90) }
       ];
 
       const result = modelSelector.filterByAccuracy(models, 95);

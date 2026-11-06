@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeAll, afterEach, vi } from 'vitest';
 import { ModelAggregator } from '../src/lib/aggregation/ModelAggregator.js';
+import { tierForSize, environmentalScoreForSize } from '../src/lib/data/constants.js';
 
 describe('ModelAggregator', () => {
   let aggregator;
@@ -345,42 +346,19 @@ describe('ModelAggregator', () => {
     });
   });
 
-  describe('determineTier', () => {
-    test('returns lightweight for models ≤500MB', () => {
-      expect(aggregator.determineTier(100)).toBe('lightweight');
-      expect(aggregator.determineTier(500)).toBe('lightweight');
-    });
-
-    test('returns standard for models ≤4GB', () => {
-      expect(aggregator.determineTier(501)).toBe('standard');
-      expect(aggregator.determineTier(4000)).toBe('standard');
-    });
-
-    test('returns advanced for models ≤20GB', () => {
-      expect(aggregator.determineTier(4001)).toBe('advanced');
-      expect(aggregator.determineTier(20000)).toBe('advanced');
-    });
-
-    test('returns xlarge for models >20GB', () => {
-      expect(aggregator.determineTier(20001)).toBe('xlarge');
-      expect(aggregator.determineTier(140000)).toBe('xlarge');
-    });
-  });
-
-  describe('calculateEnvironmentalScore', () => {
-    test('returns 1 for lightweight models', () => {
-      expect(aggregator.calculateEnvironmentalScore(100)).toBe(1);
-      expect(aggregator.calculateEnvironmentalScore(500)).toBe(1);
-    });
-
-    test('returns 2 for standard models', () => {
-      expect(aggregator.calculateEnvironmentalScore(501)).toBe(2);
-      expect(aggregator.calculateEnvironmentalScore(4000)).toBe(2);
-    });
-
-    test('returns 3 for large models', () => {
-      expect(aggregator.calculateEnvironmentalScore(4001)).toBe(3);
-      expect(aggregator.calculateEnvironmentalScore(100000)).toBe(3);
+  describe('tierForSize / environmentalScoreForSize', () => {
+    test.each([
+      [100, 'lightweight', 1],
+      [500, 'lightweight', 1],
+      [501, 'standard', 2],
+      [4000, 'standard', 2],
+      [4001, 'advanced', 3],
+      [20000, 'advanced', 3],
+      [20001, 'xlarge', 3],
+      [140000, 'xlarge', 3]
+    ])('%i MB is %s with score %i', (sizeMB, tier, score) => {
+      expect(tierForSize(sizeMB)).toBe(tier);
+      expect(environmentalScoreForSize(sizeMB)).toBe(score);
     });
   });
 
@@ -622,92 +600,147 @@ describe('ModelAggregator', () => {
     });
   });
 
+  describe('extractModelMetadata', () => {
+    test('collapses to a flat model with tasks, null accuracy and browser runtime metadata', async () => {
+      const raw = {
+        id: 'Xenova/tiny-model',
+        downloads: 10,
+        pipeline_tag: 'text-classification',
+        lastModified: '2026-03-04T05:06:07.000Z',
+        tasks: [{ category: 'natural_language_processing', subcategory: 'text_classification' }]
+      };
+      const detailed = { siblings: [{ rfilename: 'onnx/model.onnx', size: 5 * 1024 * 1024 }] };
+
+      const model = await aggregator.extractModelMetadata(raw, detailed);
+
+      expect(model).toMatchObject({
+        huggingFaceId: 'Xenova/tiny-model',
+        sizeMB: 5,
+        accuracy: null,
+        tasks: raw.tasks,
+        lastUpdated: '2026-03-04',
+        description: 'Tiny Model model for text classification',
+        runtime: { browser: { framework: 'transformers.js', backend: ['wasm'], tested: false } }
+      });
+      expect(model).not.toHaveProperty('tier');
+      expect(model).not.toHaveProperty('environmentalScore');
+    });
+  });
+
   describe('merging with existing data', () => {
-    test('fresh data replaces the stale copy but keeps curated fields', () => {
-      const agg = new ModelAggregator();
-      const existing = [{ huggingFaceId: 'a/b', sizeMB: 1, specialization: 'coding', runtime: 'ort' }];
-      const fresh = [agg.preserveCuratedFields({ huggingFaceId: 'a/b', sizeMB: 500 }, existing)];
-
-      const [model] = agg.deduplicateModels([...existing, ...fresh]);
-
-      expect(model).toMatchObject({ sizeMB: 500, specialization: 'coding', runtime: 'ort' });
+    const task = (subcategory, category = 'computer_vision') => ({ category, subcategory });
+    const model = (huggingFaceId, sizeMB, tasks, extra = {}) => ({
+      id: huggingFaceId.replace('/', '_'),
+      name: huggingFaceId,
+      huggingFaceId,
+      description: '',
+      sizeMB,
+      accuracy: null,
+      tasks,
+      deploymentOptions: ['cloud'],
+      frameworks: ['PyTorch'],
+      lastUpdated: '2026-01-01',
+      ...extra
     });
-
-    test('moves a resized model to its new tier without leaving a stale copy or mutating the old data', () => {
+    const aggregatorWith = models => {
       const agg = new ModelAggregator({ dataPath: '/nonexistent' });
-      const stale = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 1, specialization: 'coding' };
-      agg.currentModels = {
-        lastUpdated: '2026-01-01',
-        models: { cat: { sub: { lightweight: [stale], standard: [], advanced: [], xlarge: [] } } }
-      };
-      const fresh = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 66000 };
+      agg.currentModels = { schemaVersion: 2, lastUpdated: '2026-01-01', models };
+      return agg;
+    };
 
-      const merged = agg.mergeWithExistingData(
-        { cat: { sub: { lightweight: [], standard: [], advanced: [], xlarge: [fresh] } } },
-        {}
-      );
-
-      expect(merged.models.cat.sub.lightweight).toEqual([]);
-      expect(merged.models.cat.sub.xlarge).toEqual([{ ...fresh, specialization: 'coding' }]);
-      expect(agg.currentModels.models.cat.sub.lightweight).toEqual([stale]);
-      expect(agg.summarizeChanges(agg.currentModels, merged).sizeChanged).toEqual([
-        { id: 'a/b', from: 1, to: 66000 }
+    test('fresh data replaces the stale copy but keeps curated fields and tasks', () => {
+      const agg = aggregatorWith([
+        model('a/b', 1, [task('image_classification')], { specialization: 'coding', browserModelId: 'Xenova/b' })
       ]);
-    });
 
-    test('ignores field order and sees an update on any copy of a model listed under several tasks', () => {
-      const agg = new ModelAggregator();
-      const copy = (sub, size, extra = {}) => ({ huggingFaceId: 'a/b', sizeMB: size, name: 'n', ...extra });
-      const old = { models: { cat: { t1: { lightweight: [copy('t1', 1)] }, t2: { lightweight: [copy('t2', 1)] } } } };
-      const next = {
-        models: {
-          cat: {
-            t1: { xlarge: [{ name: 'n', sizeMB: 900, huggingFaceId: 'a/b' }] },
-            t2: { lightweight: [{ name: 'n', sizeMB: 1, huggingFaceId: 'a/b' }] } // stale copy, same content, other key order
-          }
-        }
-      };
+      const merged = agg.mergeWithExistingData([model('a/b', 500, [task('object_detection')], { downloads: 9 })]);
 
-      const summary = agg.summarizeChanges(old, next);
-
-      expect(summary.updated).toEqual(['a/b']);
-      expect(summary.sizeChanged).toEqual([{ id: 'a/b', from: 1, to: 900 }]);
-      expect(agg.summarizeChanges(old, old).updated).toEqual([]);
-    });
-
-    test('a cross-tier removal counts as a substantive change even if the new copy misses the cutoff', () => {
-      const agg = new ModelAggregator({ dataPath: '/nonexistent' });
-      const stale = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 1 };
-      const full = [1, 2, 3, 4, 5].map(i => ({ id: `x${i}`, huggingFaceId: `x/${i}`, sizeMB: 1, specialization: 'k' }));
-      agg.currentModels = {
-        lastUpdated: '2026-01-01',
-        models: { cat: { sub: { lightweight: [stale], standard: [], advanced: [], xlarge: full } } }
-      };
-
-      agg.mergeWithExistingData(
-        { cat: { sub: { lightweight: [], standard: [], advanced: [], xlarge: [{ id: 'a_b', huggingFaceId: 'a/b', sizeMB: 66000 }] } } },
-        {}
-      );
-
+      expect(merged.models).toHaveLength(1);
+      expect(merged.models[0]).toMatchObject({ sizeMB: 500, specialization: 'coding', browserModelId: 'Xenova/b' });
+      expect(merged.models[0].tasks).toEqual([task('image_classification'), task('object_detection')]);
+      expect(merged.models[0]).not.toHaveProperty('downloads');
       expect(agg.stats.hasSubstantiveChanges).toBe(true);
     });
 
-    test('drops legacy estimated accuracy numbers on refresh', () => {
-      const agg = new ModelAggregator();
-      const model = agg.preserveCuratedFields({ huggingFaceId: 'a/b', accuracy: null }, [{ huggingFaceId: 'a/b', accuracy: 0.75 }]);
-      expect(model.accuracy).toBeNull();
+    test('keeps only the best 5 per task and tier when fresh models arrive, preserving other tasks', () => {
+      const existing = [1, 2, 3, 4, 5].map(i =>
+        model(`old/m${i}`, 100 + i, [task('image_classification')]));
+      // Same models also serve another task whose group gets no fresh model
+      existing[0].tasks.push(task('object_detection'));
+      const agg = aggregatorWith(existing);
+
+      const merged = agg.mergeWithExistingData([
+        model('new/small', 10, [task('image_classification')], { downloads: 1 })
+      ]);
+
+      const ids = merged.models.map(m => m.huggingFaceId);
+      expect(ids).toContain('new/small');
+      expect(ids).not.toContain('old/m5'); // largest of the six, dropped
+      expect(merged.models.find(m => m.huggingFaceId === 'old/m1').tasks).toEqual([
+        task('image_classification'),
+        task('object_detection')
+      ]);
+      expect(merged.models.filter(m => m.tasks.some(t => t.subcategory === 'image_classification'))).toHaveLength(5);
     });
 
-    test('keeps sourced accuracy when the refresh has none', () => {
+    test('curated runtime metadata and sourced accuracy beat the generated defaults', () => {
+      const curated = { browser: { framework: 'transformers.js', backend: ['wasm', 'webgpu'], tested: true } };
+      const sourced = { metric: 'mAP', value: 0.5, source: 'paper' };
+      const agg = aggregatorWith([
+        model('a/b', 10, [task('image_classification')], { runtime: curated, accuracy: sourced })
+      ]);
+      const generated = { browser: { framework: 'transformers.js', backend: ['wasm'], tested: false } };
+
+      const merged = agg.mergeWithExistingData([model('a/b', 10, [task('image_classification')], { runtime: generated })]);
+
+      expect(merged.models[0].runtime).toEqual(curated);
+      expect(merged.models[0].accuracy).toEqual(sourced);
+    });
+
+    test('drops legacy estimated accuracy numbers on refresh', () => {
+      const agg = aggregatorWith([model('a/b', 10, [task('image_classification')], { accuracy: 0.75 })]);
+
+      const merged = agg.mergeWithExistingData([model('a/b', 10, [task('image_classification')])]);
+
+      expect(merged.models[0].accuracy).toBeNull();
+    });
+
+    test('a mirror-backed model keeps its browser tag on refresh', () => {
+      const runtime = { browser: { framework: 'transformers.js', backend: ['wasm'], tested: false } };
+      const agg = aggregatorWith([
+        model('a/b', 10, [task('image_classification')], { runtime, browserModelId: 'Xenova/b', deploymentOptions: ['browser', 'edge', 'cloud'] })
+      ]);
+
+      // The native repo has no ONNX framework, so the generated options lack "browser"
+      const merged = agg.mergeWithExistingData([model('a/b', 12, [task('image_classification')], { deploymentOptions: ['edge', 'cloud'] })]);
+
+      expect(merged.models[0].deploymentOptions).toContain('browser');
+      expect(merged.models[0].frameworks).toContain('ONNX');
+      expect(merged.models[0].runtime).toEqual(runtime);
+      expect(merged.models[0].browserModelId).toBe('Xenova/b');
+    });
+
+    test('does not bump lastUpdated when nothing changed', () => {
+      const existing = model('a/b', 10, [task('image_classification')]);
+      const agg = aggregatorWith([existing]);
+
+      const merged = agg.mergeWithExistingData([{ ...existing, lastUpdated: '2026-02-02', downloads: 5 }]);
+
+      expect(agg.stats.hasSubstantiveChanges).toBe(false);
+      expect(merged.lastUpdated).toBe('2026-01-01');
+    });
+
+    test('ignores field order when deciding whether a model changed', () => {
       const agg = new ModelAggregator();
-      const sourced = { metric: 'top-1', value: 0.9, source: 'paper' };
-      const model = agg.preserveCuratedFields({ huggingFaceId: 'a/b', accuracy: null }, [{ huggingFaceId: 'a/b', accuracy: sourced }]);
-      expect(model.accuracy).toEqual(sourced);
+      const old = { models: [{ huggingFaceId: 'a/b', sizeMB: 1, name: 'n', runtime: { x: 1, y: 2 } }] };
+      const next = { models: [{ name: 'n', runtime: { y: 2, x: 1 }, sizeMB: 1, huggingFaceId: 'a/b' }] };
+
+      expect(agg.summarizeChanges(old, next).updated).toEqual([]);
     });
 
     test('summarizes added, removed, updated and resized models', () => {
       const agg = new ModelAggregator();
-      const dataset = models => ({ models: { cat: { sub: { lightweight: models } } } });
+      const dataset = models => ({ models });
       const old = dataset([
         { huggingFaceId: 'keep/same', sizeMB: 10, lastUpdated: '2026-01-01' },
         { huggingFaceId: 'keep/resized', sizeMB: 1 },

@@ -225,22 +225,13 @@ describe('Integration Tests - Real User Scenarios', () => {
 
     test('should have consistent data structure', () => {
       // Verify models data integrity
-      Object.entries(modelsData.models).forEach(([category, categoryData]) => {
-        Object.entries(categoryData).forEach(([subcategory, subcategoryData]) => {
-          TIERS.forEach(tier => {
-            if (subcategoryData[tier]) {
-              subcategoryData[tier].forEach(model => {
-                expect(model).toHaveProperty('id');
-                expect(model).toHaveProperty('name');
-                expect(model).toHaveProperty('sizeMB');
-                expect(model).toHaveProperty('environmentalScore');
-                expect(typeof model.sizeMB).toBe('number');
-                expect(model.environmentalScore).toBeGreaterThanOrEqual(1);
-                expect(model.environmentalScore).toBeLessThanOrEqual(3);
-              });
-            }
-          });
-        });
+      modelSelector.models.forEach(model => {
+        expect(model).toHaveProperty('id');
+        expect(model).toHaveProperty('name');
+        expect(model).toHaveProperty('sizeMB');
+        expect(typeof model.sizeMB).toBe('number');
+        expect(model.environmentalScore).toBeGreaterThanOrEqual(1);
+        expect(model.environmentalScore).toBeLessThanOrEqual(3);
       });
     });
   });

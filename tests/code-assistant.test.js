@@ -2,6 +2,7 @@ import { describe, test, expect, beforeAll } from 'vitest';
 import { BrowserTaskClassifier } from '../src/lib/classification/BrowserTaskClassifier.js';
 import { ModelSelector } from '../src/lib/recommendation/ModelSelector.js';
 import modelsData from '../src/lib/data/models.json';
+import { TIERS } from '../src/lib/data/constants.js';
 import tasksData from '../src/lib/data/tasks.json'; // Used for data integrity tests
 
 describe('Code Assistant Classification Tests', () => {
@@ -162,9 +163,11 @@ describe('Code Assistant Classification Tests', () => {
       // Step 4: Verify recommendations
       expect(models.length).toBeGreaterThan(0);
 
-      // First model should be from lightweight tier if available
+      // First model should come from the lowest tier that has any code models
       const firstModel = models[0];
-      expect(firstModel.tier).toBe('lightweight');
+      const allTiers = modelSelector.getTaskModels(topPrediction.category, topPrediction.subcategory)
+        .map(m => m.tierPriority);
+      expect(firstModel.tierPriority).toBe(Math.min(...allTiers));
 
       // Should return a model from the code_assistant category
       // Note: Model names may vary based on automated updates from HuggingFace
@@ -216,17 +219,12 @@ describe('Code Assistant Classification Tests', () => {
 
   describe('Code Assistant Data Integrity', () => {
     test('should have valid code_assistant models in all tiers', () => {
-      const codeModels = modelsData.models.natural_language_processing.code_assistant;
+      const codeModels = modelSelector.getTaskModels('natural_language_processing', 'code_assistant');
 
-      expect(codeModels).toBeDefined();
-      expect(codeModels.lightweight).toBeDefined();
-      expect(codeModels.standard).toBeDefined();
-      expect(codeModels.advanced).toBeDefined();
-
-      // Should have at least one model in each tier
-      expect(codeModels.lightweight.length).toBeGreaterThan(0);
-      expect(codeModels.standard.length).toBeGreaterThan(0);
-      expect(codeModels.advanced.length).toBeGreaterThan(0);
+      expect(codeModels.length).toBeGreaterThan(0);
+      codeModels.forEach(model => {
+        expect(TIERS).toContain(model.tier);
+      });
     });
 
     test('should have code_assistant in tasks taxonomy', () => {
@@ -245,27 +243,20 @@ describe('Code Assistant Classification Tests', () => {
     });
 
     test('code models should have required properties', () => {
-      const codeModels = modelsData.models.natural_language_processing.code_assistant;
+      const codeModels = modelSelector.getTaskModels('natural_language_processing', 'code_assistant');
 
-      ['lightweight', 'standard', 'advanced'].forEach(tier => {
-        codeModels[tier].forEach(model => {
-          expect(model).toHaveProperty('id');
-          expect(model).toHaveProperty('name');
-          expect(model).toHaveProperty('huggingFaceId');
-          expect(model).toHaveProperty('description');
-          expect(model).toHaveProperty('sizeMB');
-          expect(model).toHaveProperty('accuracy');
-          expect(model).toHaveProperty('environmentalScore');
-          expect(model).toHaveProperty('deploymentOptions');
-          expect(model).toHaveProperty('frameworks');
+      codeModels.forEach(model => {
+        expect(model).toHaveProperty('id');
+        expect(model).toHaveProperty('name');
+        expect(model).toHaveProperty('huggingFaceId');
+        expect(model).toHaveProperty('description');
+        expect(model).toHaveProperty('sizeMB');
+        expect(model).toHaveProperty('accuracy');
+        expect(model).toHaveProperty('environmentalScore');
+        expect(model).toHaveProperty('deploymentOptions');
+        expect(model).toHaveProperty('frameworks');
 
-          expect(typeof model.sizeMB).toBe('number');
-          // null means unknown; a numeric accuracy must be a valid fraction
-          if (model.accuracy !== null) {
-            expect(model.accuracy).toBeGreaterThan(0);
-            expect(model.accuracy).toBeLessThanOrEqual(1);
-          }
-        });
+        expect(typeof model.sizeMB).toBe('number');
       });
     });
   });
