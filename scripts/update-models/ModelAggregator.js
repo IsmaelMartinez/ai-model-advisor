@@ -24,6 +24,13 @@ const MAX_FAILURE_RATE = 0.1;
 const MAX_RETRIES = 5;
 const MAX_MODELS_PER_TIER = 5;
 
+// JSON with sorted object keys, so equal models compare equal whatever their field order
+const canonical = value => JSON.stringify(value, (key, val) =>
+  val && typeof val === 'object' && !Array.isArray(val)
+    ? Object.fromEntries(Object.entries(val).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
+    : val
+);
+
 export class ModelAggregator {
   constructor(options = {}) {
     this.huggingFaceToken = options.huggingFaceToken || process.env.HF_TOKEN;
@@ -87,6 +94,7 @@ export class ModelAggregator {
       const mergedData = this.mergeWithExistingData(processedModels);
 
       const changes = this.summarizeChanges(this.currentModels, mergedData);
+      this.stats.added = changes.added.length;
       this.stats.updated = changes.updated.length;
 
       // Step 4: Save updated dataset (if not dry run AND has substantive changes)
@@ -380,6 +388,16 @@ export class ModelAggregator {
       const old = byId.get(model.huggingFaceId);
       if (old) {
         this.preserveCuratedFields(model, old);
+        if (model.browserModelId) {
+          // A mirror supplies the ONNX weights the native repo lacks, so judge
+          // browser support with ONNX available but still apply the size limits
+          const frameworks = [...new Set([...model.frameworks, 'ONNX'])];
+          model.deploymentOptions = this.determineDeploymentOptions(model.sizeMB, { id: model.huggingFaceId }, frameworks);
+          if (!model.deploymentOptions.includes('browser')) {
+            delete model.runtime;
+            delete model.browserModelId;
+          }
+        }
         model.tasks = [...old.tasks];
         for (const task of fresh.tasks) {
           if (!model.tasks.some(t => t.category === task.category && t.subcategory === task.subcategory)) {
@@ -525,7 +543,9 @@ export class ModelAggregator {
         const precision = rfilename.slice(0, onnxAt).match(/_(?:fp16|q4f16|q4|int8|uint8|quantized|bnb4)$/)?.[0] ?? '';
         variants.set(precision, (variants.get(precision) || 0) + size);
       } else if (rfilename.endsWith('.gguf')) {
-        variants.set(rfilename, size);
+        // Split files (model.Q8_0-00001-of-00002.gguf) are shards of one quantization
+        const quantization = rfilename.replace(/-\d{5}-of-\d{5}(?=\.gguf$)/, '');
+        variants.set(quantization, (variants.get(quantization) || 0) + size);
       }
     }
     return [...variants.values()];
@@ -722,13 +742,18 @@ export class ModelAggregator {
 
   /**
    * Carry curated fields over from the existing entry onto the fresh one.
-   * Curated fields are assigned by hand: specialization, runtime and browserModelId.
+   * Specialization, runtime and browserModelId are assigned by hand and win
+   * over the generated defaults; accuracy is kept because the Hub cannot
+   * supply one, so a sourced value must survive a refresh.
    */
   preserveCuratedFields(model, existing) {
     for (const field of ['specialization', 'runtime', 'browserModelId']) {
-      if (existing[field] && !model[field]) {
+      if (existing[field]) {
         model[field] = existing[field];
       }
+    }
+    if (existing.accuracy && !model.accuracy) {
+      model.accuracy = existing.accuracy;
     }
     return model;
   }
@@ -739,7 +764,7 @@ export class ModelAggregator {
    */
   summarizeChanges(oldData, newData) {
     const index = data => new Map((data?.models || []).map(m => [m.huggingFaceId, m]));
-    const comparable = ({ lastUpdated, ...rest }) => JSON.stringify(rest);
+    const comparable = ({ lastUpdated, ...rest }) => canonical(rest);
 
     const before = index(oldData);
     const after = index(newData);
