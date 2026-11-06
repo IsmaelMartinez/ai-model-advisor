@@ -33,6 +33,9 @@
   let prefillCategory = null;
   let prefillSubcategory = null;
   let prefillConfidence = 0;
+  let prefillDeployment = null;
+  // Bumped on every pre-fill so repeated identical predictions still re-apply
+  let prefillRevision = 0;
 
   // Available categories (from model data)
   let availableCategories = {};
@@ -59,9 +62,8 @@
             modelLoadProgress = progress.message;
             downloadPercentage = progress.progress;
             isModelLoading = true;
-          } else if (progress.status === "loading" || progress.status === "computing") {
+          } else if (progress.status === "loading") {
             modelLoadProgress = progress.message;
-            downloadPercentage = progress.progress;
             isModelLoading = true;
           } else if (progress.status === "ready") {
             modelLoadProgress = "";
@@ -77,21 +79,17 @@
         },
       });
 
-      const initResult = await taskClassifier.initialize(tasksData);
-      if (initResult.success) {
-        classifierReady = true;
-        usingFallback = false;
-      } else {
-        usingFallback = true;
-      }
-
-      // 2. Handle URL parameters
+      // 2. Handle URL parameters first so shared links do not wait for the model download
       const urlParams = new URLSearchParams(window.location.search);
       const catFromUrl = urlParams.get("category");
       const subFromUrl = urlParams.get("task");
       const deployFromUrl = urlParams.get("deploy");
 
       if (catFromUrl && subFromUrl) {
+        prefillCategory = catFromUrl;
+        prefillSubcategory = subFromUrl;
+        prefillDeployment = deployFromUrl || null;
+        prefillRevision += 1;
         handleFormSubmit({
           detail: {
             category: catFromUrl,
@@ -101,6 +99,12 @@
           }
         });
       }
+
+      // 3. Load the classifier in the background; the form works without it
+      taskClassifier.initialize(tasksData).then((initResult) => {
+        usingFallback = !initResult.success;
+        classifierReady = initResult.success;
+      });
     } catch (err) {
       console.error("Failed to initialize:", err);
       error = "Failed to initialize the AI model advisor. Please refresh the page.";
@@ -123,6 +127,7 @@
         prefillCategory = topPrediction.category;
         prefillSubcategory = topPrediction.subcategory || null;
         prefillConfidence = result.confidence || 0;
+        prefillRevision += 1;
       }
     } catch (err) {
       // Classifier failure is not critical — form still works
@@ -291,6 +296,8 @@
       {prefillCategory}
       {prefillSubcategory}
       {prefillConfidence}
+      {prefillDeployment}
+      {prefillRevision}
       on:submit={handleFormSubmit}
       on:classify={handleClassify}
     />
@@ -317,7 +324,7 @@
           <span class="dot">•</span>
           <span>Updated {new Date(modelsData.lastUpdated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
           <span class="dot">•</span>
-          <a href="https://github.com/ismaelmartinez/model-selector" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub">GitHub</a>
+          <a href="https://github.com/IsmaelMartinez/ai-model-advisor" target="_blank" rel="noopener noreferrer" aria-label="View source code on GitHub">GitHub</a>
         </div>
       </div>
     </footer>

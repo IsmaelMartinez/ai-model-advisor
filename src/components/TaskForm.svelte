@@ -19,6 +19,12 @@
   /** @type {number} classifier confidence (0-1) when pre-filling */
   export let prefillConfidence = 0;
 
+  /** @type {string|null} pre-filled deployment target (from a shared link) */
+  export let prefillDeployment = null;
+
+  /** @type {number} changes on every pre-fill, so an unchanged prediction is applied again */
+  export let prefillRevision = 0;
+
   const dispatch = createEventDispatcher();
 
   // Form state
@@ -48,12 +54,16 @@
     }
   }
 
-  // Accept pre-fill from classifier
-  $: if (prefillCategory && !selectedCategory) {
+  // Apply every new pre-fill (classifier result or shared link)
+  $: if (prefillRevision > 0 && prefillCategory) {
     selectedCategory = prefillCategory;
     if (prefillSubcategory) {
       selectedSubcategory = prefillSubcategory;
     }
+  }
+
+  $: if (prefillDeployment !== null) {
+    selectedDeployment = prefillDeployment;
   }
 
   function buildCategoryOptions(tasks, available) {
