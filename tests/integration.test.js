@@ -2,7 +2,7 @@ import { describe, test, expect, beforeAll } from 'vitest';
 import { BrowserTaskClassifier } from '../src/lib/classification/BrowserTaskClassifier.js';
 import { ModelSelector } from '../src/lib/recommendation/ModelSelector.js';
 import { getDefaultSubcategory, TIERS } from '../src/lib/data/constants.js';
-import modelsData from '../src/lib/data/models.json';
+import { fixtureModels } from './fixtures/models.js';
 
 describe('Integration Tests - Real User Scenarios', () => {
   let taskClassifier;
@@ -10,7 +10,7 @@ describe('Integration Tests - Real User Scenarios', () => {
 
   beforeAll(() => {
     taskClassifier = new BrowserTaskClassifier();
-    modelSelector = new ModelSelector(modelsData);
+    modelSelector = new ModelSelector(fixtureModels);
   });
 
   describe('End-to-End Workflow', () => {
@@ -218,8 +218,7 @@ describe('Integration Tests - Real User Scenarios', () => {
         
         const models = modelSelector.selectModels(classification.category, classification.subcategory, 3);
         
-        // Even for edge cases, should get some models
-        expect(models.length).toBeGreaterThanOrEqual(0);
+        expect(models.length).toBeGreaterThan(0);
       }
     });
 

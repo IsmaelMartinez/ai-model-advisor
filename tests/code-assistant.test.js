@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll } from 'vitest';
 import { BrowserTaskClassifier } from '../src/lib/classification/BrowserTaskClassifier.js';
 import { ModelSelector } from '../src/lib/recommendation/ModelSelector.js';
-import modelsData from '../src/lib/data/models.json';
+import { fixtureModels } from './fixtures/models.js';
 import { TIERS } from '../src/lib/data/constants.js';
 import tasksData from '../src/lib/data/tasks.json'; // Used for data integrity tests
 
@@ -11,7 +11,7 @@ describe('Code Assistant Classification Tests', () => {
 
   beforeAll(() => {
     taskClassifier = new BrowserTaskClassifier();
-    modelSelector = new ModelSelector(modelsData);
+    modelSelector = new ModelSelector(fixtureModels);
   });
 
   describe('Code Task Classification', () => {
@@ -108,16 +108,9 @@ describe('Code Assistant Classification Tests', () => {
     test('should prioritize lightweight code models (smaller is better)', () => {
       const models = modelSelector.selectModels('natural_language_processing', 'code_assistant', 5);
 
-      if (models.length > 1) {
-        // Check tier prioritization - lightweight should come first
-        const tiers = models.map(m => m.tierPriority);
-        let currentTier = -1;
-
-        tiers.forEach(tier => {
-          expect(tier).toBeGreaterThanOrEqual(currentTier);
-          currentTier = tier;
-        });
-      }
+      expect(models.length).toBeGreaterThan(1);
+      // Check tier prioritization - lightweight should come first
+      expect(models.map(m => m.tier)).toEqual(['lightweight', 'standard', 'advanced', 'xlarge']);
     });
 
     test('should return code-specific models (not BERT)', () => {
