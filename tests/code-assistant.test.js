@@ -108,9 +108,9 @@ describe('Code Assistant Classification Tests', () => {
     test('should prioritize lightweight code models (smaller is better)', () => {
       const models = modelSelector.selectModels('natural_language_processing', 'code_assistant', 5);
 
-      expect(models.length).toBeGreaterThan(1);
-      // Check tier prioritization - lightweight should come first
-      expect(models.map(m => m.tier)).toEqual(['lightweight', 'standard', 'advanced', 'xlarge']);
+      // Lightweight first, smaller first within the tier, then the larger tiers
+      expect(models.map(m => m.sizeMB)).toEqual([20, 80, 1000, 10000, 40000]);
+      expect(models.map(m => m.tier)).toEqual(['lightweight', 'lightweight', 'standard', 'advanced', 'xlarge']);
     });
 
     test('should return code-specific models (not BERT)', () => {
