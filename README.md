@@ -48,7 +48,7 @@ The full field reference and how the weekly updater works are in [docs/model-dat
 
 ## Deployment
 
-Pushing to `main` deploys to GitHub Pages. To deploy elsewhere, run `npm run build` and publish `dist/`.
+Pushing to `main` deploys to GitHub Pages. To deploy elsewhere, change `paths.base` in `vite.config.js` (production builds use `/ai-model-advisor`; set it to `''` for a root deployment), run `npm run build` and publish `dist/`.
 
 ## More
 
