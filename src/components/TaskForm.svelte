@@ -22,6 +22,9 @@
   /** @type {string|null} pre-filled deployment target (from a shared link) */
   export let prefillDeployment = null;
 
+  /** @type {number} changes on every pre-fill, so an unchanged prediction is applied again */
+  export let prefillRevision = 0;
+
   const dispatch = createEventDispatcher();
 
   // Form state
@@ -52,7 +55,7 @@
   }
 
   // Apply every new pre-fill (classifier result or shared link)
-  $: if (prefillCategory) {
+  $: if (prefillRevision > 0 && prefillCategory) {
     selectedCategory = prefillCategory;
     if (prefillSubcategory) {
       selectedSubcategory = prefillSubcategory;

@@ -34,6 +34,8 @@
   let prefillSubcategory = null;
   let prefillConfidence = 0;
   let prefillDeployment = null;
+  // Bumped on every pre-fill so repeated identical predictions still re-apply
+  let prefillRevision = 0;
 
   // Available categories (from model data)
   let availableCategories = {};
@@ -90,6 +92,7 @@
         prefillCategory = catFromUrl;
         prefillSubcategory = subFromUrl;
         prefillDeployment = deployFromUrl || null;
+        prefillRevision += 1;
         handleFormSubmit({
           detail: {
             category: catFromUrl,
@@ -127,6 +130,7 @@
         prefillCategory = topPrediction.category;
         prefillSubcategory = topPrediction.subcategory || null;
         prefillConfidence = result.confidence || 0;
+        prefillRevision += 1;
       }
     } catch (err) {
       // Classifier failure is not critical — form still works
@@ -296,6 +300,7 @@
       {prefillSubcategory}
       {prefillConfidence}
       {prefillDeployment}
+      {prefillRevision}
       on:submit={handleFormSubmit}
       on:classify={handleClassify}
     />
