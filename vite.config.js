@@ -34,6 +34,8 @@ export default defineConfig({
 					'connect-src': [
 						'self',
 						'https://huggingface.co',
+						// Model weights redirect from huggingface.co to the hf.co CDN.
+						'https://*.hf.co',
 						'https://cdn-lfs.huggingface.co',
 						'https://cdn-lfs-us-1.huggingface.co',
 						'https://fonts.googleapis.com',
