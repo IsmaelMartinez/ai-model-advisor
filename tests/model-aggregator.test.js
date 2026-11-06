@@ -692,6 +692,12 @@ describe('ModelAggregator', () => {
       expect(agg.stats.hasSubstantiveChanges).toBe(true);
     });
 
+    test('drops legacy estimated accuracy numbers on refresh', () => {
+      const agg = new ModelAggregator();
+      const model = agg.preserveCuratedFields({ huggingFaceId: 'a/b', accuracy: null }, [{ huggingFaceId: 'a/b', accuracy: 0.75 }]);
+      expect(model.accuracy).toBeNull();
+    });
+
     test('keeps sourced accuracy when the refresh has none', () => {
       const agg = new ModelAggregator();
       const sourced = { metric: 'top-1', value: 0.9, source: 'paper' };

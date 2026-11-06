@@ -899,11 +899,15 @@ export class ModelAggregator {
   preserveCuratedFields(newModel, existingModels) {
     const existing = existingModels.find(m => m.huggingFaceId === newModel.huggingFaceId);
     if (existing) {
-      // accuracy is kept because the Hub cannot supply one: a sourced value must survive a refresh
-      for (const field of ['specialization', 'runtime', 'accuracy']) {
+            for (const field of ['specialization', 'runtime']) {
         if (existing[field] && !newModel[field]) {
           newModel[field] = existing[field];
         }
+      }
+      // Only a sourced {metric, value, source} record counts; legacy bare numbers were
+      // estimated from the model name and are dropped
+      if (existing.accuracy?.source && !newModel.accuracy) {
+        newModel.accuracy = existing.accuracy;
       }
     }
     return newModel;
