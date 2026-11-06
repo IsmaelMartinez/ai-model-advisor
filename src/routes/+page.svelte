@@ -83,9 +83,14 @@
   // The embedding classifier and transformers.js (~52 MB on first use) are only
   // fetched when the visitor opens "Describe your task"; the keyword classifier
   // answers until it is ready.
-  async function loadClassifier() {
-    if (taskClassifier) return;
+  let classifierLoad;
+  function loadClassifier() {
+    // Share one in-flight load, so reopening "Describe your task" never starts a second one
+    classifierLoad ??= startClassifierLoad();
+    return classifierLoad;
+  }
 
+  async function startClassifierLoad() {
     let EmbeddingTaskClassifier;
     try {
       ({ EmbeddingTaskClassifier } = await import(

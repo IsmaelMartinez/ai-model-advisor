@@ -124,34 +124,15 @@ describe('Integration Tests - Real User Scenarios', () => {
 
     test('should implement "smaller is better" logic', () => {
       const models = modelSelector.selectModels('computer_vision', 'image_classification', 5);
-      
-      if (models.length > 1) {
-        // Check tier prioritization
-        const tiers = models.map(m => m.tierPriority);
-        let currentTier = -1;
-        
-        tiers.forEach(tier => {
-          expect(tier).toBeGreaterThanOrEqual(currentTier);
-          currentTier = tier;
-        });
-        
-        // Within same tier, check size ordering
-        const groupedByTier = {};
-        models.forEach(model => {
-          if (!groupedByTier[model.tier]) {
-            groupedByTier[model.tier] = [];
-          }
-          groupedByTier[model.tier].push(model);
-        });
-        
-        Object.values(groupedByTier).forEach(tierModels => {
-          if (tierModels.length > 1) {
-            for (let i = 1; i < tierModels.length; i++) {
-              expect(tierModels[i].sizeMB).toBeGreaterThanOrEqual(tierModels[i-1].sizeMB);
-            }
-          }
-        });
-      }
+
+      // Tier first, then size within the tier, whatever order the data lists them in
+      expect(models.map(m => [m.tier, m.sizeMB])).toEqual([
+        ['lightweight', 20],
+        ['lightweight', 80],
+        ['standard', 1000],
+        ['advanced', 10000],
+        ['xlarge', 40000]
+      ]);
     });
   });
 

@@ -5,20 +5,22 @@
  */
 
 import { version } from '$app/env';
+import { asset } from '$app/paths';
+import { assets, immutable, prerendered } from '$app/manifest';
 
 // One cache per build: the activate step below deletes every older build's cache,
 // so hashed assets from previous deployments are evicted instead of piling up.
 const CACHE_NAME = `model-selector-${version}`;
 
-// Assets to cache on install
-// Note: SvelteKit generates hashed filenames, so we cache dynamically
+// Cache this build's app shell on install, so an update never leaves the app without
+// its bundles when offline. The 26 MB ONNX Runtime wasm is cached on first use instead.
 const PRECACHE_ASSETS = [
-  './',
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png',
-  './favicon.png'
-];
+  ...immutable.map(({ path }) => path),
+  ...prerendered.map(({ path }) => path),
+  ...assets.map(({ path }) => path)
+]
+  .filter((path) => !path.endsWith('.wasm') && !path.endsWith('service-worker.js'))
+  .map((path) => asset(path));
 
 // Install event - cache core assets
 self.addEventListener('install', (event) => {
