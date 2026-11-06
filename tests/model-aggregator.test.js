@@ -141,6 +141,17 @@ describe('ModelAggregator', () => {
         expect(aggregator.estimateModelSize({ id: 'test/tiny' }, { siblings: [{ rfilename: 'model.onnx', size: 200 * 1024 }] })).toBe(1);
       });
 
+      test('sums GGUF shards of one quantization', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'model.Q8_0-00001-of-00002.gguf', size: 400 * MB },
+            { rfilename: 'model.Q8_0-00002-of-00002.gguf', size: 400 * MB },
+            { rfilename: 'model.Q4_K_M.gguf', size: 500 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(800);
+      });
+
       test('counts the largest GGUF quantization, not all of them', () => {
         const detailedInfo = {
           siblings: [
@@ -672,6 +683,34 @@ describe('ModelAggregator', () => {
       expect(merged.models.filter(m => m.tasks.some(t => t.subcategory === 'image_classification'))).toHaveLength(5);
     });
 
+    test('curated runtime metadata and sourced accuracy beat the generated defaults', () => {
+      const curated = { browser: { framework: 'transformers.js', backend: ['wasm', 'webgpu'], tested: true } };
+      const sourced = { metric: 'mAP', value: 0.5, source: 'paper' };
+      const agg = aggregatorWith([
+        model('a/b', 10, [task('image_classification')], { runtime: curated, accuracy: sourced })
+      ]);
+      const generated = { browser: { framework: 'transformers.js', backend: ['wasm'], tested: false } };
+
+      const merged = agg.mergeWithExistingData([model('a/b', 10, [task('image_classification')], { runtime: generated })]);
+
+      expect(merged.models[0].runtime).toEqual(curated);
+      expect(merged.models[0].accuracy).toEqual(sourced);
+    });
+
+    test('a mirror-backed model keeps its browser tag on refresh', () => {
+      const runtime = { browser: { framework: 'transformers.js', backend: ['wasm'], tested: false } };
+      const agg = aggregatorWith([
+        model('a/b', 10, [task('image_classification')], { runtime, browserModelId: 'Xenova/b', deploymentOptions: ['browser', 'edge', 'cloud'] })
+      ]);
+
+      // The native repo has no ONNX framework, so the generated options lack "browser"
+      const merged = agg.mergeWithExistingData([model('a/b', 12, [task('image_classification')], { deploymentOptions: ['edge', 'cloud'] })]);
+
+      expect(merged.models[0].deploymentOptions).toContain('browser');
+      expect(merged.models[0].runtime).toEqual(runtime);
+      expect(merged.models[0].browserModelId).toBe('Xenova/b');
+    });
+
     test('does not bump lastUpdated when nothing changed', () => {
       const existing = model('a/b', 10, [task('image_classification')]);
       const agg = aggregatorWith([existing]);
@@ -680,6 +719,14 @@ describe('ModelAggregator', () => {
 
       expect(agg.stats.hasSubstantiveChanges).toBe(false);
       expect(merged.lastUpdated).toBe('2026-01-01');
+    });
+
+    test('ignores field order when deciding whether a model changed', () => {
+      const agg = new ModelAggregator();
+      const old = { models: [{ huggingFaceId: 'a/b', sizeMB: 1, name: 'n', runtime: { x: 1, y: 2 } }] };
+      const next = { models: [{ name: 'n', runtime: { y: 2, x: 1 }, sizeMB: 1, huggingFaceId: 'a/b' }] };
+
+      expect(agg.summarizeChanges(old, next).updated).toEqual([]);
     });
 
     test('summarizes added, removed, updated and resized models', () => {
