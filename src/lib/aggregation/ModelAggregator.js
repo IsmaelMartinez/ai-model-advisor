@@ -10,10 +10,23 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Bytes per element for the dtypes reported in safetensors.parameters
+const DTYPE_BYTES = {
+  F64: 8, I64: 8, U64: 8,
+  F32: 4, I32: 4, U32: 4,
+  BF16: 2, F16: 2, I16: 2, U16: 2,
+  F8_E4M3: 1, F8_E5M2: 1, I8: 1, U8: 1, BOOL: 1
+};
+
+// Fail the run when more than this share of Hugging Face requests fail after retries
+const MAX_FAILURE_RATE = 0.1;
+const MAX_RETRIES = 5;
+
 export class ModelAggregator {
   constructor(options = {}) {
     this.huggingFaceToken = options.huggingFaceToken || process.env.HF_TOKEN;
     this.dataPath = options.dataPath || join(__dirname, '../data');
+    this.retryBaseDelayMs = options.retryBaseDelayMs ?? 2000;
     this.sources = {
       huggingface: true,
       papersWithCode: options.includePapersWithCode || false
@@ -29,6 +42,8 @@ export class ModelAggregator {
       added: 0,
       updated: 0,
       errors: 0,
+      requests: 0,
+      failedRequests: 0,
       startTime: null
     };
   }
@@ -84,6 +99,7 @@ export class ModelAggregator {
       console.log('🔄 Processing and categorizing models...');
       const processedModels = await this.processModels(hfModels, config);
       console.log(`   Processed ${processedModels.length} models\n`);
+      this.assertFailureRateAcceptable();
 
       // Step 3: Organize into tiers
       console.log('📊 Organizing models into performance tiers...');
@@ -93,6 +109,9 @@ export class ModelAggregator {
       // Step 4: Validate and merge with existing data
       console.log('✅ Validating and merging with existing dataset...');
       const mergedData = this.mergeWithExistingData(tieredModels, config);
+
+      const changes = this.summarizeChanges(this.currentModels, mergedData);
+      this.stats.updated = changes.updated.length;
 
       // Step 5: Save updated dataset (if not dry run AND has substantive changes)
       if (!config.dryRun) {
@@ -113,6 +132,7 @@ export class ModelAggregator {
       return {
         success: true,
         stats: this.stats,
+        changes,
         data: mergedData
       };
 
@@ -224,18 +244,66 @@ export class ModelAggregator {
       url.searchParams.set(key, value);
     }
 
-    const headers = {};
-    if (this.huggingFaceToken) {
-      headers['Authorization'] = `Bearer ${this.huggingFaceToken}`;
-    }
-
-    const response = await fetch(url, { headers });
+    const response = await this.fetchFromHF(url);
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     return await response.json();
+  }
+
+  /**
+   * Fetch a Hugging Face API URL, retrying 429 and 5xx responses with backoff.
+   * Returns the final response; network errors and exhausted retries count
+   * towards the failure rate checked by assertFailureRateAcceptable().
+   * A 404 is a valid answer (model gone) and is not counted as a failure.
+   */
+  async fetchFromHF(url) {
+    const headers = {};
+    if (this.huggingFaceToken) {
+      headers['Authorization'] = `Bearer ${this.huggingFaceToken}`;
+    }
+
+    this.stats.requests++;
+    let response;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        response = await fetch(url, { headers });
+      } catch (error) {
+        this.stats.failedRequests++;
+        throw error;
+      }
+
+      const retryable = response.status === 429 || response.status >= 500;
+      if (!retryable) break;
+      if (attempt === MAX_RETRIES) break;
+
+      const retryAfterSec = Number(response.headers?.get?.('retry-after'));
+      const delay = Number.isFinite(retryAfterSec) && retryAfterSec > 0
+        ? retryAfterSec * 1000
+        : this.retryBaseDelayMs * 2 ** attempt;
+      await this.sleep(delay);
+    }
+
+    if (!response.ok && response.status !== 404) {
+      this.stats.failedRequests++;
+    }
+    return response;
+  }
+
+  /**
+   * Throw when too many Hugging Face requests failed, so a rate-limited run
+   * cannot report success with a silently degraded dataset.
+   */
+  assertFailureRateAcceptable() {
+    const { requests, failedRequests } = this.stats;
+    if (requests > 0 && failedRequests / requests > MAX_FAILURE_RATE) {
+      throw new Error(
+        `${failedRequests} of ${requests} Hugging Face requests failed (limit ${MAX_FAILURE_RATE * 100}%). ` +
+        'Set HF_TOKEN to raise the rate limit.'
+      );
+    }
   }
 
   /**
@@ -279,21 +347,12 @@ export class ModelAggregator {
    * Get detailed model information from Hugging Face
    */
   async getDetailedModelInfo(modelId) {
-    try {
-      const url = `https://huggingface.co/api/models/${modelId}`;
-      const headers = {};
-      
-      if (this.huggingFaceToken) {
-        headers['Authorization'] = `Bearer ${this.huggingFaceToken}`;
-      }
+    // blobs=true adds file sizes to the siblings list
+    const url = `https://huggingface.co/api/models/${modelId}?blobs=true`;
 
-      const response = await fetch(url, { headers });
-      
-      if (response.ok) {
-        return await response.json();
-      }
-      
-      return null;
+    try {
+      const response = await this.fetchFromHF(url);
+      return response.ok ? await response.json() : null;
     } catch (error) {
       return null;
     }
@@ -493,36 +552,37 @@ export class ModelAggregator {
 
   /**
    * Estimate model size in MB based on file sizes or parameter count
-   * Priority: siblings file sizes > safetensors params > name pattern > heuristics
+   * Priority: weight file sizes (needs ?blobs=true) > safetensors dtype sizes > name pattern > heuristics
    */
   estimateModelSize(rawModel, detailedInfo) {
-    // 1. Sum siblings file sizes (MOST ACCURATE)
-    // The siblings array contains actual file info with sizes in bytes
-    if (detailedInfo?.siblings) {
-      const modelFiles = detailedInfo.siblings.filter(f => 
-        f.rfilename?.endsWith('.safetensors') || 
-        f.rfilename?.endsWith('.bin') ||
-        f.rfilename?.endsWith('.onnx')
-      );
-      if (modelFiles.length > 0) {
-        const totalBytes = modelFiles.reduce((sum, f) => sum + (f.size || 0), 0);
-        if (totalBytes > 0) {
-          return Math.round(totalBytes / (1024 * 1024));
-        }
+    // 1. Weight file sizes from siblings (MOST ACCURATE)
+    // Formats are alternative copies of the same weights, so count only one:
+    // safetensors, else .bin, else the largest single .onnx (a repo lists many variants).
+    const files = (detailedInfo?.siblings || []).filter(f => f.size > 0);
+    const sizes = ext => files.filter(f => f.rfilename?.endsWith(ext)).map(f => f.size);
+    const sum = list => list.reduce((total, size) => total + size, 0);
+    const totalBytes =
+      sum(sizes('.safetensors')) || sum(sizes('.bin')) || Math.max(0, ...sizes('.onnx'));
+    if (totalBytes > 0) {
+      return Math.round(totalBytes / (1024 * 1024));
+    }
+
+    // 2. Safetensors parameter counts per dtype (safetensors.total is a bare count
+    // and unreliable, e.g. 664944 for a 35B model whose BF16 count is 35107181936)
+    const byDtype = detailedInfo?.safetensors?.parameters;
+    if (byDtype) {
+      let bytes = 0;
+      for (const [dtype, count] of Object.entries(byDtype)) {
+        if (DTYPE_BYTES[dtype]) bytes += count * DTYPE_BYTES[dtype];
+      }
+      if (bytes > 0) {
+        return Math.round(bytes / (1024 * 1024));
       }
     }
 
-    // 2. Use safetensors param count (NOTE: safetensors.total is PARAMS, not bytes!)
-    // Estimate ~2 bytes per param for fp16 quantization
+    // 3. Only a bare total: assume fp16 (2 bytes per param)
     if (detailedInfo?.safetensors?.total) {
-      const params = detailedInfo.safetensors.total;
-      return Math.round((params * 2) / (1024 * 1024)); // fp16: 2 bytes per param
-    }
-
-    // 3. Try safetensors.parameters.total as alternative param source
-    if (detailedInfo?.safetensors?.parameters?.total) {
-      const params = detailedInfo.safetensors.parameters.total;
-      return Math.round((params * 2) / (1024 * 1024)); // fp16: 2 bytes per param
+      return Math.round((detailedInfo.safetensors.total * 2) / (1024 * 1024));
     }
 
     // 4. Try to extract parameter count from model name (e.g., "7b", "70b", "1.3b")
@@ -685,18 +745,11 @@ export class ModelAggregator {
   }
 
   /**
-   * Extract accuracy metrics (simplified)
+   * Accuracy is not available from the Hub API, so record it as unknown
+   * rather than inventing a value from the model name.
    */
-  extractAccuracy(rawModel, detailedInfo) {
-    // This would be more sophisticated in production
-    // For now, return a reasonable estimate based on model characteristics
-    const modelName = rawModel.id.toLowerCase();
-    
-    if (modelName.includes('large')) return 0.85;
-    if (modelName.includes('base')) return 0.78;
-    if (modelName.includes('small') || modelName.includes('mobile')) return 0.72;
-    
-    return 0.75; // Default
+  extractAccuracy() {
+    return null;
   }
 
   /**
@@ -766,45 +819,88 @@ export class ModelAggregator {
   }
 
   /**
-   * Remove duplicate models based on huggingFaceId
-   * Preserves curated fields (specialization) from existing models
+   * Remove duplicate models based on huggingFaceId.
+   * Later entries win, so fresh Hub data (listed after the existing copy)
+   * replaces the stale entry; preserveCuratedFields() has already carried the
+   * curated fields over.
    */
   deduplicateModels(models) {
-    const seen = new Map(); // Map huggingFaceId -> model with curated fields
-    const result = [];
-    
+    const byId = new Map();
     for (const model of models) {
-      if (seen.has(model.huggingFaceId)) {
-        // Model already exists - preserve curated fields from first occurrence
-        const existing = seen.get(model.huggingFaceId);
-        
-        // If the new model has updated data but existing has specialization, merge them
-        if (existing.specialization && !model.specialization) {
-          // Keep existing specialization on the model we already have
-          continue;
-        }
-      } else {
-        seen.set(model.huggingFaceId, model);
-        result.push(model);
-      }
+      byId.set(model.huggingFaceId, model);
     }
-    
-    return result;
+    return [...byId.values()];
   }
 
   /**
    * Preserve curated fields when merging models
-   * Curated fields: specialization (manually assigned based on research)
+   * Curated fields: specialization and runtime (manually assigned based on research)
    */
   preserveCuratedFields(newModel, existingModels) {
     const existing = existingModels.find(m => m.huggingFaceId === newModel.huggingFaceId);
     if (existing) {
-      // Preserve manually curated fields
-      if (existing.specialization && !newModel.specialization) {
-        newModel.specialization = existing.specialization;
+      for (const field of ['specialization', 'runtime']) {
+        if (existing[field] && !newModel[field]) {
+          newModel[field] = existing[field];
+        }
       }
     }
     return newModel;
+  }
+
+  /**
+   * Compare two datasets by huggingFaceId and list what was added, removed,
+   * refreshed (any field other than lastUpdated changed) and resized.
+   */
+  summarizeChanges(oldData, newData) {
+    const index = data => {
+      const byId = new Map();
+      for (const subcategories of Object.values(data?.models || {})) {
+        for (const tiers of Object.values(subcategories)) {
+          for (const models of Object.values(tiers)) {
+            for (const model of models) byId.set(model.huggingFaceId, model);
+          }
+        }
+      }
+      return byId;
+    };
+    const comparable = ({ lastUpdated, ...rest }) => JSON.stringify(rest);
+
+    const before = index(oldData);
+    const after = index(newData);
+    const summary = { added: [], removed: [], updated: [], sizeChanged: [] };
+
+    for (const [id, model] of after) {
+      const old = before.get(id);
+      if (!old) {
+        summary.added.push({ id, sizeMB: model.sizeMB });
+        continue;
+      }
+      if (comparable(old) !== comparable(model)) summary.updated.push(id);
+      if (old.sizeMB !== model.sizeMB) {
+        summary.sizeChanged.push({ id, from: old.sizeMB, to: model.sizeMB });
+      }
+    }
+    for (const id of before.keys()) {
+      if (!after.has(id)) summary.removed.push(id);
+    }
+    return summary;
+  }
+
+  /**
+   * Render the change summary as markdown for the pull request body
+   */
+  formatChangeSummary(summary) {
+    const section = (title, items) =>
+      items.length ? `\n### ${title} (${items.length})\n${items.map(i => `- ${i}`).join('\n')}\n` : '';
+
+    return [
+      '## Automated model dataset update',
+      `\nRefreshed ${summary.updated.length} existing models.`,
+      section('Added', summary.added.map(m => `\`${m.id}\` (${m.sizeMB} MB)`)),
+      section('Removed', summary.removed.map(id => `\`${id}\``)),
+      section('Size changes', summary.sizeChanged.map(c => `\`${c.id}\`: ${c.from} MB to ${c.to} MB`))
+    ].join('\n');
   }
 
   /**

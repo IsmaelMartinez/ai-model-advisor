@@ -6,6 +6,7 @@
  */
 
 import ModelAggregator from './ModelAggregator.js';
+import { writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -20,6 +21,7 @@ function parseArgs() {
     maxModelsPerCategory: 10,
     includeUpdated: true,
     validateAccuracy: true,
+    summaryPath: null,
     help: false
   };
 
@@ -32,6 +34,9 @@ function parseArgs() {
         break;
       case '--max-models':
         options.maxModelsPerCategory = parseInt(args[++i]) || 10;
+        break;
+      case '--summary':
+        options.summaryPath = args[++i];
         break;
       case '--no-validation':
         options.validateAccuracy = false;
@@ -60,6 +65,7 @@ Usage: node src/lib/aggregation/cli.js [options]
 Options:
   --dry-run              Run without saving changes
   --max-models N         Maximum models per category (default: 10)
+  --summary FILE         Write a markdown summary of added/removed/resized models
   --no-validation        Skip accuracy validation
   --help, -h             Show this help message
 
@@ -109,6 +115,10 @@ async function main() {
 
     if (result.success) {
       console.log('✅ Aggregation completed successfully!');
+
+      if (options.summaryPath) {
+        writeFileSync(options.summaryPath, aggregator.formatChangeSummary(result.changes));
+      }
 
       // Check if there were substantive changes
       const hasChanges = result.stats?.hasSubstantiveChanges;
