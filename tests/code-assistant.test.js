@@ -260,9 +260,11 @@ describe('Code Assistant Classification Tests', () => {
           expect(model).toHaveProperty('frameworks');
 
           expect(typeof model.sizeMB).toBe('number');
-          expect(typeof model.accuracy).toBe('number');
-          expect(model.accuracy).toBeGreaterThan(0);
-          expect(model.accuracy).toBeLessThanOrEqual(1);
+          // null means unknown; a numeric accuracy must be a valid fraction
+          if (model.accuracy !== null) {
+            expect(model.accuracy).toBeGreaterThan(0);
+            expect(model.accuracy).toBeLessThanOrEqual(1);
+          }
         });
       });
     });

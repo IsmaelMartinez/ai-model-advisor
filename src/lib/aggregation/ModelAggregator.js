@@ -22,6 +22,13 @@ const DTYPE_BYTES = {
 const MAX_FAILURE_RATE = 0.1;
 const MAX_RETRIES = 5;
 
+// JSON with sorted object keys, so equal models compare equal whatever their field order
+const canonical = value => JSON.stringify(value, (key, val) =>
+  val && typeof val === 'object' && !Array.isArray(val)
+    ? Object.fromEntries(Object.entries(val).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
+    : val
+);
+
 export class ModelAggregator {
   constructor(options = {}) {
     this.huggingFaceToken = options.huggingFaceToken || process.env.HF_TOKEN;
@@ -486,6 +493,7 @@ export class ModelAggregator {
                 const fresh = models.find(m => m.huggingFaceId === old.huggingFaceId);
                 this.preserveCuratedFields(fresh, [old]);
               });
+              if (stale.length > 0) hasSubstantiveChanges = true;
               merged.models[category][subcategory][otherTier] =
                 otherModels.filter(m => !moving.includes(m.huggingFaceId));
             }
@@ -558,7 +566,7 @@ export class ModelAggregator {
       delete oldWithoutTimestamp.lastUpdated;
       delete newWithoutTimestamp.lastUpdated;
 
-      if (JSON.stringify(oldWithoutTimestamp) !== JSON.stringify(newWithoutTimestamp)) {
+      if (canonical(oldWithoutTimestamp) !== canonical(newWithoutTimestamp)) {
         return true;
       }
     }
@@ -673,7 +681,9 @@ export class ModelAggregator {
         const precision = rfilename.slice(0, onnxAt).match(/_(?:fp16|q4f16|q4|int8|uint8|quantized|bnb4)$/)?.[0] ?? '';
         variants.set(precision, (variants.get(precision) || 0) + size);
       } else if (rfilename.endsWith('.gguf')) {
-        variants.set(rfilename, size);
+        // Split files (model.Q8_0-00001-of-00002.gguf) are shards of one quantization
+        const quantization = rfilename.replace(/-\d{5}-of-\d{5}(?=\.gguf$)/, '');
+        variants.set(quantization, (variants.get(quantization) || 0) + size);
       }
     }
     return [...variants.values()];
@@ -889,7 +899,8 @@ export class ModelAggregator {
   preserveCuratedFields(newModel, existingModels) {
     const existing = existingModels.find(m => m.huggingFaceId === newModel.huggingFaceId);
     if (existing) {
-      for (const field of ['specialization', 'runtime']) {
+      // accuracy is kept because the Hub cannot supply one: a sourced value must survive a refresh
+      for (const field of ['specialization', 'runtime', 'accuracy']) {
         if (existing[field] && !newModel[field]) {
           newModel[field] = existing[field];
         }
@@ -903,32 +914,42 @@ export class ModelAggregator {
    * refreshed (any field other than lastUpdated changed) and resized.
    */
   summarizeChanges(oldData, newData) {
+    // A Hub id can appear under several tasks, so keep every occurrence
     const index = data => {
       const byId = new Map();
       for (const subcategories of Object.values(data?.models || {})) {
         for (const tiers of Object.values(subcategories)) {
           for (const models of Object.values(tiers)) {
-            for (const model of models) byId.set(model.huggingFaceId, model);
+            for (const model of models) {
+              if (!byId.has(model.huggingFaceId)) byId.set(model.huggingFaceId, []);
+              byId.get(model.huggingFaceId).push(model);
+            }
           }
         }
       }
       return byId;
     };
-    const comparable = ({ lastUpdated, ...rest }) => JSON.stringify(rest);
+    const comparable = ({ lastUpdated, ...rest }) => canonical(rest);
 
     const before = index(oldData);
     const after = index(newData);
     const summary = { added: [], removed: [], updated: [], sizeChanged: [] };
 
-    for (const [id, model] of after) {
-      const old = before.get(id);
-      if (!old) {
-        summary.added.push({ id, sizeMB: model.sizeMB });
+    for (const [id, models] of after) {
+      const olds = before.get(id);
+      if (!olds) {
+        summary.added.push({ id, sizeMB: models[0].sizeMB });
         continue;
       }
-      if (comparable(old) !== comparable(model)) summary.updated.push(id);
-      if (old.sizeMB !== model.sizeMB) {
-        summary.sizeChanged.push({ id, from: old.sizeMB, to: model.sizeMB });
+      const oldForms = new Set(olds.map(comparable));
+      if (models.some(model => !oldForms.has(comparable(model)))) summary.updated.push(id);
+
+      const oldSizes = new Set(olds.map(m => m.sizeMB));
+      const newSizes = new Set(models.map(m => m.sizeMB));
+      const from = [...oldSizes].find(size => !newSizes.has(size));
+      const to = [...newSizes].find(size => !oldSizes.has(size));
+      if (from !== undefined || to !== undefined) {
+        summary.sizeChanged.push({ id, from: from ?? [...oldSizes][0], to: to ?? [...newSizes][0] });
       }
     }
     for (const id of before.keys()) {

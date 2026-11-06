@@ -140,6 +140,17 @@ describe('ModelAggregator', () => {
         expect(aggregator.estimateModelSize({ id: 'test/tiny' }, { siblings: [{ rfilename: 'model.onnx', size: 200 * 1024 }] })).toBe(1);
       });
 
+      test('sums GGUF shards of one quantization', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'model.Q8_0-00001-of-00002.gguf', size: 400 * MB },
+            { rfilename: 'model.Q8_0-00002-of-00002.gguf', size: 400 * MB },
+            { rfilename: 'model.Q4_K_M.gguf', size: 500 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(800);
+      });
+
       test('counts the largest GGUF quantization, not all of them', () => {
         const detailedInfo = {
           siblings: [
@@ -642,6 +653,50 @@ describe('ModelAggregator', () => {
       expect(agg.summarizeChanges(agg.currentModels, merged).sizeChanged).toEqual([
         { id: 'a/b', from: 1, to: 66000 }
       ]);
+    });
+
+    test('ignores field order and sees an update on any copy of a model listed under several tasks', () => {
+      const agg = new ModelAggregator();
+      const copy = (sub, size, extra = {}) => ({ huggingFaceId: 'a/b', sizeMB: size, name: 'n', ...extra });
+      const old = { models: { cat: { t1: { lightweight: [copy('t1', 1)] }, t2: { lightweight: [copy('t2', 1)] } } } };
+      const next = {
+        models: {
+          cat: {
+            t1: { xlarge: [{ name: 'n', sizeMB: 900, huggingFaceId: 'a/b' }] },
+            t2: { lightweight: [{ name: 'n', sizeMB: 1, huggingFaceId: 'a/b' }] } // stale copy, same content, other key order
+          }
+        }
+      };
+
+      const summary = agg.summarizeChanges(old, next);
+
+      expect(summary.updated).toEqual(['a/b']);
+      expect(summary.sizeChanged).toEqual([{ id: 'a/b', from: 1, to: 900 }]);
+      expect(agg.summarizeChanges(old, old).updated).toEqual([]);
+    });
+
+    test('a cross-tier removal counts as a substantive change even if the new copy misses the cutoff', () => {
+      const agg = new ModelAggregator({ dataPath: '/nonexistent' });
+      const stale = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 1 };
+      const full = [1, 2, 3, 4, 5].map(i => ({ id: `x${i}`, huggingFaceId: `x/${i}`, sizeMB: 1, specialization: 'k' }));
+      agg.currentModels = {
+        lastUpdated: '2026-01-01',
+        models: { cat: { sub: { lightweight: [stale], standard: [], advanced: [], xlarge: full } } }
+      };
+
+      agg.mergeWithExistingData(
+        { cat: { sub: { lightweight: [], standard: [], advanced: [], xlarge: [{ id: 'a_b', huggingFaceId: 'a/b', sizeMB: 66000 }] } } },
+        {}
+      );
+
+      expect(agg.stats.hasSubstantiveChanges).toBe(true);
+    });
+
+    test('keeps sourced accuracy when the refresh has none', () => {
+      const agg = new ModelAggregator();
+      const sourced = { metric: 'top-1', value: 0.9, source: 'paper' };
+      const model = agg.preserveCuratedFields({ huggingFaceId: 'a/b', accuracy: null }, [{ huggingFaceId: 'a/b', accuracy: sourced }]);
+      expect(model.accuracy).toEqual(sourced);
     });
 
     test('summarizes added, removed, updated and resized models', () => {
