@@ -1,24 +1,30 @@
 /**
- * Service Worker for AI Model Selector PWA
- * Caches static assets for offline access
+ * Service Worker for AI Model Advisor PWA
+ * Caches same-origin assets for offline access
  * Compatible with SvelteKit static adapter and GitHub Pages deployment
  */
 
-const CACHE_NAME = 'model-selector-v2';
+import { version } from '$app/env';
+import { asset } from '$app/paths';
+import { assets, immutable, prerendered } from '$app/manifest';
 
-// Assets to cache on install
-// Note: SvelteKit generates hashed filenames, so we cache dynamically
+// One cache per build: the activate step below deletes every older build's cache,
+// so hashed assets from previous deployments are evicted instead of piling up.
+const CACHE_NAME = `model-selector-${version}`;
+
+// Cache this build's app shell on install, so an update never leaves the app without
+// its bundles when offline. The 26 MB ONNX Runtime wasm is cached on first use instead.
 const PRECACHE_ASSETS = [
-  './',
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png',
-  './favicon.png'
-];
+  ...immutable.map(({ path }) => path),
+  ...prerendered.map(({ path }) => path),
+  ...assets.map(({ path }) => path)
+]
+  .filter((path) => !path.endsWith('.wasm') && !path.endsWith('service-worker.js'))
+  .map((path) => asset(path));
 
 // Install event - cache core assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker v2...');
+  console.log('[SW] Installing service worker', version);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -35,7 +41,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker v2...');
+  console.log('[SW] Activating service worker', version);
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
@@ -67,8 +73,7 @@ self.addEventListener('fetch', (event) => {
   // - Analytics/tracking
   const hostname = url.hostname;
   const isHost = (host) => hostname === host || hostname.endsWith('.' + host);
-  if (isHost('huggingface.co') ||
-      isHost('jsdelivr.net')) {
+  if (isHost('huggingface.co') || isHost('hf.co')) {
     return;
   }
 

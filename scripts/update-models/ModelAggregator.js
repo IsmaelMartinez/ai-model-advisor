@@ -1,12 +1,12 @@
 /**
  * Model Metadata Aggregation System
- * Aggregates model information from multiple sources for quarterly updates
+ * Fetches model information from the Hugging Face Hub and merges it into models.json
  */
 
 import { readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { tierForSize } from '../data/constants.js';
+import { tierForSize } from '../../src/lib/data/constants.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,16 +34,11 @@ const canonical = value => JSON.stringify(value, (key, val) =>
 export class ModelAggregator {
   constructor(options = {}) {
     this.huggingFaceToken = options.huggingFaceToken || process.env.HF_TOKEN;
-    this.dataPath = options.dataPath || join(__dirname, '../data');
+    this.dataPath = options.dataPath || join(__dirname, '../../src/lib/data');
     this.retryBaseDelayMs = options.retryBaseDelayMs ?? 2000;
-    this.sources = {
-      huggingface: true,
-      papersWithCode: options.includePapersWithCode || false
-    };
-    
+
     // Load current data
     this.currentModels = this.loadCurrentModels();
-    this.currentTasks = this.loadCurrentTasks();
     
     // Aggregation statistics
     this.stats = {
@@ -71,29 +66,13 @@ export class ModelAggregator {
   }
 
   /**
-   * Load current tasks.json file
-   */
-  loadCurrentTasks() {
-    try {
-      const tasksPath = join(this.dataPath, 'tasks.json');
-      return JSON.parse(readFileSync(tasksPath, 'utf8'));
-    } catch (error) {
-      console.warn('⚠️ Could not load current tasks.json');
-      return null;
-    }
-  }
-
-  /**
-   * Main aggregation method - updates model dataset from multiple sources
+   * Main aggregation method - updates the model dataset from the Hugging Face Hub
    */
   async aggregateModels(options = {}) {
     console.log('🚀 Starting model metadata aggregation...\n');
     this.stats.startTime = Date.now();
 
     const config = {
-      maxModelsPerCategory: options.maxModelsPerCategory || 10,
-      includeUpdated: options.includeUpdated || true,
-      validateAccuracy: options.validateAccuracy || true,
       dryRun: options.dryRun || false,
       categories: options.categories || this.getDefaultCategories()
     };
@@ -106,7 +85,7 @@ export class ModelAggregator {
 
       // Step 2: Process and categorize models
       console.log('🔄 Processing and categorizing models...');
-      const processedModels = await this.processModels(hfModels, config);
+      const processedModels = await this.processModels(hfModels);
       console.log(`   Processed ${processedModels.length} models\n`);
       this.assertFailureRateAcceptable();
 
@@ -303,7 +282,7 @@ export class ModelAggregator {
   /**
    * Process raw models into our standardized format
    */
-  async processModels(rawModels, config) {
+  async processModels(rawModels) {
     const processed = [];
 
     for (const rawModel of rawModels) {

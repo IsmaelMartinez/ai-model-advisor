@@ -2,7 +2,7 @@
 
 /**
  * CLI for Model Metadata Aggregation
- * Usage: node src/lib/aggregation/cli.js [options]
+ * Usage: node scripts/update-models/cli.js [options]
  */
 
 import ModelAggregator from './ModelAggregator.js';
@@ -18,9 +18,6 @@ function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
     dryRun: false,
-    maxModelsPerCategory: 10,
-    includeUpdated: true,
-    validateAccuracy: true,
     summaryPath: null,
     help: false
   };
@@ -32,14 +29,8 @@ function parseArgs() {
       case '--dry-run':
         options.dryRun = true;
         break;
-      case '--max-models':
-        options.maxModelsPerCategory = parseInt(args[++i]) || 10;
-        break;
       case '--summary':
         options.summaryPath = args[++i];
-        break;
-      case '--no-validation':
-        options.validateAccuracy = false;
         break;
       case '--help':
       case '-h':
@@ -60,13 +51,11 @@ function showHelp() {
   console.log(`
 Model Metadata Aggregation CLI
 
-Usage: node src/lib/aggregation/cli.js [options]
+Usage: node scripts/update-models/cli.js [options]
 
 Options:
   --dry-run              Run without saving changes
-  --max-models N         Maximum models per category (default: 10)
   --summary FILE         Write a markdown summary of added/removed/resized models
-  --no-validation        Skip accuracy validation
   --help, -h             Show this help message
 
 Environment Variables:
@@ -74,13 +63,10 @@ Environment Variables:
 
 Examples:
   # Dry run to preview changes
-  node src/lib/aggregation/cli.js --dry-run
+  node scripts/update-models/cli.js --dry-run
 
   # Update with API token
-  HF_TOKEN=your_token node src/lib/aggregation/cli.js
-
-  # Limit to 5 models per category
-  node src/lib/aggregation/cli.js --max-models 5
+  HF_TOKEN=your_token node scripts/update-models/cli.js
 `);
 }
 
@@ -107,7 +93,7 @@ async function main() {
     // Initialize aggregator
     const aggregator = new ModelAggregator({
       huggingFaceToken: process.env.HF_TOKEN,
-      dataPath: join(__dirname, '../data')
+      dataPath: join(__dirname, '../../src/lib/data')
     });
 
     // Run aggregation

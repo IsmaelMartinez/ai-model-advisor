@@ -14,15 +14,6 @@
    * @property {string} tier - Performance tier
    */
 
-  /**
-   * @typedef {Object} EnsembleInfo
-   * @property {string} method - Classification method used
-   * @property {number} votes - Number of votes for winner
-   * @property {number} total - Total number of votes
-   * @property {number} confidence - Confidence score (0-1)
-   * @property {Array<{text: string, category: string, similarity: string}>} similarExamples
-   */
-
   /** @type {Model[]} */
   export let recommendations = [];
   
@@ -34,9 +25,6 @@
   
   /** @type {boolean} */
   export let isLoading = false;
-
-  /** @type {EnsembleInfo|null} */
-  export let ensembleInfo = null;
 
   /** @type {Object|null} */
   export let tasksData = null;
@@ -166,16 +154,6 @@
             {formatCategory(taskSubcategory)}
           {/if}
         </p>
-      </div>
-
-      <div class="results-meta">
-        {#if ensembleInfo && ensembleInfo.votes !== undefined}
-          <div class="meta-badge ensemble">
-            <span class="meta-icon">🎯</span>
-            <span>{ensembleInfo.votes}/{ensembleInfo.total} examples agree ({(ensembleInfo.confidence * 100).toFixed(0)}%)</span>
-          </div>
-        {/if}
-
       </div>
     </div>
 
@@ -379,26 +357,6 @@
 
   .task-badge .arrow {
     opacity: 0.5;
-  }
-
-  .results-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .meta-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.75rem;
-    border-radius: 8px;
-    font-size: 0.75rem;
-  }
-
-  .meta-badge.ensemble {
-    background: rgba(139, 92, 246, 0.15);
-    color: #a78bfa;
   }
 
   .efficiency-banner {

@@ -8,16 +8,14 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "update-models": "node src/lib/aggregation/cli.js",
-    "update-models:dry-run": "node src/lib/aggregation/cli.js --dry-run",
-    "generate-icons": "node scripts/generate-icons.js",
+    "update-models": "node scripts/update-models/cli.js",
+    "update-models:dry-run": "node scripts/update-models/cli.js --dry-run",
     "precompute-embeddings": "node scripts/precompute-embeddings.js"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.2"
   },
   "devDependencies": {
-    "@resvg/resvg-js": "^2.6.2",
     "@sveltejs/adapter-static": "^4.0.1",
     "@sveltejs/kit": "^3.1.1",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",

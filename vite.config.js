@@ -17,6 +17,8 @@ export default defineConfig({
 				// Base path for GitHub Pages deployment
 				base: process.env.NODE_ENV === 'production' ? '/ai-model-advisor' : ''
 			},
+			// The service worker (src/service-worker.js) is registered from +layout.svelte
+			serviceWorker: { register: false },
 			// Content Security Policy. Managed by SvelteKit (hash mode) so that the
 			// framework's own inline hydration script is allowlisted by hash rather
 			// than by opening up `script-src` to all inline scripts. This keeps
@@ -37,15 +39,13 @@ export default defineConfig({
 						// Model weights redirect from huggingface.co to the hf.co CDN.
 						'https://*.hf.co',
 						'https://cdn-lfs.huggingface.co',
-						'https://cdn-lfs-us-1.huggingface.co',
-						'https://fonts.googleapis.com',
-						'https://fonts.gstatic.com'
+						'https://cdn-lfs-us-1.huggingface.co'
 					],
 					// 'unsafe-inline' stays only for styles: dynamic inline style
 					// attributes (e.g. progress-bar width) require it and inline
 					// styles are not a script-execution vector.
-					'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
-					'font-src': ['self', 'data:', 'https://fonts.gstatic.com'],
+					'style-src': ['self', 'unsafe-inline'],
+					'font-src': ['self', 'data:'],
 					'img-src': ['self', 'data:', 'blob:'],
 					'worker-src': ['self', 'blob:'],
 					'child-src': ['self', 'blob:'],

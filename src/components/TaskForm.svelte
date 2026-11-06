@@ -104,6 +104,11 @@
     });
   }
 
+  function toggleTextInput() {
+    showTextInput = !showTextInput;
+    if (showTextInput) dispatch('assistopen');
+  }
+
   function handleKeydown(event) {
     if (event.ctrlKey && event.key === 'Enter') {
       handleSubmit(event);
@@ -134,7 +139,7 @@
     <button
       type="button"
       class="toggle-text"
-      on:click={() => showTextInput = !showTextInput}
+      on:click={toggleTextInput}
       aria-expanded={showTextInput}
     >
       {#if showTextInput}

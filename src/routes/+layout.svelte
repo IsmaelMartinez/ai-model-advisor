@@ -6,7 +6,7 @@
   onMount(() => {
     if (browser && 'serviceWorker' in navigator) {
       // Resolve the service worker URL against the base path
-      const swPath = asset('sw.js');
+      const swPath = asset('service-worker.js');
 
       // Register service worker for PWA functionality
       navigator.serviceWorker.register(swPath)
