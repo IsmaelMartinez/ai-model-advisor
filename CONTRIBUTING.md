@@ -46,8 +46,8 @@ in GitHub under **Settings → Branches → Branch protection rules**:
 - Add examples and tutorials
 - Fix typos and clarify instructions
 
-### Decision Graph
-- Add new model recommendations
+### Model data
+- Add or update models (see docs/model-data.md)
 - Update existing model information
 - Improve categorization logic
 

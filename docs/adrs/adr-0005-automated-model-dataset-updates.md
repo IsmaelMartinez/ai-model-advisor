@@ -115,8 +115,7 @@ npm run update-models:dry-run
 ## Related Documents
 
 - [Auto Update Strategy](../auto-update-strategy.md) - Detailed operational documentation
-- [Model Curation Process](../model-curation-process.md) - Data collection details
-- [Quick Start Guide](../quick-start-auto-updates.md) - Setup instructions
+- [Model data and updates](../model-data.md) - Schema, curation and the weekly update workflow
 
 ---
 
