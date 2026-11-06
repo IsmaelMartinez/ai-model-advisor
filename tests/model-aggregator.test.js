@@ -697,6 +697,14 @@ describe('ModelAggregator', () => {
       expect(merged.models[0].accuracy).toEqual(sourced);
     });
 
+    test('drops legacy estimated accuracy numbers on refresh', () => {
+      const agg = aggregatorWith([model('a/b', 10, [task('image_classification')], { accuracy: 0.75 })]);
+
+      const merged = agg.mergeWithExistingData([model('a/b', 10, [task('image_classification')])]);
+
+      expect(merged.models[0].accuracy).toBeNull();
+    });
+
     test('a mirror-backed model keeps its browser tag on refresh', () => {
       const runtime = { browser: { framework: 'transformers.js', backend: ['wasm'], tested: false } };
       const agg = aggregatorWith([
@@ -707,6 +715,7 @@ describe('ModelAggregator', () => {
       const merged = agg.mergeWithExistingData([model('a/b', 12, [task('image_classification')], { deploymentOptions: ['edge', 'cloud'] })]);
 
       expect(merged.models[0].deploymentOptions).toContain('browser');
+      expect(merged.models[0].frameworks).toContain('ONNX');
       expect(merged.models[0].runtime).toEqual(runtime);
       expect(merged.models[0].browserModelId).toBe('Xenova/b');
     });
