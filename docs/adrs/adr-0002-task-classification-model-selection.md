@@ -1,7 +1,7 @@
 # ADR-0002: Task Classification Model Selection
 
 ## Status
-Accepted
+Superseded by ADR-0008 (the Hugging Face Inference API tier was never built; classification runs only in the browser)
 
 ## Context
 The AI Model Advisor MVP requires a task classification system to categorize user-provided task descriptions into appropriate ML/AI categories (computer vision, NLP, etc.). This classification drives the model recommendation engine.

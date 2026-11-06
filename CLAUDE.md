@@ -2,236 +2,82 @@
 
 ## Project Overview
 
-**Mission:** Find AI models you can run in the browser, on mobile, or at the edge — no server required. Focused on sustainability, privacy, and simplicity.
+**Mission:** Find AI models you can run in the browser, on mobile, or at the edge, with no server required. Focused on sustainability, privacy and simplicity.
 
 **Live:** https://ismaelmartinez.github.io/ai-model-advisor
-**Status:** Phase 2 Complete ✅ — Edge/browser AI advisor with runtime metadata, edge-ready badges, and pre-computed embeddings
-**Tech:** SvelteKit 2 + Vite 5 + Transformers.js (MiniLM embedding classifier, 23MB)
-**Platform:** Desktop & Mobile (PWA installable, ~23MB model download)
-**Active plan:** `ROADMAP.md` (tracking issue #227) — "continue" means the first unchecked item there
-**Details:** See `project-status.md`, `project-vision.md`, `README.md`
+**Tech:** SvelteKit 3 + Vite 8 + Transformers.js (MiniLM embedding classifier, about 23 MB, loaded only when "Describe your task" opens)
+**Active plan:** `ROADMAP.md` (tracking issue #227). "Continue" means the first unchecked item there.
 
 ---
 
 ## Quick Commands
 
 ```bash
-# Development
-npm install && npm run dev     # Start dev server (localhost:5173)
-npm run build && npm run preview  # Build + preview production
-
-# Testing
-npm test                       # Run tests (~2s) - Use for CI
-
-# Build
-npm run precompute-embeddings  # Regenerate pre-computed embeddings
-
-# Data
-npm run update-models          # Update model database from HuggingFace
-npm run update-models:dry-run  # Preview updates
+npm install && npm run dev        # Dev server (localhost:5173)
+npm run build && npm run preview  # Production build and preview
+npm test                          # Run the tests once
+npm run precompute-embeddings     # Regenerate src/lib/data/reference-embeddings.json
+npm run update-models             # Refresh models.json from Hugging Face (see docs/model-data.md)
+npm run update-models:dry-run     # Preview an update
 ```
 
 ---
 
 ## Core Architecture
 
-### Key Files
+**Application:**
+- `src/routes/+page.svelte` - main UI and application logic
+- `src/components/TaskForm.svelte`, `RecommendationDisplay.svelte` - form and results
+- `src/lib/recommendation/ModelSelector.js` - "smaller is better" ranking; derives tier and environmental score from `sizeMB`
+- `src/lib/classification/EmbeddingTaskClassifier.js` - MiniLM similarity classifier, dynamically imported on demand
+- `src/lib/classification/BrowserTaskClassifier.js` - keyword classifier used until (or instead of) the embedding classifier
+- `src/service-worker.js` - offline cache, named per build
 
-**Application Core:**
-- `src/routes/+page.svelte` - Main UI and application logic
-- `src/lib/recommendation/ModelSelector.js` - "Smaller is better" ranking algorithm
-- `src/lib/classification/EmbeddingTaskClassifier.js` - MiniLM embeddings (23MB, 98.3% accuracy)
-- `src/lib/environmental/EnvironmentalImpactCalculator.js` - Environmental scoring (1-3 scale)
+**Data (`src/lib/data/`):**
+- `models.json` - flat list of models with their tasks, validated by `models.schema.json` in `npm test`; see `docs/model-data.md`
+- `tasks.json` - task taxonomy with keywords, examples and edge maturity
+- `reference-embeddings.json` - precomputed MiniLM embeddings of the `tasks.json` examples
+- `constants.js` - tiers and the size thresholds for tier and environmental score
 
-**Data:**
-- `src/lib/data/models.json` - Model database (4 categories, 4 tiers: lightweight/standard/advanced/xlarge) with runtime metadata
-- `src/lib/data/tasks.json` - Task taxonomy with keywords
-- `src/lib/data/reference-embeddings.json` - Pre-computed MiniLM embeddings (~320 examples, generated at build time)
+**Scripts:** `scripts/update-models/` (weekly model updater) and `scripts/precompute-embeddings.js`.
 
-**Config:**
-- `vite.config.js` - WebGPU headers, transformers.js exclusions, and the SvelteKit 3 config passed to `sveltekit({...})` (static adapter, base path and CSP for GitHub Pages; `svelte.config.js` is no longer read)
-- `.github/workflows/deploy.yml` - Auto-deploy on push to main
+**Config:** `vite.config.js` holds the SvelteKit config (static adapter, base path, CSP) because SvelteKit 3 no longer reads `svelte.config.js`. The CSP is emitted as a meta tag; ONNX Runtime is bundled so no CDN is allowed.
 
-### Classification Pipeline
+### Classification
 
-**Embedding Mode with Voting** (default, ~2ms):
-1. **MiniLM Embeddings** (Primary) → Sentence similarity with 5-vote consensus (98.3% accuracy)
-2. **Semantic** (Fallback 1) → N-gram matching with keywords
-3. **Keyword** (Fallback 2) → Direct lookup
-4. **Default** (Final) → Returns natural_language_processing
+The embedding classifier compares the text with the reference examples and takes a similarity-weighted vote of the top 5 (measured leave-one-out: 95.3% category, 74.7% subcategory; a floor is enforced in `tests/embedding-classifier.test.js`). Until it has loaded, or if it fails, the keyword classifier answers. The dropdowns and shared links (`?category=&task=&deploy=`) work without any classifier.
 
-**Model Download:**
-- ~23MB on first visit (cached in IndexedDB)
-- Instant on subsequent visits
-- Works on mobile devices
+### Environmental scoring
 
-### Environmental Scoring
-
-| Score | Size | Label | Priority |
-|-------|------|-------|----------|
-| 1 (Low) | ≤500MB | Low Impact | Highest |
-| 2 (Medium) | ≤4GB | Medium Impact | Medium |
-| 3 (High) | >4GB | High Impact | Lowest |
-
-Implementation: `src/lib/environmental/EnvironmentalImpactCalculator.js`
+A size heuristic derived at load time: up to 500 MB scores 1, up to 4 GB scores 2, larger scores 3. Details in `docs/environmental-methodology.md`.
 
 ---
 
-## Development Workflows
+## Conventions
 
-### Standard Flow
-```bash
-git checkout -b feature/your-feature
-npm run dev              # Develop with hot reload
-npm test                 # Run fast tests
-npm run build            # Verify build
-git commit -m "feat: ..." && git push
-```
+- **Smaller is better:** rank by tier, then size (`ModelSelector.rankBySize`).
+- **Static only:** no backend; all inference runs in the browser. Keep the initial JavaScript small and load heavy code lazily.
+- **Accessibility:** keyboard navigation, ARIA labels and live regions (see `+page.svelte`).
+- **WebGPU:** keep the COOP/COEP headers and the `optimizeDeps.exclude` for `@huggingface/transformers` in `vite.config.js`.
+- **Tests:** `npm test`. Ranking and selection tests use the fixture in `tests/fixtures/models.js`, not the live `models.json`, so data updates cannot break them.
+- **Decisions:** record architectural changes as ADRs in `docs/adrs/`.
 
-### Adding Models
-1. Edit `src/lib/data/models.json` (follow category → subcategory → tier structure)
-2. Run `npm test` to validate
-3. Check UI with `npm run dev`
+## Common tasks
 
-Reference: See "Adding a New Model" in this file or `docs/model-curation-process.md`
+**Adding a model:** see "Adding a model by hand" in `docs/model-data.md`.
 
-### Adding Categories
-1. Edit `src/lib/data/tasks.json` (add keywords and examples)
-2. Edit `src/lib/data/models.json` (create tier structure)
-3. Add tests in `tests/integration.test.js`
+**Adding a task:** add keywords and examples to `tasks.json`, run `npm run precompute-embeddings`, add models for it in `models.json` (the data tests list tasks that have none), then `npm test`.
 
----
-
-## Critical Conventions
-
-### 1. "Smaller is Better" Philosophy
-**Always prioritize lightweight models** - See `ModelSelector.rankBySize()` in `src/lib/recommendation/ModelSelector.js`
-
-Ranking: lightweight tier > standard tier > advanced tier (within tier, smaller first)
-
-### 2. Testing Strategy
-- **CI/CD:** Run `npm test` for all tests (~2s)
-- Tests cover acceptance, integration, accuracy filtering, and code assistant workflows
-
-### 3. Static-First Architecture
-- No backend/API calls during runtime
-- All ML runs in browser (transformers.js)
-- Target: <50KB bundle, <1s load time
-- **PWA Enabled:** Installable on desktop & mobile, works offline after first visit
-
-### 4. Accessibility Required
-- Full keyboard navigation (Tab, Enter, Ctrl+Enter)
-- ARIA labels and live regions
-- Screen reader support
-- Reference: `src/routes/+page.svelte` for patterns
-
-### 5. WebGPU Configuration
-**Required in vite.config.js:**
-```javascript
-headers: {
-  'Cross-Origin-Embedder-Policy': 'require-corp',
-  'Cross-Origin-Opener-Policy': 'same-origin'
-},
-optimizeDeps: {
-  exclude: ['@huggingface/transformers']
-}
-```
-*Do not modify - breaks WASM loading and WebGPU acceleration*
-
----
-
-## Code Style
-
-**Naming:**
-- Components: PascalCase (TaskInput.svelte)
-- Functions: camelCase (calculateScore)
-- Constants: UPPER_SNAKE_CASE (MAX_SIZE_MB)
-
-**Svelte Components:**
-```svelte
-<script>
-  // Imports → Props → State → Reactive ($:) → Functions → Lifecycle
-</script>
-<!-- Markup -->
-<style>/* Component styles */</style>
-```
-
-**Testing:**
-```javascript
-describe('Module', () => {
-  test('should behavior', () => {
-    // Arrange → Act → Assert
-  });
-});
-```
-
----
-
-## Common Tasks
-
-### Adding a New Model
-```json
-// In src/lib/data/models.json under appropriate category/subcategory/tier:
-{
-  "id": "unique-id",
-  "name": "Model Name",
-  "huggingFaceId": "org/model-name",
-  "sizeMB": 75,
-  "accuracy": 0.92,
-  "environmentalScore": 1,
-  "deploymentOptions": ["browser"],
-  "frameworks": ["Transformers.js"],
-  "lastUpdated": "2025-01-15",
-  "runtime": {
-    "browser": {
-      "framework": "transformers.js",
-      "backend": ["wasm"],
-      "tested": true
-    }
-  }
-}
-```
-
-### Debugging Classification
-1. Check browser console for LLM initialization
-2. Verify input length (10-500 chars)
-3. Test with keywords from `src/lib/data/tasks.json`
-4. Check fallback chain in `BrowserTaskClassifier.js`
-
-### Deployment
-**Auto:** Push to `main` → GitHub Actions builds → GitHub Pages deploys
-**Manual:** `npm run build` → Upload `dist/` to any static host
-
----
-
-## Key Principles for AI Assistants
-
-1. **Environmental Focus** - Prioritize smaller, efficient models always
-2. **Maintain 98.3% Accuracy** - Test against LLM suite before committing classification changes
-3. **Accessibility First** - Keyboard navigation and screen readers are required
-4. **Static & Fast** - No APIs, <50KB bundle, client-side processing only
-5. **Test Smart** - Run `npm test` before commits
-6. **Document Decisions** - Create ADRs in `docs/adrs/` for architectural changes
-7. **Progressive Enhancement** - PWA support, multiple browsers with graceful fallbacks
+**Deployment:** push to `main` and GitHub Actions builds and deploys to GitHub Pages; manual deploys upload `dist/`.
 
 ---
 
 ## Resources
 
-**Project Docs:**
-- `project-status.md` - Current status, test results, known issues
-- `project-vision.md` - Mission, roadmap, success metrics
-- `docs/adrs/` - Architecture Decision Records
-- `docs/environmental-methodology.md` - Impact calculation details
-- `docs/model-curation-process.md` - Data curation guide
-
-**External:**
-- [SvelteKit](https://kit.svelte.dev/docs) | [Vite](https://vitejs.dev/) | [Transformers.js](https://huggingface.co/docs/transformers.js) | [Vitest](https://vitest.dev/)
-
----
-
-**Last Updated:** 2026-04-14
-**License:** MIT
+- `ROADMAP.md` - plan, vision and history
+- `docs/model-data.md` - model data schema and update workflow
+- `docs/adrs/` - architecture decision records
+- `docs/environmental-methodology.md` - scoring caveats
 
 ## Repo Butler
 

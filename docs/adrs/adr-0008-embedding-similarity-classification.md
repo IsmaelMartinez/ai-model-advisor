@@ -15,7 +15,7 @@ The browser-based LLM classification (ADR-0003) using Llama 3.2 1B achieved 95.2
 - **High memory usage**: ~2GB RAM for inference
 - **Complex ensemble**: ADR-0007 added 3x parallel LLM calls for higher accuracy
 
-Research evaluation (`docs/research/rag-classification-evaluation.md`) concluded that:
+Research evaluation (`docs/research/rag-classification-evaluation.md` at commit 92d7de6, since removed) concluded that:
 1. RAG is overkill for 7 categories
 2. Embedding similarity is simpler and more efficient
 3. A ~23MB embedding model can match or exceed LLM accuracy
@@ -155,7 +155,7 @@ The old LLM classifier (`LLMTaskClassifier.js`) and associated test files have b
 
 ## References
 
-- Research: `docs/research/rag-classification-evaluation.md`
+- Research: `docs/research/rag-classification-evaluation.md` at commit 92d7de6 (removed from the tree)
 - Model: [Xenova/all-MiniLM-L6-v2](https://huggingface.co/Xenova/all-MiniLM-L6-v2)
 - Framework: [Transformers.js](https://huggingface.co/docs/transformers.js)
 

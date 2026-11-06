@@ -7,7 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run",
     "update-models": "node scripts/update-models/cli.js",
     "update-models:dry-run": "node scripts/update-models/cli.js --dry-run",
     "precompute-embeddings": "node scripts/precompute-embeddings.js"
@@ -45,5 +45,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ismaelmartinez/ai-model-advisor.git"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

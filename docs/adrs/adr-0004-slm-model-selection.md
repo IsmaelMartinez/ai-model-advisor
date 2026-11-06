@@ -129,7 +129,7 @@ Tested 4 different label formats:
 5. **When to use AI** - Best for unstructured, complex, or creative tasks
 
 ## Related Documents
-- [Browser SLM Learnings](../research/browser-slm-learnings.md)
+- Browser SLM Learnings (removed from the tree; see `docs/research/browser-slm-learnings.md` at commit 92d7de6)
 - [Task Taxonomy](../../src/lib/data/tasks.json)
 - [Existing Keyword Classifier](../../src/lib/classification/BrowserTaskClassifier.js)
 
