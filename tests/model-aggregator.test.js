@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll } from 'vitest';
+import { describe, test, expect, beforeAll, afterEach, vi } from 'vitest';
 import { ModelAggregator } from '../src/lib/aggregation/ModelAggregator.js';
 
 describe('ModelAggregator', () => {
@@ -91,17 +91,97 @@ describe('ModelAggregator', () => {
       });
     });
 
-    describe('Fallback: safetensors.parameters.total', () => {
-      test('calculates size from safetensors.parameters.total', () => {
-        const rawModel = { id: 'test/model' };
+    describe('Fallback: safetensors.parameters per dtype', () => {
+      test('uses dtype byte widths, not safetensors.total (Ornith-1.0-35B case)', () => {
         const detailedInfo = {
-          safetensors: { 
-            parameters: { total: 1000000000 } // 1B params
-          }
+          safetensors: { total: 664944, parameters: { BF16: 35107181936 } }
         };
-        
-        const sizeMB = aggregator.estimateModelSize(rawModel, detailedInfo);
-        expect(sizeMB).toBe(1907);
+
+        // 35,107,181,936 params * 2 bytes = 66,962 MiB
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(66962);
+      });
+
+      test('sums mixed dtypes', () => {
+        const detailedInfo = {
+          safetensors: { parameters: { F32: 1048576, I8: 1048576 } }
+        };
+
+        // 4 MiB + 1 MiB
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(5);
+      });
+    });
+
+    describe('ONNX variants', () => {
+      const MB = 1024 * 1024;
+
+      test('sums the encoder and decoder of one precision, not every precision', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'onnx/encoder_model.onnx', size: 100 * MB },
+            { rfilename: 'onnx/decoder_model.onnx', size: 200 * MB },
+            { rfilename: 'onnx/encoder_model_q4.onnx', size: 30 * MB },
+            { rfilename: 'onnx/decoder_model_q4.onnx', size: 60 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/whisper' }, detailedInfo)).toBe(300);
+      });
+
+      test('adds external data files to their variant and never reports 0 MB', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'onnx/model.onnx', size: 1 * MB },
+            { rfilename: 'onnx/model.onnx_data', size: 1000 * MB },
+            { rfilename: 'onnx/model.onnx_data_1', size: 500 * MB },
+            { rfilename: 'onnx/model_q4.onnx', size: 1 * MB },
+            { rfilename: 'onnx/model_q4.onnx_data', size: 600 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(1501);
+        expect(aggregator.estimateModelSize({ id: 'test/tiny' }, { siblings: [{ rfilename: 'model.onnx', size: 200 * 1024 }] })).toBe(1);
+      });
+
+      test('sums GGUF shards of one quantization', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'model.Q8_0-00001-of-00002.gguf', size: 400 * MB },
+            { rfilename: 'model.Q8_0-00002-of-00002.gguf', size: 400 * MB },
+            { rfilename: 'model.Q4_K_M.gguf', size: 500 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(800);
+      });
+
+      test('counts the largest GGUF quantization, not all of them', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'model.Q4_K_M.gguf', size: 400 * MB },
+            { rfilename: 'model.Q8_0.gguf', size: 700 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(700);
+      });
+    });
+
+    describe('Weight formats are alternatives, not additive', () => {
+      test('counts safetensors only when .bin copies exist', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'model.safetensors', size: 100 * 1024 * 1024 },
+            { rfilename: 'pytorch_model.bin', size: 100 * 1024 * 1024 }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(100);
+      });
+
+      test('counts the largest single .onnx variant', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'onnx/model.onnx', size: 90 * 1024 * 1024 },
+            { rfilename: 'onnx/model_fp16.onnx', size: 45 * 1024 * 1024 },
+            { rfilename: 'onnx/model_quantized.onnx', size: 22 * 1024 * 1024 }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(90);
       });
     });
 
@@ -450,5 +530,204 @@ describe('ModelAggregator', () => {
       expect(options).toContain('mobile');
     });
   });
-});
 
+  describe('extractAccuracy', () => {
+    test('does not invent accuracy from the model name', () => {
+      expect(aggregator.extractAccuracy({ id: 'org/bert-large' }, null)).toBeNull();
+      expect(aggregator.extractAccuracy({ id: 'org/some-model' }, null)).toBeNull();
+    });
+  });
+
+  describe('processModels', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    test('skips models whose details could not be fetched instead of guessing', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+        ok: false, status: 429, statusText: '429', headers: { get: () => null }, json: async () => ({})
+      }));
+      const agg = new ModelAggregator({ retryBaseDelayMs: 0 });
+
+      const processed = await agg.processModels([{ id: 'a/b', downloads: 5 }], {});
+
+      expect(processed).toEqual([]);
+      expect(agg.stats.failedRequests).toBe(1);
+    });
+  });
+
+  describe('Hugging Face requests', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    const response = (status, body = {}, headers = {}) => ({
+      ok: status >= 200 && status < 300,
+      status,
+      statusText: String(status),
+      headers: { get: name => headers[name.toLowerCase()] ?? null },
+      json: async () => body
+    });
+
+    test('requests blob sizes for model details', async () => {
+      const fetchMock = vi.fn().mockResolvedValue(response(200, { id: 'a/b' }));
+      vi.stubGlobal('fetch', fetchMock);
+      const agg = new ModelAggregator({ retryBaseDelayMs: 0 });
+
+      await agg.getDetailedModelInfo('a/b');
+
+      expect(String(fetchMock.mock.calls[0][0])).toBe('https://huggingface.co/api/models/a/b?blobs=true');
+    });
+
+    test('retries a 429 and then succeeds', async () => {
+      const fetchMock = vi.fn()
+        .mockResolvedValueOnce(response(429))
+        .mockResolvedValueOnce(response(429))
+        .mockResolvedValueOnce(response(200, { id: 'a/b' }));
+      vi.stubGlobal('fetch', fetchMock);
+      const agg = new ModelAggregator({ retryBaseDelayMs: 0 });
+
+      const info = await agg.getDetailedModelInfo('a/b');
+
+      expect(info).toEqual({ id: 'a/b' });
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+      expect(agg.stats.failedRequests).toBe(0);
+    });
+
+    test('counts a request that stays rate limited as failed', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response(429)));
+      const agg = new ModelAggregator({ retryBaseDelayMs: 0 });
+
+      expect(await agg.getDetailedModelInfo('a/b')).toBeNull();
+      expect(agg.stats.failedRequests).toBe(1);
+    });
+
+    test('does not count a 404 as a failure', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response(404)));
+      const agg = new ModelAggregator({ retryBaseDelayMs: 0 });
+
+      await agg.getDetailedModelInfo('gone/model');
+
+      expect(agg.stats.failedRequests).toBe(0);
+    });
+
+    test('fails the run when too many requests failed', () => {
+      const agg = new ModelAggregator();
+      agg.stats.requests = 100;
+      agg.stats.failedRequests = 11;
+      expect(() => agg.assertFailureRateAcceptable()).toThrow(/11 of 100/);
+
+      agg.stats.failedRequests = 10;
+      expect(() => agg.assertFailureRateAcceptable()).not.toThrow();
+    });
+  });
+
+  describe('merging with existing data', () => {
+    test('fresh data replaces the stale copy but keeps curated fields', () => {
+      const agg = new ModelAggregator();
+      const existing = [{ huggingFaceId: 'a/b', sizeMB: 1, specialization: 'coding', runtime: 'ort' }];
+      const fresh = [agg.preserveCuratedFields({ huggingFaceId: 'a/b', sizeMB: 500 }, existing)];
+
+      const [model] = agg.deduplicateModels([...existing, ...fresh]);
+
+      expect(model).toMatchObject({ sizeMB: 500, specialization: 'coding', runtime: 'ort' });
+    });
+
+    test('moves a resized model to its new tier without leaving a stale copy or mutating the old data', () => {
+      const agg = new ModelAggregator({ dataPath: '/nonexistent' });
+      const stale = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 1, specialization: 'coding' };
+      agg.currentModels = {
+        lastUpdated: '2026-01-01',
+        models: { cat: { sub: { lightweight: [stale], standard: [], advanced: [], xlarge: [] } } }
+      };
+      const fresh = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 66000 };
+
+      const merged = agg.mergeWithExistingData(
+        { cat: { sub: { lightweight: [], standard: [], advanced: [], xlarge: [fresh] } } },
+        {}
+      );
+
+      expect(merged.models.cat.sub.lightweight).toEqual([]);
+      expect(merged.models.cat.sub.xlarge).toEqual([{ ...fresh, specialization: 'coding' }]);
+      expect(agg.currentModels.models.cat.sub.lightweight).toEqual([stale]);
+      expect(agg.summarizeChanges(agg.currentModels, merged).sizeChanged).toEqual([
+        { id: 'a/b', from: 1, to: 66000 }
+      ]);
+    });
+
+    test('ignores field order and sees an update on any copy of a model listed under several tasks', () => {
+      const agg = new ModelAggregator();
+      const copy = (sub, size, extra = {}) => ({ huggingFaceId: 'a/b', sizeMB: size, name: 'n', ...extra });
+      const old = { models: { cat: { t1: { lightweight: [copy('t1', 1)] }, t2: { lightweight: [copy('t2', 1)] } } } };
+      const next = {
+        models: {
+          cat: {
+            t1: { xlarge: [{ name: 'n', sizeMB: 900, huggingFaceId: 'a/b' }] },
+            t2: { lightweight: [{ name: 'n', sizeMB: 1, huggingFaceId: 'a/b' }] } // stale copy, same content, other key order
+          }
+        }
+      };
+
+      const summary = agg.summarizeChanges(old, next);
+
+      expect(summary.updated).toEqual(['a/b']);
+      expect(summary.sizeChanged).toEqual([{ id: 'a/b', from: 1, to: 900 }]);
+      expect(agg.summarizeChanges(old, old).updated).toEqual([]);
+    });
+
+    test('a cross-tier removal counts as a substantive change even if the new copy misses the cutoff', () => {
+      const agg = new ModelAggregator({ dataPath: '/nonexistent' });
+      const stale = { id: 'a_b', huggingFaceId: 'a/b', sizeMB: 1 };
+      const full = [1, 2, 3, 4, 5].map(i => ({ id: `x${i}`, huggingFaceId: `x/${i}`, sizeMB: 1, specialization: 'k' }));
+      agg.currentModels = {
+        lastUpdated: '2026-01-01',
+        models: { cat: { sub: { lightweight: [stale], standard: [], advanced: [], xlarge: full } } }
+      };
+
+      agg.mergeWithExistingData(
+        { cat: { sub: { lightweight: [], standard: [], advanced: [], xlarge: [{ id: 'a_b', huggingFaceId: 'a/b', sizeMB: 66000 }] } } },
+        {}
+      );
+
+      expect(agg.stats.hasSubstantiveChanges).toBe(true);
+    });
+
+    test('drops legacy estimated accuracy numbers on refresh', () => {
+      const agg = new ModelAggregator();
+      const model = agg.preserveCuratedFields({ huggingFaceId: 'a/b', accuracy: null }, [{ huggingFaceId: 'a/b', accuracy: 0.75 }]);
+      expect(model.accuracy).toBeNull();
+    });
+
+    test('keeps sourced accuracy when the refresh has none', () => {
+      const agg = new ModelAggregator();
+      const sourced = { metric: 'top-1', value: 0.9, source: 'paper' };
+      const model = agg.preserveCuratedFields({ huggingFaceId: 'a/b', accuracy: null }, [{ huggingFaceId: 'a/b', accuracy: sourced }]);
+      expect(model.accuracy).toEqual(sourced);
+    });
+
+    test('summarizes added, removed, updated and resized models', () => {
+      const agg = new ModelAggregator();
+      const dataset = models => ({ models: { cat: { sub: { lightweight: models } } } });
+      const old = dataset([
+        { huggingFaceId: 'keep/same', sizeMB: 10, lastUpdated: '2026-01-01' },
+        { huggingFaceId: 'keep/resized', sizeMB: 1 },
+        { huggingFaceId: 'drop/me', sizeMB: 5 }
+      ]);
+      const next = dataset([
+        { huggingFaceId: 'keep/same', sizeMB: 10, lastUpdated: '2026-02-02' },
+        { huggingFaceId: 'keep/resized', sizeMB: 500 },
+        { huggingFaceId: 'new/one', sizeMB: 7 }
+      ]);
+
+      const summary = agg.summarizeChanges(old, next);
+
+      expect(summary).toEqual({
+        added: [{ id: 'new/one', sizeMB: 7 }],
+        removed: ['drop/me'],
+        updated: ['keep/resized'],
+        sizeChanged: [{ id: 'keep/resized', from: 1, to: 500 }]
+      });
+      expect(agg.formatChangeSummary(summary)).toContain('`keep/resized`: 1 MB to 500 MB');
+    });
+  });
+});
