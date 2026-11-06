@@ -112,9 +112,22 @@ describe('ModelAggregator', () => {
       });
     });
 
-    describe('ONNX variants and tiny models', () => {
-      test('adds external data files to their ONNX variant', () => {
-        const MB = 1024 * 1024;
+    describe('ONNX variants', () => {
+      const MB = 1024 * 1024;
+
+      test('sums the encoder and decoder of one precision, not every precision', () => {
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'onnx/encoder_model.onnx', size: 100 * MB },
+            { rfilename: 'onnx/decoder_model.onnx', size: 200 * MB },
+            { rfilename: 'onnx/encoder_model_q4.onnx', size: 30 * MB },
+            { rfilename: 'onnx/decoder_model_q4.onnx', size: 60 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/whisper' }, detailedInfo)).toBe(300);
+      });
+
+      test('adds external data files to their variant and never reports 0 MB', () => {
         const detailedInfo = {
           siblings: [
             { rfilename: 'onnx/model.onnx', size: 1 * MB },
@@ -125,15 +138,10 @@ describe('ModelAggregator', () => {
           ]
         };
         expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(1501);
-      });
-
-      test('never reports a size of 0 for sub-megabyte models', () => {
-        const detailedInfo = { siblings: [{ rfilename: 'model.onnx', size: 200 * 1024 }] };
-        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(1);
+        expect(aggregator.estimateModelSize({ id: 'test/tiny' }, { siblings: [{ rfilename: 'model.onnx', size: 200 * 1024 }] })).toBe(1);
       });
 
       test('counts the largest GGUF quantization, not all of them', () => {
-        const MB = 1024 * 1024;
         const detailedInfo = {
           siblings: [
             { rfilename: 'model.Q4_K_M.gguf', size: 400 * MB },
@@ -494,6 +502,24 @@ describe('ModelAggregator', () => {
     test('does not invent accuracy from the model name', () => {
       expect(aggregator.extractAccuracy({ id: 'org/bert-large' }, null)).toBeNull();
       expect(aggregator.extractAccuracy({ id: 'org/some-model' }, null)).toBeNull();
+    });
+  });
+
+  describe('processModels', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    test('skips models whose details could not be fetched instead of guessing', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+        ok: false, status: 429, statusText: '429', headers: { get: () => null }, json: async () => ({})
+      }));
+      const agg = new ModelAggregator({ retryBaseDelayMs: 0 });
+
+      const processed = await agg.processModels([{ id: 'a/b', downloads: 5 }], {});
+
+      expect(processed).toEqual([]);
+      expect(agg.stats.failedRequests).toBe(1);
     });
   });
 

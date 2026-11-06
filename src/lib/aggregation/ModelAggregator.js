@@ -312,6 +312,12 @@ export class ModelAggregator {
 
         // Get detailed model info
         const modelInfo = await this.getDetailedModelInfo(rawModel.id);
+
+        // Without details the size and frameworks would be guesses, and
+        // a refresh would overwrite known data with them
+        if (!modelInfo) {
+          continue;
+        }
         
         // Extract and validate metadata
         const processedModel = await this.extractModelMetadata(rawModel, modelInfo);
@@ -496,7 +502,7 @@ export class ModelAggregator {
 
     // 3. Only a bare total: assume fp16 (2 bytes per param)
     if (detailedInfo?.safetensors?.total) {
-      return Math.round((detailedInfo.safetensors.total * 2) / (1024 * 1024));
+      return this.bytesToMB(detailedInfo.safetensors.total * 2);
     }
 
     // 4. Try to extract parameter count from model name (e.g., "7b", "70b", "1.3b")
@@ -527,17 +533,18 @@ export class ModelAggregator {
   }
 
   /**
-   * Sizes of the ONNX and GGUF variants in a file list. An ONNX variant is its
-   * .onnx file plus the external data files stored next to it
-   * (model_q4.onnx, model_q4.onnx_data, model_q4.onnx_data_1, ...).
+   * Sizes of the complete ONNX variants and the GGUF files in a file list.
+   * An ONNX variant is one precision (fp32, fp16, q4, ...) of every graph in
+   * the repo, e.g. encoder and decoder together, plus the external data files
+   * stored next to them (model_q4.onnx, model_q4.onnx_data_1, ...).
    */
   variantSizes(files) {
     const variants = new Map();
     for (const { rfilename = '', size } of files) {
       const onnxAt = rfilename.indexOf('.onnx');
       if (onnxAt !== -1) {
-        const variant = rfilename.slice(0, onnxAt);
-        variants.set(variant, (variants.get(variant) || 0) + size);
+        const precision = rfilename.slice(0, onnxAt).match(/_(?:fp16|q4f16|q4|int8|uint8|quantized|bnb4)$/)?.[0] ?? '';
+        variants.set(precision, (variants.get(precision) || 0) + size);
       } else if (rfilename.endsWith('.gguf')) {
         variants.set(rfilename, size);
       }

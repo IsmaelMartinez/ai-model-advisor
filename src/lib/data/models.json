@@ -3267,6 +3267,54 @@
       "lastUpdated": "2024-02-14"
     },
     {
+      "id": "helsinki-nlp_opus-mt-zh-en",
+      "name": "Opus Mt Zh En",
+      "huggingFaceId": "Helsinki-NLP/opus-mt-zh-en",
+      "description": "Opus Mt Zh En model for translation",
+      "sizeMB": 298,
+      "accuracy": null,
+      "deploymentOptions": [
+        "edge",
+        "cloud",
+        "server"
+      ],
+      "frameworks": [
+        "PyTorch",
+        "TensorFlow"
+      ],
+      "tasks": [
+        {
+          "category": "natural_language_processing",
+          "subcategory": "translation"
+        }
+      ],
+      "lastUpdated": "2023-08-16"
+    },
+    {
+      "id": "helsinki-nlp_opus-mt-en-ru",
+      "name": "Opus Mt En Ru",
+      "huggingFaceId": "Helsinki-NLP/opus-mt-en-ru",
+      "description": "Opus Mt En Ru model for translation",
+      "sizeMB": 293,
+      "accuracy": null,
+      "deploymentOptions": [
+        "edge",
+        "cloud",
+        "server"
+      ],
+      "frameworks": [
+        "PyTorch",
+        "TensorFlow"
+      ],
+      "tasks": [
+        {
+          "category": "natural_language_processing",
+          "subcategory": "translation"
+        }
+      ],
+      "lastUpdated": "2023-08-16"
+    },
+    {
       "id": "facebook_nllb-200-distilled-1.3b",
       "name": "Nllb 200 Distilled 1.3B",
       "huggingFaceId": "facebook/nllb-200-distilled-1.3B",
@@ -3287,6 +3335,30 @@
         }
       ],
       "lastUpdated": "2023-02-11"
+    },
+    {
+      "id": "helsinki-nlp_opus-mt-mul-en",
+      "name": "Opus Mt Mul En",
+      "huggingFaceId": "Helsinki-NLP/opus-mt-mul-en",
+      "description": "Opus Mt Mul En model for translation",
+      "sizeMB": 296,
+      "accuracy": null,
+      "deploymentOptions": [
+        "edge",
+        "cloud",
+        "server"
+      ],
+      "frameworks": [
+        "PyTorch",
+        "TensorFlow"
+      ],
+      "tasks": [
+        {
+          "category": "natural_language_processing",
+          "subcategory": "translation"
+        }
+      ],
+      "lastUpdated": "2023-08-16"
     },
     {
       "id": "helsinki-nlp_opus-mt-en-az",
@@ -3425,27 +3497,6 @@
       "lastUpdated": "2023-05-14"
     },
     {
-      "id": "lmg-anon_vntl-llama3-8b-v2-gguf",
-      "name": "Vntl Llama3 8b V2 Gguf",
-      "huggingFaceId": "lmg-anon/vntl-llama3-8b-v2-gguf",
-      "description": "Vntl Llama3 8b V2 Gguf model for translation",
-      "sizeMB": 8145,
-      "accuracy": null,
-      "deploymentOptions": [
-        "server"
-      ],
-      "frameworks": [
-        "PyTorch"
-      ],
-      "tasks": [
-        {
-          "category": "natural_language_processing",
-          "subcategory": "translation"
-        }
-      ],
-      "lastUpdated": "2025-01-02"
-    },
-    {
       "id": "philschmid_bart-large-cnn-samsum",
       "name": "Bart Large Cnn Samsum",
       "huggingFaceId": "philschmid/bart-large-cnn-samsum",
@@ -3527,6 +3578,30 @@
       }
     },
     {
+      "id": "cnicu_t5-small-booksum",
+      "name": "T5 Small Booksum",
+      "huggingFaceId": "cnicu/t5-small-booksum",
+      "description": "T5 Small Booksum model for summarization",
+      "sizeMB": 231,
+      "accuracy": null,
+      "deploymentOptions": [
+        "edge",
+        "cloud",
+        "server"
+      ],
+      "frameworks": [
+        "PyTorch",
+        "TensorFlow"
+      ],
+      "tasks": [
+        {
+          "category": "natural_language_processing",
+          "subcategory": "summarization"
+        }
+      ],
+      "lastUpdated": "2022-02-26"
+    },
+    {
       "id": "mradermacher_zawen-v0.1-35b-a3b-i1-gguf",
       "name": "Zawen V0.1 35B A3B I1 GGUF",
       "huggingFaceId": "mradermacher/Zawen-v0.1-35B-A3B-i1-GGUF",
@@ -3547,29 +3622,6 @@
         }
       ],
       "lastUpdated": "2026-10-17"
-    },
-    {
-      "id": "xenova_distilbart-cnn-6-6",
-      "name": "Distilbart Cnn 6 6",
-      "huggingFaceId": "Xenova/distilbart-cnn-6-6",
-      "description": "Distilbart Cnn 6 6 model for summarization",
-      "sizeMB": 586,
-      "accuracy": null,
-      "deploymentOptions": [
-        "cloud",
-        "server"
-      ],
-      "frameworks": [
-        "Transformers.js",
-        "ONNX"
-      ],
-      "tasks": [
-        {
-          "category": "natural_language_processing",
-          "subcategory": "summarization"
-        }
-      ],
-      "lastUpdated": "2025-07-22"
     },
     {
       "id": "russiannlp_fred-t5-summarizer",
@@ -3742,28 +3794,6 @@
       "lastUpdated": "2026-07-11"
     },
     {
-      "id": "mradermacher_compactor-qwen3.5-4b-gguf",
-      "name": "Compactor Qwen3.5 4B GGUF",
-      "huggingFaceId": "mradermacher/Compactor-Qwen3.5-4B-GGUF",
-      "description": "Compactor Qwen3.5 4B GGUF model for summarization",
-      "sizeMB": 8034,
-      "accuracy": null,
-      "deploymentOptions": [
-        "server"
-      ],
-      "frameworks": [
-        "PyTorch",
-        "TensorFlow"
-      ],
-      "tasks": [
-        {
-          "category": "natural_language_processing",
-          "subcategory": "summarization"
-        }
-      ],
-      "lastUpdated": "2026-09-09"
-    },
-    {
       "id": "tavernari_git-commit-message",
       "name": "Git Commit Message",
       "huggingFaceId": "Tavernari/git-commit-message",
@@ -3784,6 +3814,29 @@
         }
       ],
       "lastUpdated": "2025-03-10"
+    },
+    {
+      "id": "sshleifer_distilbart-xsum-12-3",
+      "name": "Distilbart Xsum 12 3",
+      "huggingFaceId": "sshleifer/distilbart-xsum-12-3",
+      "description": "Distilbart Xsum 12 3 model for summarization",
+      "sizeMB": 683,
+      "accuracy": null,
+      "deploymentOptions": [
+        "cloud",
+        "server"
+      ],
+      "frameworks": [
+        "PyTorch",
+        "TensorFlow"
+      ],
+      "tasks": [
+        {
+          "category": "natural_language_processing",
+          "subcategory": "summarization"
+        }
+      ],
+      "lastUpdated": "2021-06-14"
     },
     {
       "id": "microsoft_llmlingua-2-bert-base-multilingual-cased-meetingbank",
@@ -4092,15 +4145,57 @@
       "lastUpdated": "2022-08-06"
     },
     {
-      "id": "xenova_opus-mt-en-zh",
-      "name": "Opus Mt En Zh",
-      "huggingFaceId": "Xenova/opus-mt-en-zh",
-      "description": "Opus Mt En Zh model for translation",
-      "sizeMB": 225,
+      "id": "xenova_nllb-200-distilled-600m",
+      "name": "Nllb 200 Distilled 600M",
+      "huggingFaceId": "Xenova/nllb-200-distilled-600M",
+      "description": "Nllb 200 Distilled 600M model for translation",
+      "sizeMB": 6813,
       "accuracy": null,
       "deploymentOptions": [
-        "browser",
-        "edge",
+        "server"
+      ],
+      "frameworks": [
+        "Transformers.js",
+        "ONNX"
+      ],
+      "tasks": [
+        {
+          "category": "natural_language_processing",
+          "subcategory": "translation"
+        }
+      ],
+      "lastUpdated": "2026-03-23"
+    },
+    {
+      "id": "xenova_m2m100_418m",
+      "name": "M2m100 418M",
+      "huggingFaceId": "Xenova/m2m100_418M",
+      "description": "M2m100 418M model for translation",
+      "sizeMB": 4811,
+      "accuracy": null,
+      "deploymentOptions": [
+        "server"
+      ],
+      "frameworks": [
+        "Transformers.js",
+        "ONNX"
+      ],
+      "tasks": [
+        {
+          "category": "natural_language_processing",
+          "subcategory": "translation"
+        }
+      ],
+      "lastUpdated": "2025-07-14"
+    },
+    {
+      "id": "xenova_opus-mt-en-de",
+      "name": "Opus Mt En De",
+      "huggingFaceId": "Xenova/opus-mt-en-de",
+      "description": "Opus Mt En De model for translation",
+      "sizeMB": 808,
+      "accuracy": null,
+      "deploymentOptions": [
         "cloud",
         "server"
       ],
@@ -4114,27 +4209,16 @@
           "subcategory": "translation"
         }
       ],
-      "lastUpdated": "2025-07-14",
-      "runtime": {
-        "browser": {
-          "framework": "transformers.js",
-          "backend": [
-            "wasm"
-          ],
-          "tested": false
-        }
-      }
+      "lastUpdated": "2025-07-14"
     },
     {
-      "id": "xenova_opus-mt-en-es",
-      "name": "Opus Mt En Es",
-      "huggingFaceId": "Xenova/opus-mt-en-es",
-      "description": "Opus Mt En Es model for translation",
-      "sizeMB": 225,
+      "id": "xenova_opus-mt-de-en",
+      "name": "Opus Mt De En",
+      "huggingFaceId": "Xenova/opus-mt-de-en",
+      "description": "Opus Mt De En model for translation",
+      "sizeMB": 808,
       "accuracy": null,
       "deploymentOptions": [
-        "browser",
-        "edge",
         "cloud",
         "server"
       ],
@@ -4148,73 +4232,7 @@
           "subcategory": "translation"
         }
       ],
-      "lastUpdated": "2025-07-14",
-      "runtime": {
-        "browser": {
-          "framework": "transformers.js",
-          "backend": [
-            "wasm"
-          ],
-          "tested": false
-        }
-      }
-    },
-    {
-      "id": "xenova_opus-mt-es-en",
-      "name": "Opus Mt Es En",
-      "huggingFaceId": "Xenova/opus-mt-es-en",
-      "description": "Opus Mt Es En model for translation",
-      "sizeMB": 225,
-      "accuracy": null,
-      "deploymentOptions": [
-        "browser",
-        "edge",
-        "cloud",
-        "server"
-      ],
-      "frameworks": [
-        "Transformers.js",
-        "ONNX"
-      ],
-      "tasks": [
-        {
-          "category": "natural_language_processing",
-          "subcategory": "translation"
-        }
-      ],
-      "lastUpdated": "2025-07-14",
-      "runtime": {
-        "browser": {
-          "framework": "transformers.js",
-          "backend": [
-            "wasm"
-          ],
-          "tested": false
-        }
-      }
-    },
-    {
-      "id": "xenova_distilbart-xsum-6-6",
-      "name": "Distilbart Xsum 6 6",
-      "huggingFaceId": "Xenova/distilbart-xsum-6-6",
-      "description": "Distilbart Xsum 6 6 model for summarization",
-      "sizeMB": 586,
-      "accuracy": null,
-      "deploymentOptions": [
-        "cloud",
-        "server"
-      ],
-      "frameworks": [
-        "Transformers.js",
-        "ONNX"
-      ],
-      "tasks": [
-        {
-          "category": "natural_language_processing",
-          "subcategory": "summarization"
-        }
-      ],
-      "lastUpdated": "2025-07-22"
+      "lastUpdated": "2025-07-14"
     },
     {
       "id": "xenova_distilbert-base-multilingual-cased-ner-hrl",
@@ -4321,82 +4339,13 @@
       "lastUpdated": "2024-10-08"
     },
     {
-      "id": "onnx-community_hy-mt1.5-1.8b-onnx",
-      "name": "HY MT1.5 1.8B ONNX",
-      "huggingFaceId": "onnx-community/HY-MT1.5-1.8B-ONNX",
-      "description": "HY MT1.5 1.8B ONNX model for translation",
-      "sizeMB": 6961,
+      "id": "onnx-community_tanaos-text-summarization-v1-onnx",
+      "name": "Tanaos Text Summarization V1 ONNX",
+      "huggingFaceId": "onnx-community/tanaos-text-summarization-v1-ONNX",
+      "description": "Tanaos Text Summarization V1 ONNX model for summarization",
+      "sizeMB": 4180,
       "accuracy": null,
       "deploymentOptions": [
-        "server"
-      ],
-      "frameworks": [
-        "ONNX",
-        "Transformers.js"
-      ],
-      "tasks": [
-        {
-          "category": "natural_language_processing",
-          "subcategory": "translation"
-        }
-      ],
-      "lastUpdated": "2026-01-14"
-    },
-    {
-      "id": "onnx-community_opus-mt-tc-big-en-tr",
-      "name": "Opus Mt Tc Big En Tr",
-      "huggingFaceId": "onnx-community/opus-mt-tc-big-en-tr",
-      "description": "Opus Mt Tc Big En Tr model for translation",
-      "sizeMB": 612,
-      "accuracy": null,
-      "deploymentOptions": [
-        "cloud",
-        "server"
-      ],
-      "frameworks": [
-        "Transformers.js",
-        "ONNX"
-      ],
-      "tasks": [
-        {
-          "category": "natural_language_processing",
-          "subcategory": "translation"
-        }
-      ],
-      "lastUpdated": "2024-10-08"
-    },
-    {
-      "id": "onnx-community_opus-mt-tc-big-tr-en",
-      "name": "Opus Mt Tc Big Tr En",
-      "huggingFaceId": "onnx-community/opus-mt-tc-big-tr-en",
-      "description": "Opus Mt Tc Big Tr En model for translation",
-      "sizeMB": 612,
-      "accuracy": null,
-      "deploymentOptions": [
-        "cloud",
-        "server"
-      ],
-      "frameworks": [
-        "Transformers.js",
-        "ONNX"
-      ],
-      "tasks": [
-        {
-          "category": "natural_language_processing",
-          "subcategory": "translation"
-        }
-      ],
-      "lastUpdated": "2025-04-26"
-    },
-    {
-      "id": "onnx-community_rut5_base_sum_gazeta-onnx",
-      "name": "Rut5 Base Sum Gazeta ONNX",
-      "huggingFaceId": "onnx-community/rut5_base_sum_gazeta-ONNX",
-      "description": "Rut5 Base Sum Gazeta ONNX model for summarization",
-      "sizeMB": 609,
-      "accuracy": null,
-      "deploymentOptions": [
-        "cloud",
         "server"
       ],
       "frameworks": [
@@ -4409,18 +4358,16 @@
           "subcategory": "summarization"
         }
       ],
-      "lastUpdated": "2026-02-18"
+      "lastUpdated": "2026-10-10"
     },
     {
       "id": "onnx-community_text_summarization-onnx",
       "name": "Text Summarization ONNX",
       "huggingFaceId": "onnx-community/text_summarization-ONNX",
       "description": "Text Summarization ONNX model for summarization",
-      "sizeMB": 159,
+      "sizeMB": 600,
       "accuracy": null,
       "deploymentOptions": [
-        "browser",
-        "edge",
         "cloud",
         "server"
       ],
@@ -4434,23 +4381,37 @@
           "subcategory": "summarization"
         }
       ],
-      "lastUpdated": "2025-11-10",
-      "runtime": {
-        "browser": {
-          "framework": "transformers.js",
-          "backend": [
-            "wasm"
-          ],
-          "tested": false
-        }
-      }
+      "lastUpdated": "2025-11-10"
     },
     {
-      "id": "onnx-community_bart-german-onnx",
-      "name": "Bart German ONNX",
-      "huggingFaceId": "onnx-community/bart-german-ONNX",
-      "description": "Bart German ONNX model for summarization",
-      "sizeMB": 515,
+      "id": "onnx-community_text-summarizer-t5-small-onnx",
+      "name": "Text Summarizer T5 Small ONNX",
+      "huggingFaceId": "onnx-community/Text-Summarizer-t5-small-ONNX",
+      "description": "Text Summarizer T5 Small ONNX model for summarization",
+      "sizeMB": 753,
+      "accuracy": null,
+      "deploymentOptions": [
+        "cloud",
+        "server"
+      ],
+      "frameworks": [
+        "Transformers.js",
+        "ONNX"
+      ],
+      "tasks": [
+        {
+          "category": "natural_language_processing",
+          "subcategory": "summarization"
+        }
+      ],
+      "lastUpdated": "2026-09-18"
+    },
+    {
+      "id": "onnx-community_t5-small-german-onnx",
+      "name": "T5 Small German ONNX",
+      "huggingFaceId": "onnx-community/t5-small-german-ONNX",
+      "description": "T5 Small German ONNX model for summarization",
+      "sizeMB": 788,
       "accuracy": null,
       "deploymentOptions": [
         "cloud",
