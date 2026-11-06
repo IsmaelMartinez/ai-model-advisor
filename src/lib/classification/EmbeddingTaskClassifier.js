@@ -8,6 +8,9 @@
  */
 
 import { pipeline, env } from '@huggingface/transformers';
+// Bundled ONNX Runtime files so the strict CSP does not need to allow a CDN.
+import ortWasmUrl from 'onnxruntime-web/ort-wasm-simd-threaded.asyncify.wasm?url';
+import ortMjsUrl from 'onnxruntime-web/ort-wasm-simd-threaded.asyncify.mjs?url';
 
 // Detect environment and configure appropriately
 const isBrowser = typeof window !== 'undefined';
@@ -16,6 +19,10 @@ if (isBrowser) {
   // Browser: use IndexedDB cache
   env.allowLocalModels = false;
   env.useBrowserCache = true;
+  // Serve ORT from our own origin instead of cdn.jsdelivr.net. Skip the blob-URL
+  // wasm cache, which would need `blob:` in script-src.
+  env.backends.onnx.wasm.wasmPaths = { mjs: ortMjsUrl, wasm: ortWasmUrl };
+  env.useWasmCache = false;
 } else {
   // Node.js: use file system cache
   env.allowLocalModels = true;
