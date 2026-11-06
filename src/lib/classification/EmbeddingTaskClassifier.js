@@ -92,8 +92,9 @@ export class EmbeddingTaskClassifier {
       this.embedder = await pipeline('feature-extraction', this.modelName, {
         quantized: true,
         progress_callback: (progress) => {
-          if (progress.status === 'downloading') {
-            const percent = Math.round((progress.loaded / progress.total) * 100);
+          // transformers.js reports the combined progress of all files as 'progress_total'
+          if (progress.status === 'progress_total') {
+            const percent = Math.round(progress.progress);
             this.onProgress({ 
               status: 'downloading', 
               progress: percent,
