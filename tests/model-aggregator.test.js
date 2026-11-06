@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeAll, afterEach, vi } from 'vitest';
 import { ModelAggregator } from '../src/lib/aggregation/ModelAggregator.js';
+import { tierForSize, environmentalScoreForSize } from '../src/lib/data/constants.js';
 
 describe('ModelAggregator', () => {
   let aggregator;
@@ -108,6 +109,38 @@ describe('ModelAggregator', () => {
 
         // 4 MiB + 1 MiB
         expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(5);
+      });
+    });
+
+    describe('ONNX variants and tiny models', () => {
+      test('adds external data files to their ONNX variant', () => {
+        const MB = 1024 * 1024;
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'onnx/model.onnx', size: 1 * MB },
+            { rfilename: 'onnx/model.onnx_data', size: 1000 * MB },
+            { rfilename: 'onnx/model.onnx_data_1', size: 500 * MB },
+            { rfilename: 'onnx/model_q4.onnx', size: 1 * MB },
+            { rfilename: 'onnx/model_q4.onnx_data', size: 600 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(1501);
+      });
+
+      test('never reports a size of 0 for sub-megabyte models', () => {
+        const detailedInfo = { siblings: [{ rfilename: 'model.onnx', size: 200 * 1024 }] };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(1);
+      });
+
+      test('counts the largest GGUF quantization, not all of them', () => {
+        const MB = 1024 * 1024;
+        const detailedInfo = {
+          siblings: [
+            { rfilename: 'model.Q4_K_M.gguf', size: 400 * MB },
+            { rfilename: 'model.Q8_0.gguf', size: 700 * MB }
+          ]
+        };
+        expect(aggregator.estimateModelSize({ id: 'test/model' }, detailedInfo)).toBe(700);
       });
     });
 
@@ -294,42 +327,19 @@ describe('ModelAggregator', () => {
     });
   });
 
-  describe('determineTier', () => {
-    test('returns lightweight for models ≤500MB', () => {
-      expect(aggregator.determineTier(100)).toBe('lightweight');
-      expect(aggregator.determineTier(500)).toBe('lightweight');
-    });
-
-    test('returns standard for models ≤4GB', () => {
-      expect(aggregator.determineTier(501)).toBe('standard');
-      expect(aggregator.determineTier(4000)).toBe('standard');
-    });
-
-    test('returns advanced for models ≤20GB', () => {
-      expect(aggregator.determineTier(4001)).toBe('advanced');
-      expect(aggregator.determineTier(20000)).toBe('advanced');
-    });
-
-    test('returns xlarge for models >20GB', () => {
-      expect(aggregator.determineTier(20001)).toBe('xlarge');
-      expect(aggregator.determineTier(140000)).toBe('xlarge');
-    });
-  });
-
-  describe('calculateEnvironmentalScore', () => {
-    test('returns 1 for lightweight models', () => {
-      expect(aggregator.calculateEnvironmentalScore(100)).toBe(1);
-      expect(aggregator.calculateEnvironmentalScore(500)).toBe(1);
-    });
-
-    test('returns 2 for standard models', () => {
-      expect(aggregator.calculateEnvironmentalScore(501)).toBe(2);
-      expect(aggregator.calculateEnvironmentalScore(4000)).toBe(2);
-    });
-
-    test('returns 3 for large models', () => {
-      expect(aggregator.calculateEnvironmentalScore(4001)).toBe(3);
-      expect(aggregator.calculateEnvironmentalScore(100000)).toBe(3);
+  describe('tierForSize / environmentalScoreForSize', () => {
+    test.each([
+      [100, 'lightweight', 1],
+      [500, 'lightweight', 1],
+      [501, 'standard', 2],
+      [4000, 'standard', 2],
+      [4001, 'advanced', 3],
+      [20000, 'advanced', 3],
+      [20001, 'xlarge', 3],
+      [140000, 'xlarge', 3]
+    ])('%i MB is %s with score %i', (sizeMB, tier, score) => {
+      expect(tierForSize(sizeMB)).toBe(tier);
+      expect(environmentalScoreForSize(sizeMB)).toBe(score);
     });
   });
 
@@ -553,20 +563,102 @@ describe('ModelAggregator', () => {
     });
   });
 
+  describe('extractModelMetadata', () => {
+    test('collapses to a flat model with tasks, null accuracy and browser runtime metadata', async () => {
+      const raw = {
+        id: 'Xenova/tiny-model',
+        downloads: 10,
+        pipeline_tag: 'text-classification',
+        lastModified: '2026-03-04T05:06:07.000Z',
+        tasks: [{ category: 'natural_language_processing', subcategory: 'text_classification' }]
+      };
+      const detailed = { siblings: [{ rfilename: 'onnx/model.onnx', size: 5 * 1024 * 1024 }] };
+
+      const model = await aggregator.extractModelMetadata(raw, detailed);
+
+      expect(model).toMatchObject({
+        huggingFaceId: 'Xenova/tiny-model',
+        sizeMB: 5,
+        accuracy: null,
+        tasks: raw.tasks,
+        lastUpdated: '2026-03-04',
+        description: 'Tiny Model model for text classification',
+        runtime: { browser: { framework: 'transformers.js', backend: ['wasm'], tested: false } }
+      });
+      expect(model).not.toHaveProperty('tier');
+      expect(model).not.toHaveProperty('environmentalScore');
+    });
+  });
+
   describe('merging with existing data', () => {
-    test('fresh data replaces the stale copy but keeps curated fields', () => {
-      const agg = new ModelAggregator();
-      const existing = [{ huggingFaceId: 'a/b', sizeMB: 1, specialization: 'coding', runtime: 'ort' }];
-      const fresh = [agg.preserveCuratedFields({ huggingFaceId: 'a/b', sizeMB: 500 }, existing)];
+    const task = (subcategory, category = 'computer_vision') => ({ category, subcategory });
+    const model = (huggingFaceId, sizeMB, tasks, extra = {}) => ({
+      id: huggingFaceId.replace('/', '_'),
+      name: huggingFaceId,
+      huggingFaceId,
+      description: '',
+      sizeMB,
+      accuracy: null,
+      tasks,
+      deploymentOptions: ['cloud'],
+      frameworks: ['PyTorch'],
+      lastUpdated: '2026-01-01',
+      ...extra
+    });
+    const aggregatorWith = models => {
+      const agg = new ModelAggregator({ dataPath: '/nonexistent' });
+      agg.currentModels = { schemaVersion: 2, lastUpdated: '2026-01-01', models };
+      return agg;
+    };
 
-      const [model] = agg.deduplicateModels([...existing, ...fresh]);
+    test('fresh data replaces the stale copy but keeps curated fields and tasks', () => {
+      const agg = aggregatorWith([
+        model('a/b', 1, [task('image_classification')], { specialization: 'coding', browserModelId: 'Xenova/b' })
+      ]);
 
-      expect(model).toMatchObject({ sizeMB: 500, specialization: 'coding', runtime: 'ort' });
+      const merged = agg.mergeWithExistingData([model('a/b', 500, [task('object_detection')], { downloads: 9 })]);
+
+      expect(merged.models).toHaveLength(1);
+      expect(merged.models[0]).toMatchObject({ sizeMB: 500, specialization: 'coding', browserModelId: 'Xenova/b' });
+      expect(merged.models[0].tasks).toEqual([task('image_classification'), task('object_detection')]);
+      expect(merged.models[0]).not.toHaveProperty('downloads');
+      expect(agg.stats.hasSubstantiveChanges).toBe(true);
+    });
+
+    test('keeps only the best 5 per task and tier when fresh models arrive, preserving other tasks', () => {
+      const existing = [1, 2, 3, 4, 5].map(i =>
+        model(`old/m${i}`, 100 + i, [task('image_classification')]));
+      // Same models also serve another task whose group gets no fresh model
+      existing[0].tasks.push(task('object_detection'));
+      const agg = aggregatorWith(existing);
+
+      const merged = agg.mergeWithExistingData([
+        model('new/small', 10, [task('image_classification')], { downloads: 1 })
+      ]);
+
+      const ids = merged.models.map(m => m.huggingFaceId);
+      expect(ids).toContain('new/small');
+      expect(ids).not.toContain('old/m5'); // largest of the six, dropped
+      expect(merged.models.find(m => m.huggingFaceId === 'old/m1').tasks).toEqual([
+        task('image_classification'),
+        task('object_detection')
+      ]);
+      expect(merged.models.filter(m => m.tasks.some(t => t.subcategory === 'image_classification'))).toHaveLength(5);
+    });
+
+    test('does not bump lastUpdated when nothing changed', () => {
+      const existing = model('a/b', 10, [task('image_classification')]);
+      const agg = aggregatorWith([existing]);
+
+      const merged = agg.mergeWithExistingData([{ ...existing, lastUpdated: '2026-02-02', downloads: 5 }]);
+
+      expect(agg.stats.hasSubstantiveChanges).toBe(false);
+      expect(merged.lastUpdated).toBe('2026-01-01');
     });
 
     test('summarizes added, removed, updated and resized models', () => {
       const agg = new ModelAggregator();
-      const dataset = models => ({ models: { cat: { sub: { lightweight: models } } } });
+      const dataset = models => ({ models });
       const old = dataset([
         { huggingFaceId: 'keep/same', sizeMB: 10, lastUpdated: '2026-01-01' },
         { huggingFaceId: 'keep/resized', sizeMB: 1 },

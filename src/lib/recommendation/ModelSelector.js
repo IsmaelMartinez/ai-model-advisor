@@ -1,13 +1,24 @@
 /**
  * ModelSelector - Simple "smaller is better" model selection logic
  * Prioritizes lightweight models and smaller sizes within each tier
+ *
+ * Reads the flat models.json format: each model lists the tasks it serves.
+ * Tier and environmental score are derived from sizeMB at load time.
  */
 
-import { TIERS } from '../data/constants.js';
+import { TIERS, tierForSize, environmentalScoreForSize } from '../data/constants.js';
 
 export class ModelSelector {
+  /**
+   * @param {{models: Array}} modelsData - Parsed models.json
+   */
   constructor(modelsData) {
-    this.modelsData = modelsData;
+    this.models = modelsData.models.map(model => ({
+      ...model,
+      tier: tierForSize(model.sizeMB),
+      tierPriority: TIERS.indexOf(tierForSize(model.sizeMB)),
+      environmentalScore: environmentalScoreForSize(model.sizeMB)
+    }));
   }
 
   /**
@@ -23,24 +34,15 @@ export class ModelSelector {
   }
 
   /**
-   * Get all models for a specific task, organized by tier
+   * Get all models serving a task, with the task's category and subcategory attached
    * @param {string} category - Main category
-   * @param {string} subcategory - Subcategory  
+   * @param {string} subcategory - Subcategory
    * @returns {Array} Flat array of all models for the task with tier info
    */
   getTaskModels(category, subcategory) {
-    const taskData = this.modelsData.models[category]?.[subcategory];
-    if (!taskData) return [];
-    
-    return TIERS.flatMap((tier, index) => 
-      (taskData[tier] || []).map(model => ({
-        ...model, 
-        tier, 
-        tierPriority: index,
-        category,
-        subcategory
-      }))
-    );
+    return this.models
+      .filter(model => model.tasks.some(t => t.category === category && t.subcategory === subcategory))
+      .map(model => ({ ...model, category, subcategory }));
   }
 
   /**
@@ -51,7 +53,7 @@ export class ModelSelector {
    * @returns {Array} Models ranked by efficiency (best first)
    */
   rankBySize(models) {
-    return models.sort((a, b) =>
+    return [...models].sort((a, b) =>
       a.tierPriority - b.tierPriority || a.sizeMB - b.sizeMB
     );
   }
@@ -74,7 +76,7 @@ export class ModelSelector {
 
     const thresholdDecimal = threshold / 100;
     const filtered = models.filter(model => {
-      const accuracy = model.accuracy ?? 0;
+      const accuracy = model.accuracy?.value ?? 0;
       return accuracy >= thresholdDecimal;
     });
 
@@ -123,30 +125,14 @@ export class ModelSelector {
    * @returns {Object} Models grouped by tier with filter metadata
    */
   getTaskModelsGroupedByTier(category, subcategory, accuracyThreshold = 0, deploymentTarget = null) {
-    const taskData = this.modelsData.models[category]?.[subcategory];
-    if (!taskData) {
-      return {
-        lightweight: { models: [], hidden: 0 },
-        standard: { models: [], hidden: 0 },
-        advanced: { models: [], hidden: 0 },
-        xlarge: { models: [], hidden: 0 },
-        totalHidden: 0,
-        totalShown: 0
-      };
-    }
-
+    const taskModels = this.getTaskModels(category, subcategory);
     const result = {
       totalHidden: 0,
       totalShown: 0
     };
 
     TIERS.forEach(tier => {
-      const tierModels = (taskData[tier] || []).map(model => ({
-        ...model,
-        tier,
-        category,
-        subcategory
-      }));
+      const tierModels = taskModels.filter(model => model.tier === tier);
 
       const accuracyResult = this.filterByAccuracy(tierModels, accuracyThreshold);
       const deployResult = this.filterByDeployment(accuracyResult.filtered, deploymentTarget);
@@ -165,20 +151,15 @@ export class ModelSelector {
 
   /**
    * Get all categories and subcategories that have models
-   * @returns {Object} Map of category → subcategory[] with model counts
+   * @returns {Object} Map of category → { subcategory: model count }
    */
   getAvailableCategories() {
     const result = {};
-    for (const [category, subcats] of Object.entries(this.modelsData.models)) {
-      const subs = {};
-      for (const [subcategory, tiers] of Object.entries(subcats)) {
-        let count = 0;
-        TIERS.forEach(tier => {
-          if (Array.isArray(tiers[tier])) count += tiers[tier].length;
-        });
-        if (count > 0) subs[subcategory] = count;
+    for (const model of this.models) {
+      for (const { category, subcategory } of model.tasks) {
+        result[category] ??= {};
+        result[category][subcategory] = (result[category][subcategory] || 0) + 1;
       }
-      if (Object.keys(subs).length > 0) result[category] = subs;
     }
     return result;
   }

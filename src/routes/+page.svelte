@@ -50,10 +50,7 @@
       fallbackClassifier = new BrowserTaskClassifier();
       availableCategories = modelSelector.getAvailableCategories();
 
-      // Count total models
-      totalModelCount = Object.values(availableCategories)
-        .flatMap(subs => Object.values(subs))
-        .reduce((a, b) => a + b, 0);
+      totalModelCount = modelsData.models.length;
 
       // Initialize embedding classifier (loads in background, not blocking)
       taskClassifier = new EmbeddingTaskClassifier({

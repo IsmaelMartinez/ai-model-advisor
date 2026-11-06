@@ -6,6 +6,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { tierForSize } from '../data/constants.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,6 +22,7 @@ const DTYPE_BYTES = {
 // Fail the run when more than this share of Hugging Face requests fail after retries
 const MAX_FAILURE_RATE = 0.1;
 const MAX_RETRIES = 5;
+const MAX_MODELS_PER_TIER = 5;
 
 export class ModelAggregator {
   constructor(options = {}) {
@@ -101,19 +103,14 @@ export class ModelAggregator {
       console.log(`   Processed ${processedModels.length} models\n`);
       this.assertFailureRateAcceptable();
 
-      // Step 3: Organize into tiers
-      console.log('📊 Organizing models into performance tiers...');
-      const tieredModels = this.organizeIntoTiers(processedModels);
-      this.logTierSummary(tieredModels);
-
-      // Step 4: Validate and merge with existing data
+      // Step 3: Validate and merge with existing data
       console.log('✅ Validating and merging with existing dataset...');
-      const mergedData = this.mergeWithExistingData(tieredModels, config);
+      const mergedData = this.mergeWithExistingData(processedModels);
 
       const changes = this.summarizeChanges(this.currentModels, mergedData);
       this.stats.updated = changes.updated.length;
 
-      // Step 5: Save updated dataset (if not dry run AND has substantive changes)
+      // Step 4: Save updated dataset (if not dry run AND has substantive changes)
       if (!config.dryRun) {
         if (this.stats.hasSubstantiveChanges) {
           console.log('💾 Saving updated model dataset...');
@@ -151,9 +148,23 @@ export class ModelAggregator {
    * Two passes: (1) popular models by downloads, (2) browser-ready models from ONNX orgs
    */
   async fetchHuggingFaceModels(categories) {
-    const allModels = [];
+    // One raw model per Hugging Face id; `tasks` lists every category it was found for
+    const byId = new Map();
+    const add = (model, category) => {
+      const task = { category: category.category, subcategory: category.subcategory };
+      const known = byId.get(model.id);
+      if (!known) {
+        byId.set(model.id, { ...model, tasks: [task] });
+        this.stats.processed++;
+        return true;
+      }
+      if (!known.tasks.some(t => t.category === task.category && t.subcategory === task.subcategory)) {
+        known.tasks.push(task);
+      }
+      return false;
+    };
 
-    // Pass 1: Fetch most popular models by downloads (existing behavior)
+    // Pass 1: Fetch most popular models by downloads
     for (const category of categories) {
       try {
         console.log(`   Fetching ${category.task} models...`);
@@ -166,16 +177,7 @@ export class ModelAggregator {
         });
 
         console.log(`   Found ${models.length} ${category.task} models`);
-
-        const categorizedModels = models.map(model => ({
-          ...model,
-          sourceCategory: category.category,
-          sourceSubcategory: category.subcategory,
-          sourceTask: category.task
-        }));
-
-        allModels.push(...categorizedModels);
-        this.stats.processed += models.length;
+        models.forEach(model => add(model, category));
         await this.sleep(500);
 
       } catch (error) {
@@ -187,7 +189,6 @@ export class ModelAggregator {
     // Pass 2: Fetch browser-ready models from known ONNX-publishing organizations
     // These orgs publish pre-converted ONNX models that actually work in browsers
     const browserReadyOrgs = ['Xenova', 'onnx-community'];
-    const seenIds = new Set(allModels.map(m => m.id));
 
     console.log('\n   📦 Fetching browser-ready models (Xenova, onnx-community)...');
 
@@ -203,22 +204,7 @@ export class ModelAggregator {
             full: 'true'
           });
 
-          // Only add models we haven't already seen
-          let added = 0;
-          for (const model of models) {
-            if (!seenIds.has(model.id)) {
-              seenIds.add(model.id);
-              allModels.push({
-                ...model,
-                sourceCategory: category.category,
-                sourceSubcategory: category.subcategory,
-                sourceTask: category.task
-              });
-              added++;
-              this.stats.processed++;
-            }
-          }
-
+          const added = models.filter(model => add(model, category)).length;
           if (added > 0) {
             console.log(`   Found ${added} new ${category.task} models from ${org}`);
           }
@@ -232,7 +218,7 @@ export class ModelAggregator {
       }
     }
 
-    return allModels;
+    return [...byId.values()];
   }
 
   /**
@@ -362,190 +348,113 @@ export class ModelAggregator {
    * Extract and standardize model metadata
    */
   async extractModelMetadata(rawModel, detailedInfo) {
-    // Estimate model size (simplified logic)
     const sizeMB = this.estimateModelSize(rawModel, detailedInfo);
-    
-    // Determine tier based on size
-    const tier = this.determineTier(sizeMB);
-    
-    // Extract accuracy if available (simplified)
-    const accuracy = this.extractAccuracy(rawModel, detailedInfo);
-    
-    // Calculate environmental score based on size
-    const environmentalScore = this.calculateEnvironmentalScore(sizeMB);
-
-    // Extract supported frameworks (must come before deployment options)
     const frameworks = this.extractFrameworks(rawModel, detailedInfo);
-
-    // Determine deployment options based on size AND framework compatibility
     const deploymentOptions = this.determineDeploymentOptions(sizeMB, rawModel, frameworks);
 
-    return {
+    const model = {
       id: this.generateModelId(rawModel),
       name: this.extractModelName(rawModel),
       huggingFaceId: rawModel.id,
       description: this.extractDescription(rawModel, detailedInfo),
       sizeMB: sizeMB,
-      accuracy: accuracy,
-      environmentalScore: environmentalScore,
-      deploymentOptions: deploymentOptions,
+      accuracy: this.extractAccuracy(),
+      deploymentOptions,
       frameworks: frameworks,
-      lastUpdated: rawModel.lastModified || new Date().toISOString().split('T')[0],
-      
-      // Internal metadata for processing
-      category: rawModel.sourceCategory,
-      subcategory: rawModel.sourceSubcategory,
-      tier: tier,
-      downloads: rawModel.downloads || 0,
-      likes: rawModel.likes || 0
-    };
-  }
+      tasks: rawModel.tasks,
+      lastUpdated: (rawModel.lastModified || new Date().toISOString()).split('T')[0],
 
-  /**
-   * Organize processed models into performance tiers
-   */
-  organizeIntoTiers(processedModels) {
-    const tiered = {
-      computer_vision: {
-        image_classification: { lightweight: [], standard: [], advanced: [], xlarge: [] },
-        object_detection: { lightweight: [], standard: [], advanced: [], xlarge: [] }
-      },
-      natural_language_processing: {
-        text_classification: { lightweight: [], standard: [], advanced: [], xlarge: [] },
-        sentiment_analysis: { lightweight: [], standard: [], advanced: [], xlarge: [] },
-        text_generation: { lightweight: [], standard: [], advanced: [], xlarge: [] },
-        code_assistant: { lightweight: [], standard: [], advanced: [], xlarge: [] }
-      },
-      speech_processing: {
-        speech_recognition: { lightweight: [], standard: [], advanced: [], xlarge: [] },
-        text_to_speech: { lightweight: [], standard: [], advanced: [], xlarge: [] }
-      },
-      time_series: {
-        forecasting: { lightweight: [], standard: [], advanced: [], xlarge: [] }
-      }
+      // Used for ranking only, stripped before saving
+      downloads: rawModel.downloads || 0
     };
 
-    for (const model of processedModels) {
-      const { category, subcategory, tier } = model;
-      
-      if (tiered[category] && tiered[category][subcategory] && tiered[category][subcategory][tier]) {
-        // Remove processing metadata before adding to tiers
-        const cleanModel = { ...model };
-        delete cleanModel.category;
-        delete cleanModel.subcategory;
-        delete cleanModel.tier;
-        delete cleanModel.downloads;
-        delete cleanModel.likes;
-        
-        tiered[category][subcategory][tier].push(cleanModel);
-      }
-    }
-
-    // Sort models within each tier by relevance (downloads, accuracy, size)
-    this.sortModelsInTiers(tiered);
-
-    return tiered;
-  }
-
-  /**
-   * Merge new data with existing dataset
-   */
-  mergeWithExistingData(newTieredModels, config) {
-    const merged = {
-      ...this.currentModels,
-      models: { ...this.currentModels.models }
-    };
-
-    // Track whether we made substantive changes
-    let hasSubstantiveChanges = false;
-
-    // Merge each category/subcategory/tier
-    for (const [category, subcategories] of Object.entries(newTieredModels)) {
-      if (!merged.models[category]) {
-        merged.models[category] = {};
-      }
-
-      for (const [subcategory, tiers] of Object.entries(subcategories)) {
-        if (!merged.models[category][subcategory]) {
-          merged.models[category][subcategory] = {};
+    // Browser models get runtime metadata; nothing has been tested in a browser by this script
+    if (deploymentOptions.includes('browser')) {
+      model.runtime = {
+        browser: {
+          framework: frameworks.includes('Transformers.js') ? 'transformers.js' : 'onnx-runtime-web',
+          backend: ['wasm'],
+          tested: false
         }
+      };
+    }
+    return model;
+  }
 
-        for (const [tier, models] of Object.entries(tiers)) {
-          if (models.length > 0) {
-            // Keep best models from existing + new (limit per tier)
-            const existing = merged.models[category][subcategory][tier] || [];
+  /**
+   * Merge freshly fetched models into the existing dataset.
+   * Fresh Hub data replaces the stale copy of a model, curated fields and
+   * existing task assignments are kept, and each task keeps at most
+   * MAX_MODELS_PER_TIER models per tier (curated first, then by relevance).
+   */
+  mergeWithExistingData(freshModels) {
+    const byId = new Map(this.currentModels.models.map(m => [m.huggingFaceId, m]));
 
-            // Preserve curated fields (specialization) on new models
-            const modelsWithCuratedFields = models.map(m => this.preserveCuratedFields(m, existing));
-
-            const combined = [...existing, ...modelsWithCuratedFields];
-
-            // Remove duplicates based on huggingFaceId (preserves curated fields)
-            const deduped = this.deduplicateModels(combined);
-
-            // Sort and limit - prioritize models with curated specialization
-            const sorted = this.sortModelsByRelevance(deduped);
-            const finalModels = sorted.slice(0, 5); // Max 5 per tier
-
-            // Check if this tier has substantive changes
-            if (this.hasModelListChanged(existing, finalModels)) {
-              hasSubstantiveChanges = true;
-            }
-
-            merged.models[category][subcategory][tier] = finalModels;
-
-            // Update statistics
-            const newCount = models.length;
-            const existingCount = existing.length;
-            if (newCount > 0) {
-              this.stats.added += Math.max(0, finalModels.length - existingCount);
-            }
+    for (const fresh of freshModels) {
+      const { downloads, ...model } = fresh;
+      const old = byId.get(model.huggingFaceId);
+      if (old) {
+        this.preserveCuratedFields(model, old);
+        model.tasks = [...old.tasks];
+        for (const task of fresh.tasks) {
+          if (!model.tasks.some(t => t.category === task.category && t.subcategory === task.subcategory)) {
+            model.tasks.push(task);
           }
         }
       }
+      model.downloads = downloads;
+      byId.set(model.huggingFaceId, model);
     }
 
-    // Only update timestamp if there are substantive changes
-    if (hasSubstantiveChanges) {
-      merged.lastUpdated = new Date().toISOString().split('T')[0];
-    } else {
-      // Preserve existing timestamp
-      merged.lastUpdated = this.currentModels.lastUpdated || new Date().toISOString().split('T')[0];
-    }
+    const kept = this.limitModelsPerTask(
+      [...byId.values()],
+      new Set(freshModels.map(m => m.huggingFaceId))
+    );
+    const models = kept.map(({ downloads, ...model }) => model);
 
-    // Store whether we had substantive changes for reporting
-    this.stats.hasSubstantiveChanges = hasSubstantiveChanges;
+    const merged = { ...this.currentModels, models };
+    const changes = this.summarizeChanges(this.currentModels, merged);
+    this.stats.hasSubstantiveChanges =
+      changes.added.length + changes.removed.length + changes.updated.length > 0;
+
+    // Only bump the timestamp when something changed
+    merged.lastUpdated = this.stats.hasSubstantiveChanges
+      ? new Date().toISOString().split('T')[0]
+      : this.currentModels.lastUpdated;
 
     return merged;
   }
 
   /**
-   * Check if two model lists have substantive differences
-   * Compares model content excluding lastUpdated fields
+   * Keep the best MAX_MODELS_PER_TIER models per task and tier, for the
+   * task/tier groups that received a fresh model (other groups are left as
+   * they are). A model loses the tasks it no longer ranks in and is dropped
+   * when none are left.
    */
-  hasModelListChanged(oldModels, newModels) {
-    // Different number of models = change
-    if (oldModels.length !== newModels.length) {
-      return true;
-    }
-
-    // Compare each model (excluding lastUpdated)
-    for (let i = 0; i < oldModels.length; i++) {
-      const oldModel = oldModels[i];
-      const newModel = newModels[i];
-
-      // Compare all fields except lastUpdated
-      const oldWithoutTimestamp = { ...oldModel };
-      const newWithoutTimestamp = { ...newModel };
-      delete oldWithoutTimestamp.lastUpdated;
-      delete newWithoutTimestamp.lastUpdated;
-
-      if (JSON.stringify(oldWithoutTimestamp) !== JSON.stringify(newWithoutTimestamp)) {
-        return true;
+  limitModelsPerTask(models, freshIds) {
+    const groups = new Map();
+    for (const model of models) {
+      for (const task of model.tasks) {
+        const key = `${task.category}/${task.subcategory}/${tierForSize(model.sizeMB)}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push({ model, task });
       }
     }
 
-    return false;
+    const keptTasks = new Map(models.map(model => [model, new Set()]));
+    for (const group of groups.values()) {
+      const touched = group.some(entry => freshIds.has(entry.model.huggingFaceId));
+      const ranked = touched
+        ? this.sortModelsByRelevance(group.map(entry => entry.model)).slice(0, MAX_MODELS_PER_TIER)
+        : group.map(entry => entry.model);
+      for (const model of ranked) {
+        keptTasks.get(model).add(group.find(entry => entry.model === model).task);
+      }
+    }
+
+    return models
+      .filter(model => keptTasks.get(model).size > 0)
+      .map(model => ({ ...model, tasks: model.tasks.filter(task => keptTasks.get(model).has(task)) }));
   }
 
   // === Utility Methods ===
@@ -557,14 +466,19 @@ export class ModelAggregator {
   estimateModelSize(rawModel, detailedInfo) {
     // 1. Weight file sizes from siblings (MOST ACCURATE)
     // Formats are alternative copies of the same weights, so count only one:
-    // safetensors, else .bin, else the largest single .onnx (a repo lists many variants).
+    // safetensors, else pickled checkpoints, else the largest single variant of
+    // the repo's ONNX or GGUF files.
     const files = (detailedInfo?.siblings || []).filter(f => f.size > 0);
-    const sizes = ext => files.filter(f => f.rfilename?.endsWith(ext)).map(f => f.size);
+    const sizes = exts => files
+      .filter(f => exts.some(ext => f.rfilename?.endsWith(ext)))
+      .map(f => f.size);
     const sum = list => list.reduce((total, size) => total + size, 0);
     const totalBytes =
-      sum(sizes('.safetensors')) || sum(sizes('.bin')) || Math.max(0, ...sizes('.onnx'));
+      sum(sizes(['.safetensors'])) ||
+      sum(sizes(['.bin', '.pt', '.pth', '.ckpt'])) ||
+      Math.max(0, ...this.variantSizes(files));
     if (totalBytes > 0) {
-      return Math.round(totalBytes / (1024 * 1024));
+      return this.bytesToMB(totalBytes);
     }
 
     // 2. Safetensors parameter counts per dtype (safetensors.total is a bare count
@@ -576,7 +490,7 @@ export class ModelAggregator {
         if (DTYPE_BYTES[dtype]) bytes += count * DTYPE_BYTES[dtype];
       }
       if (bytes > 0) {
-        return Math.round(bytes / (1024 * 1024));
+        return this.bytesToMB(bytes);
       }
     }
 
@@ -606,27 +520,29 @@ export class ModelAggregator {
   }
 
   /**
-   * Determine performance tier based on size
-   * Tiers: lightweight (≤500MB), standard (≤4GB), advanced (≤20GB), xlarge (>20GB)
+   * Whole megabytes, at least 1 so tiny models never get a size of 0
    */
-  determineTier(sizeMB) {
-    if (sizeMB <= 500) return 'lightweight';
-    if (sizeMB <= 4000) return 'standard';
-    if (sizeMB <= 20000) return 'advanced';
-    return 'xlarge';
+  bytesToMB(bytes) {
+    return Math.max(1, Math.round(bytes / (1024 * 1024)));
   }
 
   /**
-   * Calculate environmental impact score based on model size
-   * Simple heuristic: smaller models = lower environmental impact
-   * 
-   * @param {number} sizeMB - Model size in megabytes
-   * @returns {number} Environmental score (1-3)
+   * Sizes of the ONNX and GGUF variants in a file list. An ONNX variant is its
+   * .onnx file plus the external data files stored next to it
+   * (model_q4.onnx, model_q4.onnx_data, model_q4.onnx_data_1, ...).
    */
-  calculateEnvironmentalScore(sizeMB) {
-    if (sizeMB <= 500) return 1;   // Low impact (lightweight)
-    if (sizeMB <= 4000) return 2;  // Medium impact (standard)
-    return 3;                       // High impact (advanced/xlarge)
+  variantSizes(files) {
+    const variants = new Map();
+    for (const { rfilename = '', size } of files) {
+      const onnxAt = rfilename.indexOf('.onnx');
+      if (onnxAt !== -1) {
+        const variant = rfilename.slice(0, onnxAt);
+        variants.set(variant, (variants.get(variant) || 0) + size);
+      } else if (rfilename.endsWith('.gguf')) {
+        variants.set(rfilename, size);
+      }
+    }
+    return [...variants.values()];
   }
 
   /**
@@ -740,8 +656,8 @@ export class ModelAggregator {
     
     // Generate basic description
     const name = this.extractModelName(rawModel);
-    const task = rawModel.sourceTask.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    return `${name} model for ${task.toLowerCase()}`;
+    const task = (rawModel.pipeline_tag || 'general use').replace(/-/g, ' ');
+    return `${name} model for ${task}`;
   }
 
   /**
@@ -756,7 +672,7 @@ export class ModelAggregator {
    * Validate model data completeness
    */
   validateModelData(model) {
-    const required = ['id', 'name', 'huggingFaceId', 'sizeMB', 'environmentalScore'];
+    const required = ['id', 'name', 'huggingFaceId', 'sizeMB', 'tasks'];
     return required.every(field => model[field] !== undefined && model[field] !== null);
   }
 
@@ -819,33 +735,16 @@ export class ModelAggregator {
   }
 
   /**
-   * Remove duplicate models based on huggingFaceId.
-   * Later entries win, so fresh Hub data (listed after the existing copy)
-   * replaces the stale entry; preserveCuratedFields() has already carried the
-   * curated fields over.
+   * Carry curated fields over from the existing entry onto the fresh one.
+   * Curated fields are assigned by hand: specialization, runtime and browserModelId.
    */
-  deduplicateModels(models) {
-    const byId = new Map();
-    for (const model of models) {
-      byId.set(model.huggingFaceId, model);
-    }
-    return [...byId.values()];
-  }
-
-  /**
-   * Preserve curated fields when merging models
-   * Curated fields: specialization and runtime (manually assigned based on research)
-   */
-  preserveCuratedFields(newModel, existingModels) {
-    const existing = existingModels.find(m => m.huggingFaceId === newModel.huggingFaceId);
-    if (existing) {
-      for (const field of ['specialization', 'runtime']) {
-        if (existing[field] && !newModel[field]) {
-          newModel[field] = existing[field];
-        }
+  preserveCuratedFields(model, existing) {
+    for (const field of ['specialization', 'runtime', 'browserModelId']) {
+      if (existing[field] && !model[field]) {
+        model[field] = existing[field];
       }
     }
-    return newModel;
+    return model;
   }
 
   /**
@@ -853,17 +752,7 @@ export class ModelAggregator {
    * refreshed (any field other than lastUpdated changed) and resized.
    */
   summarizeChanges(oldData, newData) {
-    const index = data => {
-      const byId = new Map();
-      for (const subcategories of Object.values(data?.models || {})) {
-        for (const tiers of Object.values(subcategories)) {
-          for (const models of Object.values(tiers)) {
-            for (const model of models) byId.set(model.huggingFaceId, model);
-          }
-        }
-      }
-      return byId;
-    };
+    const index = data => new Map((data?.models || []).map(m => [m.huggingFaceId, m]));
     const comparable = ({ lastUpdated, ...rest }) => JSON.stringify(rest);
 
     const before = index(oldData);
@@ -914,7 +803,7 @@ export class ModelAggregator {
       if (aCurated !== bCurated) return bCurated - aCurated;
       
       // Then: prioritize accuracy
-      const accuracyDiff = (b.accuracy || 0) - (a.accuracy || 0);
+      const accuracyDiff = (b.accuracy?.value ?? 0) - (a.accuracy?.value ?? 0);
       if (Math.abs(accuracyDiff) > 0.05) return accuracyDiff;
       
       // Then: smaller size is better
@@ -924,19 +813,6 @@ export class ModelAggregator {
       // Finally: more downloads
       return (b.downloads || 0) - (a.downloads || 0);
     });
-  }
-
-  /**
-   * Sort models within tiers
-   */
-  sortModelsInTiers(tiered) {
-    for (const [category, subcategories] of Object.entries(tiered)) {
-      for (const [subcategory, tiers] of Object.entries(subcategories)) {
-        for (const [tier, models] of Object.entries(tiers)) {
-          tiered[category][subcategory][tier] = this.sortModelsByRelevance(models);
-        }
-      }
-    }
   }
 
   /**
@@ -960,99 +836,23 @@ export class ModelAggregator {
       { category: 'natural_language_processing', subcategory: 'code_assistant', task: 'text-generation' },
       { category: 'speech_processing', subcategory: 'speech_recognition', task: 'automatic-speech-recognition' },
       { category: 'speech_processing', subcategory: 'text_to_speech', task: 'text-to-speech' },
-      { category: 'time_series', subcategory: 'forecasting', task: 'time-series-forecasting' }
+      { category: 'time_series', subcategory: 'forecasting', task: 'time-series-forecasting' },
+      { category: 'natural_language_processing', subcategory: 'translation', task: 'translation' },
+      { category: 'natural_language_processing', subcategory: 'summarization', task: 'summarization' },
+      { category: 'natural_language_processing', subcategory: 'named_entity_recognition', task: 'token-classification' },
+      { category: 'computer_vision', subcategory: 'semantic_segmentation', task: 'image-segmentation' }
     ];
   }
 
   /**
-   * Get default models structure
+   * Empty dataset used when models.json cannot be read
    */
   getDefaultModelsStructure() {
     return {
-      version: "1.0",
+      schemaVersion: 2,
       lastUpdated: new Date().toISOString().split('T')[0],
-      tiers: {
-        lightweight: {
-          label: "Lightweight Models",
-          description: "Small, efficient models optimized for edge deployment and mobile devices",
-          priority: 1,
-          maxSizeMB: 500,
-          environmentalScore: 1
-        },
-        standard: {
-          label: "Standard Models", 
-          description: "Production-ready models including quantized LLMs, suitable for most hardware",
-          priority: 2,
-          maxSizeMB: 4000,
-          environmentalScore: 2
-        },
-        advanced: {
-          label: "Advanced Models",
-          description: "Large models including full-precision 7B+ LLMs for maximum capability",
-          priority: 3,
-          maxSizeMB: 20000,
-          environmentalScore: 3
-        },
-        xlarge: {
-          label: "Extra Large Models",
-          description: "Very large models (13B+, 70B+) requiring significant infrastructure",
-          priority: 4,
-          maxSizeMB: null,
-          environmentalScore: 3
-        }
-      },
-      models: {},
-      environmentalImpact: {
-        scoringCriteria: {
-          "1": {
-            label: "Low Impact",
-            description: "Lightweight models (≤500MB), suitable for edge/mobile",
-            sizeThreshold: "≤ 500 MB"
-          },
-          "2": {
-            label: "Medium Impact", 
-            description: "Standard models (≤4GB), suitable for cloud deployment",
-            sizeThreshold: "≤ 4 GB"
-          },
-          "3": {
-            label: "High Impact",
-            description: "Large models (>4GB), require significant compute resources",
-            sizeThreshold: "> 4 GB"
-          }
-        },
-        methodology: "Simple size-based heuristic: larger models require more compute.",
-        caveat: "This is a rough approximation for comparison only, not a scientific measurement."
-      },
-      selectionRules: {
-        defaultTierPriority: ["lightweight", "standard", "advanced"],
-        environmentalWeighting: 0.4,
-        accuracyWeighting: 0.4,
-        deploymentWeighting: 0.2,
-        maxRecommendations: 3
-      }
+      models: []
     };
-  }
-
-  /**
-   * Print tier summary
-   */
-  logTierSummary(tiered) {
-    for (const [category, subcategories] of Object.entries(tiered)) {
-      for (const [subcategory, tiers] of Object.entries(subcategories)) {
-        const counts = {
-          lightweight: tiers.lightweight.length,
-          standard: tiers.standard.length,
-          advanced: tiers.advanced.length,
-          xlarge: tiers.xlarge.length
-        };
-        const total = counts.lightweight + counts.standard + counts.advanced + counts.xlarge;
-        
-        if (total > 0) {
-          console.log(`   ${category}/${subcategory}: L:${counts.lightweight} S:${counts.standard} A:${counts.advanced} XL:${counts.xlarge}`);
-        }
-      }
-    }
-    console.log();
   }
 
   /**

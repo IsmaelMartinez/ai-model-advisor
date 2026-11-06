@@ -21,6 +21,7 @@
     "@sveltejs/adapter-static": "^4.0.1",
     "@sveltejs/kit": "^3.1.1",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "ajv": "^8.20.0",
     "svelte": "^5.57.3",
     "vite": "^8.3.5",
     "vitest": "^5.0.5"

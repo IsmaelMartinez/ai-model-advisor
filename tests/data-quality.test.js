@@ -1,131 +1,83 @@
 import { describe, test, expect } from 'vitest';
-import { TIERS } from '../src/lib/data/constants.js';
+import Ajv from 'ajv';
 import modelsData from '../src/lib/data/models.json';
+import schema from '../src/lib/data/models.schema.json';
+import tasksData from '../src/lib/data/tasks.json';
+import { TIERS, tierForSize, TIER_MAX_SIZE_MB } from '../src/lib/data/constants.js';
+import { ModelSelector } from '../src/lib/recommendation/ModelSelector.js';
 
-const TIER_SIZE_LIMITS = {
-  lightweight: 500,
-  standard: 4000,
-  advanced: 20000,
-  xlarge: Infinity
-};
+const BROWSER_COMPATIBLE_FRAMEWORKS = ['Transformers.js', 'TensorFlow.js', 'ONNX'];
 
-const BROWSER_COMPATIBLE_FRAMEWORKS = [
-  'Transformers.js',
-  'TensorFlow.js',
-  'ONNX',
-  'MediaPipe',
-  'ONNX Runtime Web'
-];
+const allModels = modelsData.models;
 
-const REQUIRED_FIELDS = [
-  'id',
-  'name',
-  'huggingFaceId',
-  'sizeMB',
-  'environmentalScore',
-  'deploymentOptions',
-  'frameworks'
-];
+describe('Data Quality - models.json', () => {
+  test('matches models.schema.json', () => {
+    const validate = new Ajv({ allErrors: true }).compile(schema);
 
-/**
- * Collect all models from the nested structure with their tier and location metadata.
- */
-function getAllModels() {
-  const models = [];
-  const categories = modelsData.models;
+    const valid = validate(modelsData);
 
-  for (const [category, subcategories] of Object.entries(categories)) {
-    for (const [subcategory, tiers] of Object.entries(subcategories)) {
-      for (const [tier, modelList] of Object.entries(tiers)) {
-        for (const model of modelList) {
-          models.push({ ...model, tier, category, subcategory });
-        }
-      }
+    expect(valid, JSON.stringify(validate.errors?.slice(0, 5), null, 2)).toBe(true);
+  });
+
+  test('ids and Hugging Face ids are unique', () => {
+    for (const field of ['id', 'huggingFaceId']) {
+      const values = allModels.map(m => m[field]);
+      const duplicates = values.filter((v, i) => values.indexOf(v) !== i);
+      expect(duplicates, `Duplicate ${field}`).toEqual([]);
     }
-  }
+  });
 
-  return models;
-}
+  test('every task exists in tasks.json', () => {
+    const unknown = allModels.flatMap(m =>
+      m.tasks
+        .filter(t => !tasksData.taskTaxonomy[t.category]?.subcategories?.[t.subcategory])
+        .map(t => `${m.id}: ${t.category}/${t.subcategory}`)
+    );
+    expect(unknown).toEqual([]);
+  });
 
-const allModels = getAllModels();
+  test('every task in tasks.json has at least one model', () => {
+    const available = new ModelSelector(modelsData).getAvailableCategories();
+    const empty = Object.entries(tasksData.taskTaxonomy).flatMap(([category, { subcategories }]) =>
+      Object.keys(subcategories)
+        .filter(subcategory => !available[category]?.[subcategory])
+        .map(subcategory => `${category}/${subcategory}`)
+    );
+    // No suitable Hub models exist for anomaly detection yet (the two former entries were
+    // placeholders that are not on the Hub). Remove it from this list once it is seeded or dropped.
+    expect(empty).toEqual(['time_series/anomaly_detection']);
+  });
 
-describe('Data Quality - Model Validation', () => {
   test('TIERS constant matches expected tiers', () => {
     expect(TIERS).toEqual(['lightweight', 'standard', 'advanced', 'xlarge']);
   });
 
-  describe('Size/Tier consistency', () => {
-    for (const tier of TIERS) {
-      const modelsInTier = allModels.filter((m) => m.tier === tier);
+  describe('Derived tier and environmental score', () => {
+    const selector = new ModelSelector(modelsData);
 
-      if (modelsInTier.length === 0) continue;
-
-      test(`all ${tier} models should be within the ${TIER_SIZE_LIMITS[tier]}MB limit`, () => {
-        const violations = modelsInTier.filter(
-          (m) => m.sizeMB > TIER_SIZE_LIMITS[tier]
-        );
-
-        if (violations.length > 0) {
-          const details = violations
-            .map(
-              (m) =>
-                `${m.id} (${m.sizeMB}MB in ${m.category}/${m.subcategory})`
-            )
-            .join(', ');
-          expect(violations, `Size violations: ${details}`).toHaveLength(0);
-        }
-      });
-    }
-  });
-
-  describe('Browser deployment requires browser-compatible framework', () => {
-    const browserModels = allModels.filter((m) =>
-      m.deploymentOptions.includes('browser')
-    );
-
-    test('all models with browser deployment should have a browser-compatible framework', () => {
-      const violations = browserModels.filter((m) => {
-        return !m.frameworks.some((f) =>
-          BROWSER_COMPATIBLE_FRAMEWORKS.includes(f)
-        );
-      });
-
-      if (violations.length > 0) {
-        const details = violations
-          .map(
-            (m) =>
-              `${m.id} (frameworks: [${m.frameworks.join(', ')}] in ${m.category}/${m.subcategory}/${m.tier})`
-          )
-          .join(', ');
-        expect(
-          violations,
-          `Browser models without browser-compatible framework: ${details}`
-        ).toHaveLength(0);
+    test('tier always agrees with size', () => {
+      for (const model of selector.models) {
+        expect(model.tier, model.id).toBe(tierForSize(model.sizeMB));
+        const limit = TIER_MAX_SIZE_MB[model.tier] ?? Infinity;
+        expect(model.sizeMB, model.id).toBeLessThanOrEqual(limit);
       }
     });
   });
 
-  describe('Required fields', () => {
-    test('every model should have all required fields', () => {
-      const violations = [];
+  describe('Browser deployment', () => {
+    test('requires a browser-compatible framework', () => {
+      const violations = allModels
+        .filter(m => m.deploymentOptions.includes('browser'))
+        .filter(m => !m.frameworks.some(f => BROWSER_COMPATIBLE_FRAMEWORKS.includes(f)))
+        .map(m => `${m.id} (frameworks: ${m.frameworks.join(', ')})`);
+      expect(violations).toEqual([]);
+    });
 
-      for (const model of allModels) {
-        const missing = REQUIRED_FIELDS.filter(
-          (field) => model[field] === undefined || model[field] === null
-        );
-        if (missing.length > 0) {
-          violations.push(
-            `${model.id || 'unknown'} missing: ${missing.join(', ')} (${model.category}/${model.subcategory}/${model.tier})`
-          );
-        }
-      }
-
-      if (violations.length > 0) {
-        expect(
-          violations,
-          `Models with missing fields: ${violations.join('; ')}`
-        ).toHaveLength(0);
-      }
+    test('browser runtime metadata only on browser-tagged models', () => {
+      const violations = allModels
+        .filter(m => m.runtime?.browser && !m.deploymentOptions.includes('browser'))
+        .map(m => m.id);
+      expect(violations).toEqual([]);
     });
   });
 });

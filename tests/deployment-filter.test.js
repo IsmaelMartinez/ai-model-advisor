@@ -1,26 +1,19 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { ModelSelector } from '../src/lib/recommendation/ModelSelector.js';
 
-// Mock model data with deployment options
+const tasks = [{ category: 'computer_vision', subcategory: 'image_classification' }];
+const acc = value => ({ metric: 'top-1', value, source: 'fixture' });
+
+// Mock model data with deployment options. Tiers are derived from sizeMB (<=500, <=4000, <=20000).
 const mockModelsData = {
-  models: {
-    computer_vision: {
-      image_classification: {
-        lightweight: [
-          { id: 'browser-model', name: 'Browser Model', sizeMB: 20, accuracy: 0.77, deploymentOptions: ['browser', 'mobile'] },
-          { id: 'edge-model', name: 'Edge Model', sizeMB: 50, accuracy: 0.85, deploymentOptions: ['edge', 'cloud'] },
-          { id: 'cloud-only', name: 'Cloud Only', sizeMB: 100, accuracy: 0.90, deploymentOptions: ['cloud', 'server'] }
-        ],
-        standard: [
-          { id: 'standard-browser', name: 'Standard Browser', sizeMB: 300, accuracy: 0.88, deploymentOptions: ['browser'] },
-          { id: 'standard-cloud', name: 'Standard Cloud', sizeMB: 500, accuracy: 0.92, deploymentOptions: ['cloud'] }
-        ],
-        advanced: [
-          { id: 'advanced-server', name: 'Advanced Server', sizeMB: 2000, accuracy: 0.95, deploymentOptions: ['server'] }
-        ]
-      }
-    }
-  }
+  models: [
+    { id: 'browser-model', name: 'Browser Model', sizeMB: 20, accuracy: acc(0.77), deploymentOptions: ['browser', 'mobile'], tasks },
+    { id: 'edge-model', name: 'Edge Model', sizeMB: 50, accuracy: acc(0.85), deploymentOptions: ['edge', 'cloud'], tasks },
+    { id: 'cloud-only', name: 'Cloud Only', sizeMB: 100, accuracy: acc(0.90), deploymentOptions: ['cloud', 'server'], tasks },
+    { id: 'standard-browser', name: 'Standard Browser', sizeMB: 1300, accuracy: acc(0.88), deploymentOptions: ['browser'], tasks },
+    { id: 'standard-cloud', name: 'Standard Cloud', sizeMB: 2500, accuracy: acc(0.92), deploymentOptions: ['cloud'], tasks },
+    { id: 'advanced-server', name: 'Advanced Server', sizeMB: 9000, accuracy: acc(0.95), deploymentOptions: ['server'], tasks }
+  ]
 };
 
 describe('ModelSelector - Deployment Filtering', () => {
@@ -137,9 +130,9 @@ describe('ModelSelector - Deployment Filtering', () => {
     });
 
     test('excludes empty categories', () => {
-      const emptySelector = new ModelSelector({ models: { empty_cat: { empty_sub: {} } } });
+      const emptySelector = new ModelSelector({ models: [] });
       const categories = emptySelector.getAvailableCategories();
-      expect(categories.empty_cat).toBeUndefined();
+      expect(categories).toEqual({});
     });
   });
 });
